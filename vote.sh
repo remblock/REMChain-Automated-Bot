@@ -23,7 +23,7 @@ tel_id_f="$create_dir/telegramid.txt"
 #telegram message to send
 tel_message="$0 executed on $HOSTNAME at $(date)"
 #line to add to the crontab
-cron_line="*/15 * * * * /root/vote.sh --cron"
+cron_line="@daily /root/vote.sh --cron"
 
 #Check if line is on cron already, if not add it
 if ! crontab -l | grep -v '^#' | grep vote.sh &>/dev/null
