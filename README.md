@@ -10,7 +10,7 @@ The following steps describe how to create a new bot:
 * If your chosen name is available, BotFather will send you a token
 * Save the token
 
-Once your bot is created, you can set a name profile photo and description for it. Description is a message which shown in middle of the profile page usually describing what the bot can do.
+Once your bot is created, you can set a custom name, profile photo and description for it. The description is basically a message which explains what the bot can do.
 
 **To set the Bot name in BotFather do the following:**
 
