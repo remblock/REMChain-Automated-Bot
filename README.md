@@ -48,5 +48,5 @@ Your chat ID will be shown in this format `"id":7041782343`
 <br>
 <br>
 ```
-sudo wget https://github.com/SooSDExZ/REMChain-Voting-Script/raw/master/vote.sh && sudo chmod u+x vote.sh && sudo ./vote.sh
+sudo wget https://github.com/SooSDExZ/REMChain-Automated-Voting-Script/raw/master/vote.sh && sudo chmod u+x vote.sh && sudo ./vote.sh
 ```
