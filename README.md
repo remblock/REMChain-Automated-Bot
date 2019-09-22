@@ -41,7 +41,8 @@ To get the chat ID, open the following URL in your web-browser:
 Your chat ID will be shown in this format `"id":7041782343`
 
 **Step 3: Download and install the voting script**
-
+<br>
+<br>
 ```
 sudo wget https://github.com/SooSDExZ/REMChain-Voting-Script/raw/master/vote.sh && sudo chmod u+x vote.sh && sudo ./vote.sh
 ```
