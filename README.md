@@ -1,4 +1,4 @@
-# REMChain-Automated-Voting-Script
+# REMChain-Automated-Voting-Bot
 
 **Step 1: Create a bot using BotFather**
 
