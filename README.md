@@ -1,5 +1,6 @@
 # REMChain-Automated-Voting-Bot
-
+<br>
+<br>
 **Step 1: Create a bot using BotFather**
 
 The following steps describe how to create a new bot:
