@@ -30,7 +30,7 @@ Once your bot is created, you can set a name profile photo and description for i
 * Select the bot for which you are writing a Description
 * Change the description and send it to BotFather
 
-There are some other useful methods in BotFather which we won't cover in this tutorial like `/setcommands` and other.
+There are some other useful methods in BotFather which we won't cover in this tutorial like `/setcommands`.
 
 **Step 2: Obtain your Chat Identification Number**
 
