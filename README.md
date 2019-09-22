@@ -44,7 +44,7 @@ Your chat ID will be shown in this format `"id":7041782343`
 
 ***
 
-**Step 3: Download and install the voting script**
+**Step 3: Download and install the voting script in root**
 <br>
 <br>
 ```
