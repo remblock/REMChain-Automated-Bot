@@ -87,7 +87,7 @@ else
   then
     exit 2
   fi
-  read -p "VOTE FOR ANOTHER BLOCK PRODUCER: " -e bpaccountnames
+  read -p "BLOCK PRODUCERS TO VOTE FOR: " -e bpaccountnames
   if [ -z "$bpaccountnames" ]
   then
     echo $owneraccountname > "$bpaccountnames_f"
