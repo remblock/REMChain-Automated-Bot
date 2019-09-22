@@ -1,4 +1,4 @@
-# REMChain-Voting-Script
+# REMChain-Automated-Voting-Script
 
 **Step 1: Create a bot using BotFather**
 
@@ -39,8 +39,8 @@ To get the chat ID, open the following URL in your web-browser:
 
 Your chat ID will be shown in this format `"id":7041782343`
 
-**Step 3: Download and installing the voting script**
+**Step 3: Download and install the voting script**
 
 ```
-sudo wget https://github.com/SooSDExZ/REMChain-Testnet-Scripts/raw/master/vote.sh && sudo chmod u+x vote.sh && sudo ./vote.sh
+sudo wget https://github.com/SooSDExZ/REMChain-Voting-Script/raw/master/vote.sh && sudo chmod u+x vote.sh && sudo ./vote.sh
 ```
