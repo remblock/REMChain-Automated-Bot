@@ -39,9 +39,9 @@ There are some other useful methods in BotFather which we won't cover in this tu
 
 To get your Chat ID, open the following URL in your web-browser: 
 
-[https://api.telegram.org/bot"TOKEN"/getUpdates](https://api.telegram.org/bot"TOKEN"/getUpdates) > replace `"TOKEN"` with your bot token.
+[https://api.telegram.org/bot"TOKEN"/getUpdates](https://api.telegram.org/bot"TOKEN"/getUpdates) > replace **`"TOKEN"`** with your bot token.
 
-Your Chat ID will be shown in this format `"id":7041782343`
+Your Chat ID will be shown in this format **`"id":7041782343`**
 
 ***
 
