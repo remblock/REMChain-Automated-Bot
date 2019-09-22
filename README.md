@@ -14,21 +14,21 @@ Once your bot is created, you can set a name profile photo and description for i
 
 **To set the Bot name in BotFather do the following:**
 
-* Send `/setname` to BotFather
+* Send `/setname` to BotFather.
 * Select the bot which you want to change.
 * Send the new name to BotFather.
 
 **To set a Profile photo for your bot in BotFather do the following:**
 
-* Send `/setuserpic` to BotFather
-* Select the bot for which you are writing a Description
-* Send the photo to BotFather
+* Send `/setuserpic` to BotFather.
+* Select the bot for which you are writing a Description.
+* Send the photo to BotFather.
 
 **To set Description for your bot in BotFather do the following:**
 
-* Send `/setdescription` to BotFather
-* Select the bot for which you are writing a Description
-* Change the description and send it to BotFather
+* Send `/setdescription` to BotFather.
+* Select the bot for which you are writing a Description.
+* Change the description and send it to BotFather.
 
 There are some other useful methods in BotFather which we won't cover in this tutorial like `/setcommands`.
 
