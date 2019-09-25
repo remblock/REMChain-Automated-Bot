@@ -20,10 +20,14 @@ bpaccountnames_f="$create_dir/bpaccountnames.txt"
 tel_token_f="$create_dir/telegramtoken.txt"
 #path to telegram id
 tel_id_f="$create_dir/telegramid.txt"
+#path to automated vote file
+automated_vote_f="$create_dir/automatedvote.txt"
+#path to automated vote file
+automated_reward_f="$create_dir/automatedreward.txt"
 #telegram message to send
-tel_message="$0 executed on $HOSTNAME at $(date)"
+#check at the end of the script to change the messages
 #line to add to the crontab
-cron_line="@daily /root/vote.sh --cron"
+cron_line="1 0 * * * /root/vote.sh --cron"
 
 #Check if line is on cron already, if not add it
 if ! crontab -l | grep -v '^#' | grep vote.sh &>/dev/null
@@ -124,14 +128,78 @@ else
   echo 
 fi
 
+
+if [ -f "$automated_vote_f" ]
+then
+  automated_vote=$(cat "$automated_vote_f")
+else
+  if $cron
+  then
+    exit 2
+  fi
+  read -p "DO YOU WANT AUTOMATED VOTING (y/n): " -e automated_vote
+  automated_vote=$(echo $automated_vote | tr '[:upper:]' '[:lower:]')
+  echo $automated_vote > "$automated_vote_f"
+  echo 
+fi
+
+if [ -f "$automated_reward_f" ]
+then
+  automated_reward=$(cat "$automated_reward_f")
+else
+  if $cron
+  then
+    exit 2
+  fi
+  read -p "DO YOU WANT AUTOMATED REWARDS (y/n): " -e automated_reward
+  automated_reward=$(echo $automated_reward | tr '[:upper:]' '[:lower:]')
+  echo $automated_reward > "$automated_reward_f"
+  echo 
+fi
+
+auto_vote=false
+auto_reward=false
+
 if $cron
 then
   remcli wallet unlock --password $walletpassword &>/dev/null
-  remcli system voteproducer prods $owneraccountname $bpaccountnames -p $owneraccountname@vote &>/dev/null
+  if [[ "$automated_vote" == "y" || "$automated_vote" == "yes" ]] 
+  then
+    auto_vote=true
+    remcli system voteproducer prods $owneraccountname $bpaccountnames -p $owneraccountname@vote &>/dev/null
+  fi
+  if [[ "$automated_reward" == "y" || "$automated_reward" == "yes" ]] 
+  then
+    auto_reward=true
+    remcli system claimrewards $owneraccountname -p $owneraccountname@claim &>/dev/null
+  fi
 else
   remcli wallet unlock --password $walletpassword
-  remcli system voteproducer prods $owneraccountname $bpaccountnames -p $owneraccountname@vote
+  if [[ "$automated_vote" == "y" || "$automated_vote" == "yes" ]] 
+  then
+    auto_vote=true
+    remcli system voteproducer prods $owneraccountname $bpaccountnames -p $owneraccountname@vote
+  fi
+  if [[ "$automated_reward" == "y" || "$automated_reward" == "yes" ]] 
+  then
+    auto_reward=true
+    remcli system claimrewards $owneraccountname -p $owneraccountname@claim
+  fi
 fi
 
+#Telegram messages configuration
+tel_message_1="Your vote was executed for $bpaccountnames on $HOSTNAME at $(date)r"
+tel_message_2="Your claim was executed for $owneraccountname on $HOSTNAME at $(date)"
+tel_message_3="Your vote (for $bpaccountnames) and claim were executed for $owneraccountname on $HOSTNAME at $(date)"
+
 #Send notification to telegram
-curl -s -X POST https://api.telegram.org/bot$tel_token/sendMessage -d chat_id=$tel_id -d text="$tel_message" &>/dev/null
+if $auto_vote && $auto_reward
+then
+  curl -s -X POST https://api.telegram.org/bot$tel_token/sendMessage -d chat_id=$tel_id -d text="$tel_message_3" &>/dev/null
+elif $auto_vote
+then
+  curl -s -X POST https://api.telegram.org/bot$tel_token/sendMessage -d chat_id=$tel_id -d text="$tel_message_1" &>/dev/null
+elif $auto_reward
+then
+  curl -s -X POST https://api.telegram.org/bot$tel_token/sendMessage -d chat_id=$tel_id -d text="$tel_message_2" &>/dev/null
+fi
