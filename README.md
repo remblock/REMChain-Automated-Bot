@@ -1,4 +1,4 @@
-# REMChain-Automated-Voting-Bot
+# REMChain-Automated-Voting-Claim-Bot
 <br>
 
 **Step 1: Create a bot using BotFather**
@@ -45,7 +45,7 @@ Your Chat ID will be shown in this format **`"id":7041782343`**
 
 ***
 
-**Step 3: Download and install the voting script in root**
+**Step 3: Download and install the script in root**
 <br>
 <br>
 ```
