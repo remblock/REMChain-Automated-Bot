@@ -188,9 +188,9 @@ else
 fi
 
 #Telegram messages configuration
-tel_message_1="Your vote was executed for $bpaccountnames on $HOSTNAME at $(date)r"
+tel_message_1="Your vote was cast for $bpaccountnames on $HOSTNAME at $(date)r"
 tel_message_2="Your claim was executed for $owneraccountname on $HOSTNAME at $(date)"
-tel_message_3="Your vote was casted for $bpaccountnames and your rewards were claimed for $owneraccountname on $HOSTNAME at $(date)"
+tel_message_3="Your vote was cast for $bpaccountnames and your rewards were claimed for $owneraccountname on $HOSTNAME at $(date)"
 
 #Send notification to telegram
 if $auto_vote && $auto_reward
