@@ -1,4 +1,4 @@
-# REMChain-Automated-Voting-Claim-Bot
+# REMChain Automated Voting + Automated Claiming
 <br>
 
 **Step 1: Create a bot using BotFather**
