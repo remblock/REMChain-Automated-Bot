@@ -1,6 +1,6 @@
 # REMChain Automated Bot
 
-This script will allow you to choose whether to automate your votes daily, have it claim your BP rewards at the same time, or just have it do both. For this script to work you must  have already setup your "vote" and "claim" account permissions.<br>
+This script will allow you to choose whether to have it automate your votes daily, have it just claim your BP rewards instead, or just have it do both these tasks. For this script to work you must  have already setup your "vote" and "claim" account permissions.<br>
 <br>
 If not please refer to https://github.com/SooSDExZ/REMChain-Testnet-Scripts to setup these account permissions.
 
