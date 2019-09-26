@@ -1,4 +1,4 @@
-# REMChain Automated Bot
+# REMChain Automated Bot + Telegram Notifications
 
 This script will allow you to choose whether to have it automate your votes daily, or have it instead just claim your BP rewards daily. You can also set it up to do both these tasks. For this script to work you must have already setup your "vote" and "claim" account permissions.<br>
 <br>
