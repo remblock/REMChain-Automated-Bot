@@ -2,7 +2,7 @@
 
 This script will allow you to choose whether to have it automate your votes daily, or have it instead just claim your BP rewards daily. You can also set it up to do both these tasks. For this script to work you must have already setup your "vote" and "claim" account permissions.<br>
 <br>
-If not please refer to https://github.com/SooSDExZ/REMChain-Testnet-Scripts to setup these account permissions.
+If haven't refer to https://github.com/SooSDExZ/REMChain-Testnet-Scripts to setup these account permissions.
 
 ***
 
