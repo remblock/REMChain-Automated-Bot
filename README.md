@@ -1,7 +1,8 @@
 # REMChain Automated Bot
 
 **Automated Voting**<br>
-**Automated Claiming**
+**Automated Claiming**<br>
+**Telegram Notifications**
 <br>
 ***
 
