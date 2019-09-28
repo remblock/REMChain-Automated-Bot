@@ -279,12 +279,12 @@ then
   remcli wallet unlock --password $walletpassword &>/dev/null
   if $auto_vote
   then
-    remcli system voteproducer prods $owneraccountname $bpaccountnames -p $owneraccountname@vote &>/dev/null
+    remcli system voteproducer prods $owneraccountname $bpaccountnames -p $owneraccountname@vote -f &>/dev/null
   fi
   if $auto_reward
   then
     previous=$(remcli get currency balance rem.token $owneraccountname | awk '{print $1}')
-    remcli system claimrewards $owneraccountname -p $owneraccountname@claim &>/dev/null
+    remcli system claimrewards $owneraccountname -p $owneraccountname@claim -f &>/dev/null
     after=$(remcli get currency balance rem.token $owneraccountname  | awk '{print $1}')
     total_reward=$(echo "$after - $previous"|bc)
   fi
@@ -292,12 +292,12 @@ else
   remcli wallet unlock --password $walletpassword
   if $auto_vote
   then
-    remcli system voteproducer prods $owneraccountname $bpaccountnames -p $owneraccountname@vote
+    remcli system voteproducer prods $owneraccountname $bpaccountnames -p $owneraccountname@vote -f
   fi
   if $auto_reward
   then
     previous=$(remcli get currency balance rem.token $owneraccountname | awk '{print $1}')
-    remcli system claimrewards $owneraccountname -p $owneraccountname@claim
+    remcli system claimrewards $owneraccountname -p $owneraccountname@claim -f
     after=$(remcli get currency balance rem.token $owneraccountname  | awk '{print $1}')
     total_reward=$(echo "$after - $previous"|bc)
   fi
@@ -439,24 +439,24 @@ then
   if [[ "$automated_vote" == "y" || "$automated_vote" == "yes" ]] 
   then
     auto_vote=true
-    remcli system voteproducer prods $owneraccountname $bpaccountnames -p $owneraccountname@vote &>/dev/null
+    remcli system voteproducer prods $owneraccountname $bpaccountnames -p $owneraccountname@vote -f &>/dev/null
   fi
   if [[ "$automated_reward" == "y" || "$automated_reward" == "yes" ]] 
   then
     auto_reward=true
-    remcli system claimrewards $owneraccountname -p $owneraccountname@claim &>/dev/null
+    remcli system claimrewards $owneraccountname -p $owneraccountname@claim -f &>/dev/null
   fi
 else
   remcli wallet unlock --password $walletpassword
   if [[ "$automated_vote" == "y" || "$automated_vote" == "yes" ]] 
   then
     auto_vote=true
-    remcli system voteproducer prods $owneraccountname $bpaccountnames -p $owneraccountname@vote
+    remcli system voteproducer prods $owneraccountname $bpaccountnames -p $owneraccountname@vote -f
   fi
   if [[ "$automated_reward" == "y" || "$automated_reward" == "yes" ]] 
   then
     auto_reward=true
-    remcli system claimrewards $owneraccountname -p $owneraccountname@claim
+    remcli system claimrewards $owneraccountname -p $owneraccountname@claim -f
   fi
 fi
 
