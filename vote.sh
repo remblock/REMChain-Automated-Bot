@@ -137,7 +137,7 @@ then
     then
       exit 2
     fi
-    read -p "DO YOU WANT VOTE NOTIFICATIONS (y/n): " -e automated_vote_notifications
+    read -p "DO YOU WANT VOTING NOTIFICATIONS (y/n): " -e automated_vote_notifications
     automated_vote_notifications=$(echo $automated_vote_notifications | tr '[:upper:]' '[:lower:]')
     echo $automated_vote_notifications > "$automated_vote_notifications_f"
     echo 
