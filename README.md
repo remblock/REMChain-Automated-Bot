@@ -56,4 +56,4 @@ Your Chat ID will be shown in this format **`"id":7041782343`**
 ```
 sudo wget https://github.com/SooSDExZ/REMChain-Automated-Bot/raw/master/vote.sh && sudo chmod u+x vote.sh && sudo ./vote.sh
 ```
-_NOTE: This will only work if you have either setup your key permissions through my Setup-Your-Key-Management scripts or recently used my latest REMChain-Testnet-Guide scripts._
+**_NOTE: This will only work if you have either setup your key permissions through my Setup-Your-Key-Management scripts or recently used my latest REMChain-Testnet-Guide scripts._**
