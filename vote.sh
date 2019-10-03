@@ -22,29 +22,53 @@ tel_token_f="$create_dir/telegramtoken.txt"
 tel_id_f="$create_dir/telegramid.txt"
 #path to automated vote file
 automated_vote_f="$create_dir/automatedvote.txt"
-#path to automated vote file
+#path to automated reward file
 automated_reward_f="$create_dir/automatedreward.txt"
-#path to automated vote file
+#path to automated vote notification file
 automated_vote_notifications_f="$create_dir/automatedvotenotifications.txt"
-#path to automated vote file
+#path to automated reward notification file
 automated_reward_notifications_f="$create_dir/automatedrewardnotifications.txt"
+#path to automated restaking file
+automated_restaking_f="$create_dir/automatedrestaking.txt"
+#path to automated restaking notification file
+automated_restaking_notifications_f="$create_dir/automatedrestakingnotifications.txt"
+#path to restaking percentage file
+restakingpercentage_f="$create_dir/restakingpercentage.txt"
 #telegram message to send
 #check at the end of the script to change the messages
-#line to add to the crontab
-cron_line="1 0 * * * /root/vote.sh --cron"
+#minutes to wait between executions of the script, 1440 min is 24 hours. recommended 2 mins to avoid possible round up errors
+minutes_to_wait=1442
 
-#Check if line is on cron already, if not add it
-if ! crontab -l | grep -v '^#' | grep vote.sh &>/dev/null
+#Initiate boolean variables
+auto_vote=false
+auto_reward=false
+auto_restaking=false
+auto_vote_noti=false
+auto_reward_noti=false
+auto_restaking_noti=false
+
+#Verify if the required packages are isntalled, if not install them
+if ! dpkg -l | awk '{print $2}' | grep -w at &>/dev/null
 then
-  echo "Crontab line added"
-  (crontab -l; echo "$cron_line" ) | crontab -
+  echo "at package not installed, installing it..."
+  apt-get install at -y
 fi
 
-#check if cron mode must be enabled
-cron=false
-if [[ "$1" == "--cron" ]]
+if ! dpkg -l | awk '{print $2}' | grep -w bc &>/dev/null
 then
-  cron=true
+  echo "bc package not installed, installing it..."
+  apt-get install bc -y
+fi
+
+#check if at mode must be enabled (in order to not print any output)
+at=false
+if [[ "$1" == "--at" ]]
+then
+  at=true
+  #Setup next execution
+at now + $minutes_to_wait minutes << DOC &>/dev/null
+/root/autovote.sh --at
+DOC
 fi
 
 #Create the directory if it does not exist
@@ -53,17 +77,28 @@ then
   mkdir "$create_dir"
 fi
 
-#unused function
-function pause(){
-      read -p "$*"
+#FUNCTION DEFINITIONS
+function get_user_answer_yn(){
+  while :
+  do
+    read -p "$1 (y/n): " answer
+    answer="$(echo $answer | tr '[:upper:]' '[:lower:]')"  
+    case "$answer" in
+      yes|y) return 0 ;;
+      no|n) return 1 ;;
+      *) echo  "  Invalid answer, (yes/y/no/n expected)";continue;;
+    esac
+  done
 }
+
+#MAIN PROGRAM
 
 #get variable values from files or user
 if [ -f "$owner_f" ]
 then
   owneraccountname=$(cat "$owner_f")
 else
-  if $cron
+  if $at
   then
     exit 1
   fi
@@ -77,7 +112,7 @@ if [ -f "$wallet_f" ]
 then
   walletpassword=$(cat "$wallet_f")
 else
-  if $cron
+  if $at
   then
     exit 2
   fi
@@ -88,23 +123,23 @@ fi
 
 if [ -f "$automated_vote_f" ]
 then
-  automated_vote=$(cat "$automated_vote_f")
+  if [ "$(cat $automated_vote_f)" = "true" ]
+  then
+    auto_vote=true
+  fi
 else
-  if $cron
+  if $at
   then
     exit 2
   fi
-  read -p "DO YOU WANT AUTOMATED VOTING (y/n): " -e automated_vote
-  automated_vote=$(echo $automated_vote | tr '[:upper:]' '[:lower:]')
-  echo $automated_vote > "$automated_vote_f"
+  if get_user_answer_yn "DO YOU WANT AUTOMATED VOTING"
+  then
+    auto_vote=true
+    echo "true" > "$automated_vote_f"
+  else
+    echo "false" > "$automated_vote_f"
+  fi
   echo 
-fi
-
-auto_vote=false
-auto_vote_noti=false
-if [[ "$automated_vote" == "y" || "$automated_vote" == "yes" ]] 
-then
-  auto_vote=true
 fi
 
 if $auto_vote
@@ -114,7 +149,7 @@ then
   then
     bpaccountnames=$(cat "$bpaccountnames_f")
   else
-    if $cron
+    if $at
     then
       exit 2
     fi
@@ -131,44 +166,46 @@ then
 
   if [ -f "$automated_vote_notifications_f" ]
   then
-    automated_vote_notifications=$(cat "$automated_vote_notifications_f")
+    if [ "$(cat $automated_vote_notifications_f)" = "true" ]
+    then
+      auto_vote_noti=true
+    fi
   else
-    if $cron
+    if $at
     then
       exit 2
     fi
-    read -p "DO YOU WANT VOTING NOTIFICATIONS (y/n): " -e automated_vote_notifications
-    automated_vote_notifications=$(echo $automated_vote_notifications | tr '[:upper:]' '[:lower:]')
-    echo $automated_vote_notifications > "$automated_vote_notifications_f"
+    if get_user_answer_yn "DO YOU WANT AUTOMATED VOTING NOTIFICATIONS"
+    then
+      auto_vote_noti=true
+      echo "true" > "$automated_vote_notifications_f"
+    else
+      echo "false" > "$automated_vote_notifications_f"
+    fi
     echo 
-  fi
-
-  if [[ "$automated_vote_notifications" == "y" || "$automated_vote_notifications" == "yes" ]] 
-  then
-    auto_vote_noti=true
   fi
 
 fi
 
 if [ -f "$automated_reward_f" ]
 then
-  automated_reward=$(cat "$automated_reward_f")
+  if [ "$(cat $automated_reward_f)" = "true" ]
+  then
+    auto_reward=true
+  fi
 else
-  if $cron
+  if $at
   then
     exit 2
   fi
-  read -p "DO YOU WANT AUTOMATED REWARDS (y/n): " -e automated_reward
-  automated_reward=$(echo $automated_reward | tr '[:upper:]' '[:lower:]')
-  echo $automated_reward > "$automated_reward_f"
+  if get_user_answer_yn "DO YOU WANT AUTOMATED REWARDS"
+  then
+    auto_reward=true
+    echo "true" > "$automated_reward_f"
+  else
+    echo "false" > "$automated_reward_f"
+  fi
   echo 
-fi
-
-auto_reward=false
-auto_reward_noti=false
-if [[ "$automated_reward" == "y" || "$automated_reward" == "yes" ]] 
-then
-  auto_reward=true
 fi
 
 if $auto_reward
@@ -176,33 +213,92 @@ then
 
   if [ -f "$automated_reward_notifications_f" ]
   then
-    automated_reward_notifications=$(cat "$automated_reward_notifications_f")
+    if [ "$(cat $automated_reward_notifications_f)" = "true" ]
+    then
+      auto_reward_noti=true
+    fi
   else
-    if $cron
+    if $at
     then
       exit 2
     fi
-    read -p "DO YOU WANT REWARD NOTIFICATIONS (y/n): " -e automated_reward_notifications
-    automated_reward_notifications=$(echo $automated_reward_notifications | tr '[:upper:]' '[:lower:]')
-    echo $automated_reward_notifications > "$automated_reward_notifications_f"
+    if get_user_answer_yn "DO YOU WANT AUTOMATED REWARDS NOTIFICATIONS"
+    then
+      auto_reward_noti=true
+      echo "true" > "$automated_reward_notifications_f"
+    else
+      echo "false" > "$automated_reward_notifications_f"
+    fi
     echo 
   fi
 
-  if [[ "$automated_reward_notifications" == "y" || "$automated_reward_notifications" == "yes" ]] 
+  if [ -f "$automated_restaking_f" ]
   then
-    auto_reward_noti=true
+    if [ "$(cat $automated_restaking_f)" = "true" ]
+    then
+      auto_restaking=true
+    fi
+  else
+    if $at
+    then
+      exit 2
+    fi
+    if get_user_answer_yn "DO YOU WANT TO ENABLE AUTOMATED RESTAKING"
+    then
+      auto_restaking=true
+      echo "true" > "$automated_restaking_f"
+    else
+      echo "false" > "$automated_restaking_f"
+    fi
+    echo 
+  fi
+
+  if $auto_restaking
+  then
+    if [ -f "$restakingpercentage_f" ]
+    then
+      restakingpercentage=$(cat "$restakingpercentage_f")
+    else
+      if $at
+      then
+        exit 2
+      fi
+      read -p "SET YOUR RESTAKING PERCENTAGE: " -e restakingpercentage
+      echo $restakingpercentage > "$restakingpercentage_f"
+      echo 
+    fi
+
+    if [ -f "$automated_restaking_notifications_f" ]
+    then
+      if [ "$(cat $automated_restaking_notifications_f)" = "true" ]
+      then
+        auto_restaking_noti=true
+      fi
+    else
+      if $at
+      then
+        exit 2
+      fi
+      if get_user_answer_yn "DO YOU WANT AUTOMATED RESTAKING NOTIFICATIONS"
+      then
+        auto_restaking_noti=true
+        echo "true" > "$automated_restaking_notifications_f"
+      else
+        echo "false" > "$automated_restaking_notifications_f"
+      fi
+      echo 
+    fi
   fi
 
 fi
 
-if $auto_vote_noti || $auto_reward_noti
+if $auto_vote_noti || $auto_reward_noti || $auto_restaking_noti
 then
-
   if [ -f "$tel_token_f" ]
   then
     tel_token=$(cat "$tel_token_f")
   else
-    if $cron
+    if $at
     then
       exit 2
     fi
@@ -215,7 +311,7 @@ then
   then
     tel_id=$(cat "$tel_id_f")
   else
-    if $cron
+    if $at
     then
       exit 2
     fi
@@ -226,7 +322,7 @@ then
 
 fi
 
-if $cron
+if $at
 then
   remcli wallet unlock --password $walletpassword &>/dev/null
   if $auto_vote
@@ -239,6 +335,11 @@ then
     remcli system claimrewards $owneraccountname -p $owneraccountname@claim -f &>/dev/null
     after=$(remcli get currency balance rem.token $owneraccountname  | awk '{print $1}')
     total_reward=$(echo "$after - $previous"|bc)
+  fi
+  if $auto_restaking
+  then
+    restake_reward=$(echo "( $total_reward / 100 ) * $restakingpercentage" | bc )
+    remcli system delegatebw $owneraccountname $owneraccountname "$restake_reward REM" -x 120 -p $owneraccountname@stake -f &>/dev/null
   fi
 else
   remcli wallet unlock --password $walletpassword
@@ -253,21 +354,42 @@ else
     after=$(remcli get currency balance rem.token $owneraccountname  | awk '{print $1}')
     total_reward=$(echo "$after - $previous"|bc)
   fi
+  if $auto_restaking
+  then
+    restake_reward=$(echo "( $total_reward / 100 ) * $restakingpercentage" | bc )
+    remcli system delegatebw $owneraccountname $owneraccountname "$restake_reward REM" -x 120 -p $owneraccountname@stake -f
+  fi
 fi
 
-#Telegram messages configuration
-tel_message_1="Your vote was casted for $bpaccountnames on $(date)"
-tel_message_2="$total_reward REM was received for $owneraccountname on $(date)"
-tel_message_3="$total_reward REM was received for $owneraccountname and your vote was casted for $bpaccountnames on $(date)"
 
-#Send notification to telegram
-if $auto_vote_noti && $auto_reward_noti
+if $auto_vote_noti || $auto_reward_noti || $auto_restaking_noti
 then
-  curl -s -X POST https://api.telegram.org/bot$tel_token/sendMessage -d chat_id=$tel_id -d text="$tel_message_3" &>/dev/null
-elif $auto_vote_noti
-then
-  curl -s -X POST https://api.telegram.org/bot$tel_token/sendMessage -d chat_id=$tel_id -d text="$tel_message_1" &>/dev/null
-elif $auto_reward_noti
-then
-  curl -s -X POST https://api.telegram.org/bot$tel_token/sendMessage -d chat_id=$tel_id -d text="$tel_message_2" &>/dev/null
+  #Telegram messages configuration
+  tel_message_1="Your vote was casted for $bpaccountnames on $(date)"
+  tel_message_2="$total_reward REM was received for $owneraccountname on $(date)"
+  tel_message_3="$restake_reward REM was restaked for $owneraccountname on $(date)"
+  tel_message_4="$total_reward REM was received for $owneraccountname and your vote was casted for $bpaccountnames on $(date)"
+  tel_message_5="$total_reward REM was received and $restake_reward REM was restaked for $owneraccountname on $(date)"
+  tel_message_6="$restake_reward REM was restaked for $owneraccountname and your vote was casted for $bpaccountnames on $(date)"
+  tel_message_7="$total_reward REM was received and $restake_reward REM was restaked for $owneraccountname and your vote was casted for $bpaccountnames on $(date)"
+
+  #Transform notification options into binary
+  #first bit is vote, second claim, third restake
+  if $auto_vote_noti; then option_bin="1"; else option_bin="0"; fi
+  if $auto_reward_noti; then option_bin="${option_bin}1"; else option_bin="${option_bin}0"; fi
+  if $auto_restaking_noti; then option_bin="${option_bin}1"; else option_bin="${option_bin}0"; fi
+
+  case "$option_bin" in
+    100) tel_message="$tel_message_1";;
+    010) tel_message="$tel_message_2";;
+    001) tel_message="$tel_message_3";;
+    110) tel_message="$tel_message_4";;
+    011) tel_message="$tel_message_5";;
+    101) tel_message="$tel_message_6";;
+    111) tel_message="$tel_message_7";;
+      *) tel_message="Error in case stament";;
+  esac
+  
+  #Send notification to telegram
+  curl -s -X POST https://api.telegram.org/bot$tel_token/sendMessage -d chat_id=$tel_id -d text="$tel_message" &>/dev/null
 fi
