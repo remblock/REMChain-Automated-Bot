@@ -2,7 +2,7 @@
 
 This bot is fully customisable, allowing the user to choose whether to have their votes, claims and even a percentage of their claimed rewards restaked automatically daily. Please note in order for this to work you need to have your "vote", "claim" and "delegatebw" account permissions setup.<br>
 <br>
-If you haven't please refer to [**https://github.com/SooSDExZ/REMChain-Testnet-Scripts**](https://github.com/SooSDExZ/REMChain-Testnet-Scripts) to setup these permissions.
+If you haven't refer to [**https://github.com/SooSDExZ/REMChain-Testnet-Scripts**](https://github.com/SooSDExZ/REMChain-Testnet-Scripts) to setup these permissions.
 
 ***
 
