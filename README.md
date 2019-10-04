@@ -2,7 +2,7 @@
 
 This bot is fully customisable, allowing the user to choose whether to have their votes, claims and even a percentage of their rewards restaked automatically daily. Please note in order for this bot to work you need to have your "vote", "claim" and "Delegatebw" account permissions setup.<br>
 <br>
-If haven't refer to [https://github.com/SooSDExZ/REMChain-Testnet-Scripts](https://github.com/SooSDExZ/REMChain-Testnet-Scripts) to setup these account permissions.
+If haven't refer to [**https://github.com/SooSDExZ/REMChain-Testnet-Scripts**](https://github.com/SooSDExZ/REMChain-Testnet-Scripts) to setup these account permissions.
 
 ***
 
@@ -44,7 +44,7 @@ There are some other useful methods in BotFather which we won't cover in this tu
 
 Theres two ways to retrieve your Chat ID, the first is by opening the following URL in your web-browser: 
 
-[https://api.telegram.org/bot"TOKEN"/getUpdates](https://api.telegram.org/bot"TOKEN"/getUpdates) then replace the **`"TOKEN"`** with your actual bot token.
+[**https://api.telegram.org/bot"TOKEN"/getUpdates**](https://api.telegram.org/bot"TOKEN"/getUpdates) then replace the **`"TOKEN"`** with your actual bot token.
 
 Your Chat ID will be shown in this format **`"id":7041782343`**
 
