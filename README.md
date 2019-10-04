@@ -46,7 +46,7 @@ Theres two ways to retrieve your Chat ID, the first is by opening the following 
 
 [**https://api.telegram.org/botTOKEN/getUpdates**](https://api.telegram.org/botTOKEN/getUpdates) then replace the **`TOKEN`** with your actual bot token.
 
-Your Chat ID will be shown in this format **`"id":7041782343`**, based on this example your Chat ID would of been **`7041782343`**. Now the second way this can be done is through a third party telegram bot called [**@get_id_bot**](https://telegram.me/get_id_bot)
+Your Chat ID will be shown in this format **`"id":7041782343`**, based on this example your Chat ID would of been **`7041782343`**. The second way this can be done is through a third party telegram bot called [**@get_id_bot**](https://telegram.me/get_id_bot).
 
 ***
 
