@@ -2,7 +2,7 @@
 
 This script will allow you to choose whether to have your votes automated daily, or just have it claim your daily BP<br>rewards instead. You can even set it up so that both these tasks automated at the same time. Please note for this script to work you must have already setup your "vote" and "claim" account permissions.<br>
 <br>
-If haven't refer to https://github.com/SooSDExZ/REMChain-Testnet-Scripts to setup these account permissions.
+If haven't refer to [https://github.com/SooSDExZ/REMChain-Testnet-Scripts](https://github.com/SooSDExZ/REMChain-Testnet-Scripts) to setup these account permissions.
 
 ***
 
@@ -10,7 +10,7 @@ If haven't refer to https://github.com/SooSDExZ/REMChain-Testnet-Scripts to setu
 
 The following steps describe how to create a new bot:
 
-* Contact **`@BotFather`** in your Telegram messenger.
+* Contact [**@BotFather**](https://telegram.me/BotFather) in your Telegram messenger.
 * To get a token, send BotFather a message that says **`/newbot`**.
 * When asked for a name for your new bot choose something that ends with the word bot, so for example my_test_bot.
 * If your chosen name is available, BotFather will then send you a token.
@@ -42,11 +42,13 @@ There are some other useful methods in BotFather which we won't cover in this tu
 
 **Step 2: Obtain your Chat Identification Number**
 
-To get your Chat ID, open the following URL in your web-browser: 
+Theres two ways to get your Chat ID, the first is by opening the following URL in your web-browser: 
 
-[https://api.telegram.org/bot"TOKEN"/getUpdates](https://api.telegram.org/bot"TOKEN"/getUpdates) > replace **`"TOKEN"`** with your bot token.
+[https://api.telegram.org/bot"TOKEN"/getUpdates](https://api.telegram.org/bot"TOKEN"/getUpdates) replace **`"TOKEN"`** with your bot token.
 
 Your Chat ID will be shown in this format **`"id":7041782343`**
+
+The second way is through a third party telegram bot called [**@get_id_bot**](https://telegram.me/get_id_bot)
 
 ***
 
