@@ -54,7 +54,6 @@ The second way is through a third party telegram bot called [**@get_id_bot**](ht
 
 **Step 3: Download and install the script in root**
 <br>
-<br>
 ```
 sudo wget https://github.com/SooSDExZ/REMChain-Automated-Bot/raw/master/autobot.sh && sudo chmod u+x autobot.sh && sudo ./autobot.sh
 ```
