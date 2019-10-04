@@ -1,6 +1,6 @@
 # Automated Bot + Telegram Notifications
 
-This script will allow you to choose whether to have your votes automated daily, or just have it claim your daily BP<br>rewards instead. You can even set it up so that both these tasks automated at the same time. Please note for this script to work you must have already setup your "vote" and "claim" account permissions.<br>
+This bot is fully customisable, allowing the user to choose whether to have their votes, claims and even a percentage of their daily rewards restaked automatically. Please note for this bot to work you must already have setup your "vote" and "claim" account permissions.<br>
 <br>
 If haven't refer to [https://github.com/SooSDExZ/REMChain-Testnet-Scripts](https://github.com/SooSDExZ/REMChain-Testnet-Scripts) to setup these account permissions.
 
@@ -42,9 +42,9 @@ There are some other useful methods in BotFather which we won't cover in this tu
 
 **Step 2: Obtain your Chat Identification Number**
 
-Theres two ways to get your Chat ID, the first is by opening the following URL in your web-browser: 
+Theres two ways to retrieve your Chat ID, the first is by opening the following URL in your web-browser: 
 
-[https://api.telegram.org/bot"TOKEN"/getUpdates](https://api.telegram.org/bot"TOKEN"/getUpdates) replace **`"TOKEN"`** with your bot token.
+[https://api.telegram.org/bot"TOKEN"/getUpdates](https://api.telegram.org/bot"TOKEN"/getUpdates) then replace the **`"TOKEN"`** with your actual bot token.
 
 Your Chat ID will be shown in this format **`"id":7041782343`**
 
