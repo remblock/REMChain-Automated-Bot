@@ -67,7 +67,7 @@ then
   at=true
   #Setup next execution
 at now + $minutes_to_wait minutes << DOC &>/dev/null
-/root/autovote.sh --at
+/root/autobot.sh --at
 DOC
 fi
 
