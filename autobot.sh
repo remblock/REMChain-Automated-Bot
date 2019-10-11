@@ -157,7 +157,7 @@ get_info_response="$(remcli get info)"
 
 # if response is empty or that of failed connection
 if [[ -z "${get_info_response// }" ]] || [[ "Failed" =~ ^$get_info_response ]]; then
-    alerts+=( "Failed to receive a response from (remcli get info)" )
+    alerts+=( "Failed to receive a response from remcli get info." )
 else
     head_block_num="$(jq '.head_block_num | tonumber' <<< ${get_info_response})"
     li_block_num="$(jq '.last_irreversible_block_num | tonumber' <<< ${get_info_response})"
@@ -171,7 +171,7 @@ else
 
     # if last irreversible block has not advanced
     if [ $LAST_IRREVERSIBLE_BLOCK_NUM -eq $li_block_num ]; then
-        alerts+=( "Last irreversible block is stuck on ${li_block_num}" )
+        alerts+=( "Last irreversible block is stuck on ${li_block_num}." )
     fi
 
     # update last irreversible block number
