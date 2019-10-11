@@ -157,7 +157,7 @@ get_info_response="$(remcli get info)"
 
 # if response is empty or that of failed connection
 if [[ -z "${get_info_response// }" ]] || [[ "Failed" =~ ^$get_info_response ]]; then
-    alerts+=( "Failed to receive a response from remcli get info." )
+    alerts+=( "No response from remcli get info." )
 else
     head_block_num="$(jq '.head_block_num | tonumber' <<< ${get_info_response})"
     li_block_num="$(jq '.last_irreversible_block_num | tonumber' <<< ${get_info_response})"
@@ -187,7 +187,7 @@ net_peers_response="$(remcli net peers)"
 
 # if response is empty or that of failed connection
 if [[ -z "${net_peers_response// }" ]] || [[ "Failed" =~ ^$net_peers_response ]]; then
-    alerts+=( "Failed to receive a response from remcli net peers." )
+    alerts+=( "No response from remcli net peers." )
 else
     last_handshake=$(jq '.[0].last_handshake.time | tonumber' <<< ${net_peers_response})
 
@@ -215,7 +215,8 @@ if [ ${#alerts[@]} -gt 0 ]; then
 ---------------------------------------"
         for i in "${alerts[@]}"
         do
-            alert="${alert} ${i}"
+            alert="${alert} 
+${i}"
         done
 
         alert="${alert} 
@@ -241,7 +242,8 @@ if [ $(date +%H:%M) == $DAILY_STATUS_AT ]; then
 
     for i in "${messages[@]}"
     do
-        summary="${summary} ${i}"
+        summary="${summary}
+${i}"
     done
 
     summary="${summary} 
