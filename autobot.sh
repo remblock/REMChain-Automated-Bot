@@ -50,7 +50,7 @@ then
   at=true
   #Setup next execution
 at now + $minutes_to_wait minutes << DOC &>/dev/null
-/root/autovote.sh --at
+/root/remblock/autobot/autobot.sh --at
 DOC
 fi
 
@@ -63,7 +63,7 @@ fi
 #Create the config file if it does not exists
 if [ ! -f "$config_file" ]
 then
-  echo "#Configuration file for the autovote.sh script" > "$config_file"
+  echo "#Configuration file for the autobot.sh script" > "$config_file"
   echo "#Make the entries as variable=value" >> "$config_file"
   echo  >> "$config_file"
 fi
@@ -100,7 +100,7 @@ cat << 'DOC' > $bp_monitor_script_path
 # SETUP
 #---------------------------------
 # load variables from config
-source "/root/rem-utils/autovote/bp-monitor-config.conf"
+source "/root/remblock/autobot/bp-monitor-config.conf"
 
 # config file where the telegram details are loaded from
 tel_config_file="/root/remblock/autobot/config"
@@ -270,8 +270,6 @@ DAILY_STATUS_AT="11:30"
 
 LAST_ALERT="2006-09-04"
 LAST_STATUS="2006-09-04"
-LAST_CLAIM="2006-09-04"
-LAST_VOTE="2006-09-04"
 LAST_IRREVERSIBLE_BLOCK_NUM=0
 DOC
 }
