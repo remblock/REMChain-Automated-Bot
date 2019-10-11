@@ -141,7 +141,7 @@ log_byte_size=$(stat -c%s $NODE_LOG_FILE)
 # if log has not been modified
 # within the last 5 minutes
 if [ $modified_diff -ge 300 ]; then
-    alerts+=( "Node log was last modified $(( modified_diff / 60 )) minutes ago" )
+    alerts+=( "Node log was last modified $(( modified_diff / 60 )) minutes ago." )
 fi
 
 # if log is larger than specified threshold
@@ -167,7 +167,7 @@ else
     # if the gap between head block and last irreversible
     # is more than 3 minutes, send an alert
     if (( block_diff / 2 / 60 > 3 )); then
-        alerts+=( "Current block is ${block_diff} ahead of last irreversible" )
+        alerts+=( "Current block is ${block_diff} ahead of last irreversible." )
     fi
 
     # if last irreversible block has not advanced
@@ -188,7 +188,7 @@ net_peers_response="$(remcli net peers)"
 
 # if response is empty or that of failed connection
 if [[ -z "${net_peers_response// }" ]] || [[ "Failed" =~ ^$net_peers_response ]]; then
-    alerts+=( "Failed to receive a response from (remcli net peers)" )
+    alerts+=( "Failed to receive a response from remcli net peers." )
 else
     last_handshake=$(jq '.[0].last_handshake.time | tonumber' <<< ${net_peers_response})
 
