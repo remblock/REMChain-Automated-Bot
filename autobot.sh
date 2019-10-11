@@ -95,7 +95,6 @@ function get_config_value(){
 
 function create_bp_monitor_files(){
 cat << 'DOC' > $bp_monitor_script_path
-
 #!/bin/bash
 
 #---------------------------------
