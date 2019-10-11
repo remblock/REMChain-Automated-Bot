@@ -216,7 +216,7 @@ if [ ${#alerts[@]} -gt 0 ]; then
 
         for i in "${alerts[@]}"
         do
-            alert="${alert}\n- ${i}"
+            alert="${alert} ${i}"
         done
 
         alert="${alert} ---------------------------------------"
@@ -240,7 +240,7 @@ if [ $(date +%H:%M) == $DAILY_STATUS_AT ]; then
 
     for i in "${messages[@]}"
     do
-        summary="${summary}\n- ${i}"
+        summary="${summary} ${i}"
     done
 
     summary="${summary} ---------------------------------------"
