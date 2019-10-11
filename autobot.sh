@@ -95,10 +95,13 @@ function get_config_value(){
 
 function create_bp_monitor_files(){
 cat << 'DOC' > $bp_monitor_script_path
+
 #!/bin/bash
+
 #---------------------------------
 # SETUP
 #---------------------------------
+
 # load variables from config
 source "/root/remblock/autobot/bp-monitor-config.conf"
 
@@ -121,6 +124,7 @@ tel_id="$(grep -v '^#' "$tel_config_file" | grep '^tel_id=' | awk -F '=' '{print
 #---------------------------------
 # SCHEDULE THIS SCRIPT AS CRON
 #---------------------------------
+
 if ! crontab -l | grep -q "$SCRIPT_FILE"
 then
   (crontab -l ; echo "* * * * * ${SCRIPT_DIR}/${SCRIPT_FILE} >> ${SCRIPT_DIR}/${SCRIPT_LOG_FILE} 2>&1") | crontab -
@@ -129,6 +133,7 @@ fi
 #---------------------------------
 # LOG FILE STATE TEST & MAINTENANCE
 #---------------------------------
+
 log_last_modified_s=$(date -r $NODE_LOG_FILE +%s)
 modified_diff=$(( $now_s - $log_last_modified_s ))
 log_byte_size=$(stat -c%s $NODE_LOG_FILE)
@@ -147,6 +152,7 @@ fi
 #---------------------------------
 # TEST CHAIN STATE
 #---------------------------------
+
 # test "remcli get info" response
 get_info_response="$(remcli get info)"
 
@@ -176,6 +182,7 @@ fi
 #---------------------------------
 # TEST NET PEER STATE
 #---------------------------------
+
 # test "remcli net peers" last handshake time
 net_peers_response="$(remcli net peers)"
 
@@ -194,6 +201,7 @@ fi
 #---------------------------------
 # SEND ALERTS IF PROBLEMS WERE FOUND
 #---------------------------------
+
 # if there are alerts
 if [ ${#alerts[@]} -gt 0 ]; then
 
@@ -204,14 +212,14 @@ if [ ${#alerts[@]} -gt 0 ]; then
     # time difference is in seconds, alert threshold is in minutes
     if [ $diff_s -ge $(( $ALERT_THRESHOLD * 60 )) ]; then
 
-        alert="\`\`\`Alert (${ALERT_THRESHOLD} minute frequency)\n---------------------------------------"
+        alert="Alert (${ALERT_THRESHOLD} minute frequency) ---------------------------------------"
 
         for i in "${alerts[@]}"
         do
             alert="${alert}\n- ${i}"
         done
 
-        alert="${alert}\n---------------------------------------\`\`\`"
+        alert="${alert} ---------------------------------------"
 
         #send alert to telegram
         curl -s -X POST https://api.telegram.org/bot$tel_token/sendMessage -d chat_id=$tel_id -d text="$alert" &>/dev/null
@@ -225,16 +233,17 @@ fi
 #---------------------------------
 # SEND DAILY SUMMARY
 #---------------------------------
+
 if [ $(date +%H:%M) == $DAILY_STATUS_AT ]; then
-    summary="\`\`\`Daily Summary\n---------------------------------------"
-    summary="${summary}\nCron job is still running, scheduled to check in at ${DAILY_STATUS_AT} UTC every day."
+    summary="Daily Summary ---------------------------------------"
+    summary="${summary} Cron job is still running, scheduled to check in at ${DAILY_STATUS_AT} UTC every day."
 
     for i in "${messages[@]}"
     do
         summary="${summary}\n- ${i}"
     done
 
-    summary="${summary}\n---------------------------------------\`\`\`"
+    summary="${summary} ---------------------------------------"
 
     # send summary to telegram
     curl -s -X POST https://api.telegram.org/bot$tel_token/sendMessage -d chat_id=$tel_id -d text="$summary" &>/dev/null
