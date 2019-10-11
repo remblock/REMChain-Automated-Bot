@@ -211,14 +211,15 @@ if [ ${#alerts[@]} -gt 0 ]; then
     # time difference is in seconds, alert threshold is in minutes
     if [ $diff_s -ge $(( $ALERT_THRESHOLD * 60 )) ]; then
 
-        alert="Alert (${ALERT_THRESHOLD} minute frequency) ---------------------------------------"
-
+        alert="Alert (${ALERT_THRESHOLD} minute frequency) 
+---------------------------------------"
         for i in "${alerts[@]}"
         do
             alert="${alert} ${i}"
         done
 
-        alert="${alert} ---------------------------------------"
+        alert="${alert} 
+---------------------------------------"
 
         #send alert to telegram
         curl -s -X POST https://api.telegram.org/bot$tel_token/sendMessage -d chat_id=$tel_id -d text="$alert" &>/dev/null
@@ -234,7 +235,8 @@ fi
 #---------------------------------
 
 if [ $(date +%H:%M) == $DAILY_STATUS_AT ]; then
-    summary="Daily Summary ---------------------------------------"
+    summary="Daily Summary 
+---------------------------------------" 
     summary="${summary} Cron job is still running, scheduled to check in at ${DAILY_STATUS_AT} UTC every day."
 
     for i in "${messages[@]}"
@@ -242,7 +244,8 @@ if [ $(date +%H:%M) == $DAILY_STATUS_AT ]; then
         summary="${summary} ${i}"
     done
 
-    summary="${summary} ---------------------------------------"
+    summary="${summary} 
+---------------------------------------"
 
     # send summary to telegram
     curl -s -X POST https://api.telegram.org/bot$tel_token/sendMessage -d chat_id=$tel_id -d text="$summary" &>/dev/null
