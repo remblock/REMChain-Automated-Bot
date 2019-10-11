@@ -4,40 +4,22 @@
 if (($EUID!=0))
 then
   echo "You must be root to run this script" 2>&1
-  exit 3
+  exit 1
 fi
 
 #CONFIGURATION VARIABLES
 #directory to create
-create_dir="/root/info"
-#path to owner file
-owner_f="$create_dir/owneraccountname.txt"
-#path to wallet file
-wallet_f="$create_dir/walletpassword.txt"
-#path to block producers to voy
-bpaccountnames_f="$create_dir/bpaccountnames.txt"
-#path to telegram token
-tel_token_f="$create_dir/telegramtoken.txt"
-#path to telegram id
-tel_id_f="$create_dir/telegramid.txt"
-#path to automated vote file
-automated_vote_f="$create_dir/automatedvote.txt"
-#path to automated reward file
-automated_reward_f="$create_dir/automatedreward.txt"
-#path to automated vote notification file
-automated_vote_notifications_f="$create_dir/automatedvotenotifications.txt"
-#path to automated reward notification file
-automated_reward_notifications_f="$create_dir/automatedrewardnotifications.txt"
-#path to automated restaking file
-automated_restaking_f="$create_dir/automatedrestaking.txt"
-#path to automated restaking notification file
-automated_restaking_notifications_f="$create_dir/automatedrestakingnotifications.txt"
-#path to restaking percentage file
-restakingpercentage_f="$create_dir/restakingpercentage.txt"
+create_dir="/root/remblock/autobot"
+#config file
+config_file="/root/remblock/autobot/config"
+bp_monitor_script_path="/root/remblock/autobot/bpmonitor.sh"
+bp_monitor_config_path="/root/remblock/autobot/bp-monitor-config.conf"
 #telegram message to send
 #check at the end of the script to change the messages
 #minutes to wait between executions of the script, 1440 min is 24 hours. recommended 2 mins to avoid possible round up errors
 minutes_to_wait=1442
+#BP monitoring cron line
+bp_mon_cron_line="* * * * * /root/remblock/autobot/bpmonitor.sh"
 
 #Initiate boolean variables
 auto_vote=false
@@ -46,6 +28,7 @@ auto_restaking=false
 auto_vote_noti=false
 auto_reward_noti=false
 auto_restaking_noti=false
+bp_monitoring=false
 
 #Verify if the required packages are isntalled, if not install them
 if ! dpkg -l | awk '{print $2}' | grep -w at &>/dev/null
@@ -67,14 +50,22 @@ then
   at=true
   #Setup next execution
 at now + $minutes_to_wait minutes << DOC &>/dev/null
-/root/autobot.sh --at
+/root/autovote.sh --at
 DOC
 fi
 
 #Create the directory if it does not exist
 if [ ! -d "$create_dir" ]
 then
-  mkdir "$create_dir"
+  mkdir -p "$create_dir"
+fi
+
+#Create the config file if it does not exists
+if [ ! -f "$config_file" ]
+then
+  echo "#Configuration file for the autovote.sh script" > "$config_file"
+  echo "#Make the entries as variable=value" >> "$config_file"
+  echo  >> "$config_file"
 fi
 
 #FUNCTION DEFINITIONS
@@ -91,39 +82,233 @@ function get_user_answer_yn(){
   done
 }
 
+function get_config_value(){
+  #global value is used as an global variable to return the result
+  global_value=$(grep -v '^#' "$config_file" | grep "^$1=" | awk -F '=' '{print $2}')
+  if [ -z "$global_value" ]
+  then
+    return 1
+  else
+    return 0
+  fi
+}
+
+function create_bp_monitor_files(){
+cat << 'DOC' > $bp_monitor_script_path
+#!/bin/bash
+#---------------------------------
+# SETUP
+#---------------------------------
+# load variables from config
+source "/root/rem-utils/autovote/bp-monitor-config.conf"
+
+# config file where the telegram details are loaded from
+tel_config_file="/root/remblock/autobot/config"
+
+alerts=()
+messages=()
+now=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
+now_s=$(date -d $now +%s)
+now_n=$(date -d $now +%s%N)
+
+#---------------------------------
+# GET TELEGRAM CONFIGURATION
+#---------------------------------
+
+tel_token="$(grep -v '^#' "$tel_config_file" | grep '^tel_token=' | awk -F '=' '{print $2}')"
+tel_id="$(grep -v '^#' "$tel_config_file" | grep '^tel_id=' | awk -F '=' '{print $2}')"
+
+#---------------------------------
+# SCHEDULE THIS SCRIPT AS CRON
+#---------------------------------
+if ! crontab -l | grep -q "$SCRIPT_FILE"
+then
+  (crontab -l ; echo "* * * * * ${SCRIPT_DIR}/${SCRIPT_FILE} >> ${SCRIPT_DIR}/${SCRIPT_LOG_FILE} 2>&1") | crontab -
+fi
+
+#---------------------------------
+# LOG FILE STATE TEST & MAINTENANCE
+#---------------------------------
+log_last_modified_s=$(date -r $NODE_LOG_FILE +%s)
+modified_diff=$(( $now_s - $log_last_modified_s ))
+log_byte_size=$(stat -c%s $NODE_LOG_FILE)
+
+# if log has not been modified
+# within the last 5 minutes
+if [ $modified_diff -ge 300 ]; then
+    alerts+=( "Node log was last modified $(( modified_diff / 60 )) minutes ago" )
+fi
+
+# if log is larger than specified threshold
+if [ $(( $log_byte_size / 1000000)) -gt $MAX_LOG_SIZE ]; then
+    sudo truncate -s 0 $NODE_LOG_FILE
+fi
+
+#---------------------------------
+# TEST CHAIN STATE
+#---------------------------------
+# test "remcli get info" response
+get_info_response="$(remcli get info)"
+
+# if response is empty or that of failed connection
+if [[ -z "${get_info_response// }" ]] || [[ "Failed" =~ ^$get_info_response ]]; then
+    alerts+=( "Failed to receive a response from (remcli get info)" )
+else
+    head_block_num="$(jq '.head_block_num | tonumber' <<< ${get_info_response})"
+    li_block_num="$(jq '.last_irreversible_block_num | tonumber' <<< ${get_info_response})"
+    block_diff=$(( head_block_num - li_block_num ))
+
+    # if the gap between head block and last irreversible
+    # is more than 3 minutes, send an alert
+    if (( block_diff / 2 / 60 > 3 )); then
+        alerts+=( "Current block is ${block_diff} ahead of last irreversible" )
+    fi
+
+    # if last irreversible block has not advanced
+    if [ $LAST_IRREVERSIBLE_BLOCK_NUM -eq $li_block_num ]; then
+        alerts+=( "Last irreversible block is stuck on ${li_block_num}" )
+    fi
+
+    # update last irreversible block number
+    sed -i "s/last_irreversible_block_num=.*/last_irreversible_block_num=$li_block_num/" $SCRIPT_DIR/$CONFIG_FILE
+fi
+
+#---------------------------------
+# TEST NET PEER STATE
+#---------------------------------
+# test "remcli net peers" last handshake time
+net_peers_response="$(remcli net peers)"
+
+# if response is empty or that of failed connection
+if [[ -z "${net_peers_response// }" ]] || [[ "Failed" =~ ^$net_peers_response ]]; then
+    alerts+=( "Failed to receive a response from (remcli net peers)" )
+else
+    last_handshake=$(jq '.[0].last_handshake.time | tonumber' <<< ${net_peers_response})
+
+    # if peer time is older than 3 minutes, in nanoseconds
+    if [ $last_handshake -eq 0 ] ; then
+        alerts+=( "Peer handshake never took place" )
+    fi
+fi
+
+#---------------------------------
+# SEND ALERTS IF PROBLEMS WERE FOUND
+#---------------------------------
+# if there are alerts
+if [ ${#alerts[@]} -gt 0 ]; then
+
+    # if we haven't sent a message recently
+    last_alert_s=$(date -d $LAST_ALERT +%s)
+    diff_s=$(( $now_s - $last_alert_s ))
+
+    # time difference is in seconds, alert threshold is in minutes
+    if [ $diff_s -ge $(( $ALERT_THRESHOLD * 60 )) ]; then
+
+        alert="\`\`\`Alert (${ALERT_THRESHOLD} minute frequency)\n---------------------------------------"
+
+        for i in "${alerts[@]}"
+        do
+            alert="${alert}\n- ${i}"
+        done
+
+        alert="${alert}\n---------------------------------------\`\`\`"
+
+        #send alert to telegram
+        curl -s -X POST https://api.telegram.org/bot$tel_token/sendMessage -d chat_id=$tel_id -d text="$alert" &>/dev/null
+
+        # update the timestamp
+        sed -i "s/LAST_ALERT=.*/LAST_ALERT=$now/" $SCRIPT_DIR/$CONFIG_FILE
+
+    fi
+fi
+
+#---------------------------------
+# SEND DAILY SUMMARY
+#---------------------------------
+if [ $(date +%H:%M) == $DAILY_STATUS_AT ]; then
+    summary="\`\`\`Daily Summary\n---------------------------------------"
+    summary="${summary}\nCron job is still running, scheduled to check in at ${DAILY_STATUS_AT} UTC every day."
+
+    for i in "${messages[@]}"
+    do
+        summary="${summary}\n- ${i}"
+    done
+
+    summary="${summary}\n---------------------------------------\`\`\`"
+
+    # send summary to telegram
+    curl -s -X POST https://api.telegram.org/bot$tel_token/sendMessage -d chat_id=$tel_id -d text="$summary" &>/dev/null
+
+    # update the timestamp
+    sed -i "s/LAST_STATUS=.*/LAST_STATUS=$now/" $SCRIPT_DIR/$CONFIG_FILE
+fi
+DOC
+chmod u+x $bp_monitor_script_path
+
+cat << 'DOC' > $bp_monitor_config_path
+NODE_NAME=""
+SCRIPT_DIR="/root/remblock/autobot"
+SCRIPT_FILE="/root/remblock/autobot/bpmonitor.sh"
+SCRIPT_LOG_FILE="log.txt"
+CONFIG_FILE="config.conf"
+NODE_LOG_FILE="/root/remnode.log"
+
+# log will be emptied
+# if size exceeds this definition
+# defined in MB
+MAX_LOG_SIZE=100
+
+# this cron will run every minute
+# but we don't want to receive alerts that often
+# defined in minutes
+ALERT_THRESHOLD=30
+
+# this script will check in once a day
+# to confirm that it is still active
+# defined in UTC military time, -4 for eastern
+DAILY_STATUS_AT="11:30"
+
+LAST_ALERT="2006-09-04"
+LAST_STATUS="2006-09-04"
+LAST_CLAIM="2006-09-04"
+LAST_VOTE="2006-09-04"
+LAST_IRREVERSIBLE_BLOCK_NUM=0
+DOC
+}
+
 #MAIN PROGRAM
 
 #get variable values from files or user
-if [ -f "$owner_f" ]
+if get_config_value owner
 then
-  owneraccountname=$(cat "$owner_f")
+  owneraccountname="$global_value"
 else
   if $at
   then
-    exit 1
+    exit 2
   fi
   echo
   read -p "YOUR ACCOUNT NAME: " -e owneraccountname
-  echo $owneraccountname > "$owner_f"
+  echo "owner=$owneraccountname" >> "$config_file"
   echo 
 fi
 
-if [ -f "$wallet_f" ]
+if get_config_value walletpassword
 then
-  walletpassword=$(cat "$wallet_f")
+  walletpassword="$global_value"
 else
   if $at
   then
     exit 2
   fi
   read -p "YOUR WALLET PASSWORD: " -e walletpassword
-  echo $walletpassword > "$wallet_f"
+  echo "walletpassword=$walletpassword" >> "$config_file"
   echo 
 fi
 
-if [ -f "$automated_vote_f" ]
+if get_config_value auto_vote
 then
-  if [ "$(cat $automated_vote_f)" = "true" ]
+  if [ "$global_value" = "true" ]
   then
     auto_vote=true
   fi
@@ -135,9 +320,9 @@ else
   if get_user_answer_yn "DO YOU WANT AUTOMATED VOTING"
   then
     auto_vote=true
-    echo "true" > "$automated_vote_f"
+    echo "auto_vote=true" >> "$config_file"
   else
-    echo "false" > "$automated_vote_f"
+    echo "auto_vote=false" >> "$config_file"
   fi
   echo 
 fi
@@ -145,9 +330,9 @@ fi
 if $auto_vote
 then
 
-  if [ -f "$bpaccountnames_f" ]
+  if get_config_value bpaccountnames
   then
-    bpaccountnames=$(cat "$bpaccountnames_f")
+    bpaccountnames="$global_value"
   else
     if $at
     then
@@ -156,17 +341,15 @@ then
     read -p "BLOCK PRODUCERS TO VOTE FOR: " -e bpaccountnames
     if [ -z "$bpaccountnames" ]
     then
-      echo $owneraccountname > "$bpaccountnames_f"
       bpaccountnames="$owneraccountname"
-    else
-      echo $bpaccountnames > "$bpaccountnames_f"
     fi
+    echo "bpaccountnames=$bpaccountnames" >> "$config_file"
     echo 
   fi
 
-  if [ -f "$automated_vote_notifications_f" ]
+  if get_config_value auto_vote_noti
   then
-    if [ "$(cat $automated_vote_notifications_f)" = "true" ]
+    if [ "$global_value" = "true" ]
     then
       auto_vote_noti=true
     fi
@@ -178,18 +361,18 @@ then
     if get_user_answer_yn "DO YOU WANT AUTOMATED VOTING NOTIFICATIONS"
     then
       auto_vote_noti=true
-      echo "true" > "$automated_vote_notifications_f"
+      echo "auto_vote_noti=true" >> "$config_file"
     else
-      echo "false" > "$automated_vote_notifications_f"
+      echo "auto_vote_noti=false" >> "$config_file"
     fi
     echo 
   fi
 
 fi
 
-if [ -f "$automated_reward_f" ]
+if get_config_value auto_reward
 then
-  if [ "$(cat $automated_reward_f)" = "true" ]
+  if [ "$global_value" = "true" ]
   then
     auto_reward=true
   fi
@@ -201,9 +384,9 @@ else
   if get_user_answer_yn "DO YOU WANT AUTOMATED REWARDS"
   then
     auto_reward=true
-    echo "true" > "$automated_reward_f"
+    echo "auto_reward=true" >> "$config_file"
   else
-    echo "false" > "$automated_reward_f"
+    echo "auto_reward=false" >> "$config_file"
   fi
   echo 
 fi
@@ -211,9 +394,9 @@ fi
 if $auto_reward
 then
 
-  if [ -f "$automated_reward_notifications_f" ]
+  if get_config_value auto_reward_noti
   then
-    if [ "$(cat $automated_reward_notifications_f)" = "true" ]
+    if [ "$global_value" = "true" ]
     then
       auto_reward_noti=true
     fi
@@ -225,16 +408,16 @@ then
     if get_user_answer_yn "DO YOU WANT AUTOMATED REWARDS NOTIFICATIONS"
     then
       auto_reward_noti=true
-      echo "true" > "$automated_reward_notifications_f"
+      echo "auto_reward_noti=true" >> "$config_file"
     else
-      echo "false" > "$automated_reward_notifications_f"
+      echo "auto_reward_noti=false" >> "$config_file"
     fi
     echo 
   fi
 
-  if [ -f "$automated_restaking_f" ]
+  if get_config_value auto_restaking
   then
-    if [ "$(cat $automated_restaking_f)" = "true" ]
+    if [ "$global_value" = "true" ]
     then
       auto_restaking=true
     fi
@@ -246,31 +429,31 @@ then
     if get_user_answer_yn "DO YOU WANT TO ENABLE AUTOMATED RESTAKING"
     then
       auto_restaking=true
-      echo "true" > "$automated_restaking_f"
+      echo "auto_restaking=true" >> "$config_file"
     else
-      echo "false" > "$automated_restaking_f"
+      echo "auto_restaking=false" >> "$config_file"
     fi
     echo 
   fi
 
   if $auto_restaking
   then
-    if [ -f "$restakingpercentage_f" ]
+    if get_config_value restakingpercentage
     then
-      restakingpercentage=$(cat "$restakingpercentage_f")
+      restakingpercentage="$global_value"
     else
       if $at
       then
         exit 2
       fi
       read -p "SET YOUR RESTAKING PERCENTAGE: " -e restakingpercentage
-      echo $restakingpercentage > "$restakingpercentage_f"
+      echo "restakingpercentage=$restakingpercentage" >> "$config_file"
       echo 
     fi
 
-    if [ -f "$automated_restaking_notifications_f" ]
+    if get_config_value auto_restaking_noti
     then
-      if [ "$(cat $automated_restaking_notifications_f)" = "true" ]
+      if [ "$global_value" = "true" ]
       then
         auto_restaking_noti=true
       fi
@@ -282,9 +465,9 @@ then
       if get_user_answer_yn "DO YOU WANT AUTOMATED RESTAKING NOTIFICATIONS"
       then
         auto_restaking_noti=true
-        echo "true" > "$automated_restaking_notifications_f"
+        echo "auto_restaking_noti=true" >> "$config_file"
       else
-        echo "false" > "$automated_restaking_notifications_f"
+        echo "auto_restaking_noti=false" >> "$config_file"
       fi
       echo 
     fi
@@ -292,34 +475,64 @@ then
 
 fi
 
-if $auto_vote_noti || $auto_reward_noti || $auto_restaking_noti
+if get_config_value bp_monitoring
 then
-  if [ -f "$tel_token_f" ]
+  if [ "$global_value" = "true" ]
   then
-    tel_token=$(cat "$tel_token_f")
+    bp_monitoring=true
+  fi
+else
+  if $at
+  then
+    exit 2
+  fi
+  if get_user_answer_yn "DO YOU WANT TO ACTIVATE BP MONITORING"
+  then
+    bp_monitoring=true
+    echo "bp_monitoring=true" >> "$config_file"
+    create_bp_monitor_files
+  else
+    echo "bp_monitoring=false" >> "$config_file"
+  fi
+  echo 
+fi
+
+if $bp_monitoring
+then
+  #Check if line is on cron already, if not add it
+  if ! crontab -l | grep -v '^#' | grep bpmonitor.sh &>/dev/null
+  then
+    (crontab -l; echo "$bp_mon_cron_line" ) | crontab -
+  fi
+fi
+
+if $auto_vote_noti || $auto_reward_noti || $auto_restaking_noti || $bp_monitoring
+then
+  if get_config_value tel_token
+  then
+    tel_token="$global_value"
   else
     if $at
     then
       exit 2
     fi
     read -p "COPY AND PASTE YOUR TELEGRAM TOKEN: " -e tel_token
-    echo $tel_token > "$tel_token_f"
+    echo "tel_token=$tel_token" >> "$config_file"
     echo 
   fi
 
-  if [ -f "$tel_id_f" ]
+  if get_config_value tel_id
   then
-    tel_id=$(cat "$tel_id_f")
+    tel_id="$global_value"
   else
     if $at
     then
       exit 2
     fi
     read -p "COPY AND PASTE YOUR TELEGRAM CHAT ID: " -e tel_id
-    echo $tel_id > "$tel_id_f"
+    echo "tel_id=$tel_id" >> "$config_file"
     echo 
   fi
-
 fi
 
 if $at
@@ -338,7 +551,12 @@ then
   fi
   if $auto_restaking
   then
-    restake_reward=$(echo "( $total_reward / 100 ) * $restakingpercentage" | bc )
+    if (( restakingpercentage == 100 ))
+    then
+      restake_reward="$total_reward"
+    else
+      restake_reward=$(echo "scale=4; ( $total_reward / 100 ) * $restakingpercentage" | bc )
+    fi
     remcli system delegatebw $owneraccountname $owneraccountname "$restake_reward REM" -x 120 -p $owneraccountname@stake -f &>/dev/null
   fi
 else
@@ -356,7 +574,12 @@ else
   fi
   if $auto_restaking
   then
-    restake_reward=$(echo "( $total_reward / 100 ) * $restakingpercentage" | bc )
+    if (( restakingpercentage == 100 ))
+    then
+      restake_reward="$total_reward"
+    else
+      restake_reward=$(echo "scale=4; ( $total_reward / 100 ) * $restakingpercentage" | bc )
+    fi
     remcli system delegatebw $owneraccountname $owneraccountname "$restake_reward REM" -x 120 -p $owneraccountname@stake -f
   fi
 fi
