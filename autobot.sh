@@ -85,7 +85,6 @@ at=false
 if [[ "$1" == "--at" ]]
 then
   at=true
-  #Setup next execution
 at now + $minutes_to_wait minutes << DOC &>/dev/null
 /root/remblock/autobot/autobot.sh --at
 DOC
@@ -386,8 +385,7 @@ LAST_IRREVERSIBLE_BLOCK_NUM=0
 
 # TIME IS DEFINED IN UTC MILITARY TIME, -4 FOR EASTERN
 
-DOC
-}
+DOC }
 
 #****************************************************************************************************#
 #                                       MAIN PROGRAM FUNCTIONS                                       #
@@ -632,7 +630,6 @@ then
       echo 
     fi
   fi
-
 fi
 
 #-----------------------------------------------------------------------------------------------------
@@ -661,12 +658,12 @@ else
   echo 
 fi
 
-if $bp_monitoring
-then
-
 #-----------------------------------------------------------------------------------------------------
 # CHECK IF THE LINE IS ALREADY ON CRON, IF NOT ADD IT INSIDE
 #-----------------------------------------------------------------------------------------------------
+
+if $bp_monitoring
+then
 
   if ! crontab -l | grep -v '^#' | grep bpmonitor.sh &>/dev/null
   then
