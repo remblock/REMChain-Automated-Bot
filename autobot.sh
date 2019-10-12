@@ -324,7 +324,8 @@ fi
 if [ $(date +%H:%M) == $DAILY_STATUS_AT ]; then
     summary="Daily Summary 
 ---------------------------------------" 
-    summary="${summary} Cron job is still running, scheduled to check in at ${DAILY_STATUS_AT} UTC every day."
+    summary="${summary}
+Cron job is still running, scheduled to check in at ${DAILY_STATUS_AT} UTC every day."
 
     for i in "${messages[@]}"
     do
