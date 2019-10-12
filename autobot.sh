@@ -219,7 +219,7 @@ get_info_response="$(remcli get info)"
 #-----------------------------------------------------------------------------------------------------
 
 if [[ -z "${get_info_response// }" ]] || [[ "Failed" =~ ^$get_info_response ]]; then
-    alerts+=( "No response from remcli get info." )
+    alerts+=( "Failed to receive a response from remcli get info." )
 else
     head_block_num="$(jq '.head_block_num | tonumber' <<< ${get_info_response})"
     li_block_num="$(jq '.last_irreversible_block_num | tonumber' <<< ${get_info_response})"
@@ -230,7 +230,7 @@ else
 #-----------------------------------------------------------------------------------------------------
 
     if (( block_diff / 2 / 60 > 3 )); then
-        alerts+=( "Current block is ${block_diff} ahead of last irreversible." )
+        alerts+=( "Current block is ${block_diff} ahead of last irreversible block." )
     fi
 
 #-----------------------------------------------------------------------------------------------------
@@ -259,7 +259,7 @@ net_peers_response="$(remcli net peers)"
 #-----------------------------------------------------------------------------------------------------
 
 if [[ -z "${net_peers_response// }" ]] || [[ "Failed" =~ ^$net_peers_response ]]; then
-    alerts+=( "No response from remcli net peers." )
+    alerts+=( "Failed to receive a response from remcli net peers." )
 else
     last_handshake=$(jq '.[0].last_handshake.time | tonumber' <<< ${net_peers_response})
 
