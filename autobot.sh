@@ -550,7 +550,7 @@ then
 # GET REWARD NOTIFCATIONS ANSWER FROM THE USER OR TAKE IT FROM THE CONFIG FILE
 #-----------------------------------------------------------------------------------------------------
 
-    if get_user_answer_yn "DO YOU WANT AUTOMATED REWARDS NOTIFICATIONS"
+    if get_user_answer_yn "DO YOU WANT AUTOMATED REWARD NOTIFICATIONS"
     then
       auto_reward_noti=true
       echo "auto_reward_noti=true" >> "$config_file"
