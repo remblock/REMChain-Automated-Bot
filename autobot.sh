@@ -349,6 +349,7 @@ ${i}"
     sed -i "s/LAST_STATUS=.*/LAST_STATUS=$now/" $SCRIPT_DIR/$CONFIG_FILE
 fi
 DOC
+
 chmod u+x $bp_monitor_script_path
 
 #-----------------------------------------------------------------------------------------------------
