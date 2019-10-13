@@ -44,13 +44,13 @@ bp_monitor_config_path="/root/remblock/autobot/bp-monitor-config.conf"
 minutes_to_wait=1442
 
 #-----------------------------------------------------------------------------------------------------
-# CRON LINE IS CREATED FOR THE BP MONITORING SCRIPT
+# CRON LINE WILL BE CREATED FOR THE BP MONITORING SCRIPT
 #-----------------------------------------------------------------------------------------------------
 
 bp_mon_cron_line="* * * * * /root/remblock/autobot/bpmonitor.sh"
 
 #-----------------------------------------------------------------------------------------------------
-# INITIATE BOOLEAN VARIABLES FOR THE AUTOBOT
+# INITIATE BOOLEAN VARIABLES FOR THE AUTOBOT SCRIPT
 #-----------------------------------------------------------------------------------------------------
 
 auto_vote=false
@@ -443,7 +443,7 @@ else
   then
     exit 2
   fi
-  if get_user_answer_yn "DO YOU WANT AUTOMATED VOTING"
+  if get_user_answer_yn "DO YOU WANT AUTOBOT TO AUTOMATE YOUR VOTING"
   then
     auto_vote=true
     echo "auto_vote=true" >> "$config_file"
@@ -468,7 +468,7 @@ then
     then
       exit 2
     fi
-    read -p "BLOCK PRODUCERS TO VOTE FOR: " -e bpaccountnames
+    read -p "THE BLOCK PRODUCERS THAT YOU WANT TO VOTE FOR: " -e bpaccountnames
     if [ -z "$bpaccountnames" ]
     then
       bpaccountnames="$owneraccountname"
@@ -476,7 +476,11 @@ then
     echo "bpaccountnames=$bpaccountnames" >> "$config_file"
     echo 
   fi
-
+    
+#-----------------------------------------------------------------------------------------------------
+# GET VOTING NOTIFCATIONS ANSWER FROM THE USER OR TAKE IT FROM THE CONFIG FILE
+#-----------------------------------------------------------------------------------------------------
+      
   if get_config_value auto_vote_noti
   then
     if [ "$global_value" = "true" ]
@@ -488,12 +492,7 @@ then
     then
       exit 2
     fi
-    
-#-----------------------------------------------------------------------------------------------------
-# GET VOTING NOTIFCATIONS ANSWER FROM THE USER OR TAKE IT FROM THE CONFIG FILE
-#-----------------------------------------------------------------------------------------------------
-    
-    if get_user_answer_yn "DO YOU WANT AUTOMATED VOTING NOTIFICATIONS"
+    if get_user_answer_yn "DO YOU WANT TO RECEIVE VOTING NOTIFICATIONS"
     then
       auto_vote_noti=true
       echo "auto_vote_noti=true" >> "$config_file"
@@ -504,6 +503,10 @@ then
   fi
 
 fi
+
+#-----------------------------------------------------------------------------------------------------
+# GET AUTOMATED REWARDS ANSWER FROM THE USER OR TAKE IT FROM THE CONFIG FILE
+#-----------------------------------------------------------------------------------------------------
 
 if get_config_value auto_reward
 then
@@ -516,12 +519,7 @@ else
   then
     exit 2
   fi
-
-#-----------------------------------------------------------------------------------------------------
-# GET AUTOMATED REWARDS ANSWER FROM THE USER OR TAKE IT FROM THE CONFIG FILE
-#-----------------------------------------------------------------------------------------------------
-
-  if get_user_answer_yn "DO YOU WANT AUTOMATED REWARDS"
+  if get_user_answer_yn "DO YOU WANT AUTOBOT TO AUTO CLAIM YOUR REWARDS"
   then
     auto_reward=true
     echo "auto_reward=true" >> "$config_file"
@@ -531,9 +529,12 @@ else
   echo 
 fi
 
+#-----------------------------------------------------------------------------------------------------
+# GET REWARD NOTIFCATIONS ANSWER FROM THE USER OR TAKE IT FROM THE CONFIG FILE
+#-----------------------------------------------------------------------------------------------------
+
 if $auto_reward
 then
-
   if get_config_value auto_reward_noti
   then
     if [ "$global_value" = "true" ]
@@ -545,12 +546,7 @@ then
     then
       exit 2
     fi
-
-#-----------------------------------------------------------------------------------------------------
-# GET REWARD NOTIFCATIONS ANSWER FROM THE USER OR TAKE IT FROM THE CONFIG FILE
-#-----------------------------------------------------------------------------------------------------
-
-    if get_user_answer_yn "DO YOU WANT AUTOMATED REWARD NOTIFICATIONS"
+    if get_user_answer_yn "DO YOU WANT TO RECEIVE REWARD NOTIFICATIONS"
     then
       auto_reward_noti=true
       echo "auto_reward_noti=true" >> "$config_file"
@@ -559,6 +555,10 @@ then
     fi
     echo 
   fi
+
+#-----------------------------------------------------------------------------------------------------
+# GET AUTOMATED RESTAKING ANSWER FROM THE USER OR TAKE IT FROM THE CONFIG FILE
+#-----------------------------------------------------------------------------------------------------
 
   if get_config_value auto_restaking
   then
@@ -571,12 +571,7 @@ then
     then
       exit 2
     fi
-
-#-----------------------------------------------------------------------------------------------------
-# GET AUTOMATED RESTAKING ANSWER FROM THE USER OR TAKE IT FROM THE CONFIG FILE
-#-----------------------------------------------------------------------------------------------------
-
-    if get_user_answer_yn "DO YOU WANT TO ENABLE AUTOMATED RESTAKING"
+    if get_user_answer_yn "DO YOU WANT AUTOBOT TO AUTO RESTAKE YOUR REWARDS"
     then
       auto_restaking=true
       echo "auto_restaking=true" >> "$config_file"
@@ -585,6 +580,10 @@ then
     fi
     echo 
   fi
+
+#-----------------------------------------------------------------------------------------------------
+# GET THE RESTAKING PERCENTAGE FROM THE USER OR TAKE IT FROM THE CONFIG FILE
+#-----------------------------------------------------------------------------------------------------
 
   if $auto_restaking
   then
@@ -596,15 +595,14 @@ then
       then
         exit 2
       fi
-
-#-----------------------------------------------------------------------------------------------------
-# GET THE RESTAKING PERCENTAGE FROM THE USER OR TAKE IT FROM THE CONFIG FILE
-#-----------------------------------------------------------------------------------------------------
-
-      read -p "SET YOUR RESTAKING PERCENTAGE: " -e restakingpercentage
+      read -p "PLEASE SET YOUR RESTAKING PERCENTAGE: " -e restakingpercentage
       echo "restakingpercentage=$restakingpercentage" >> "$config_file"
       echo 
     fi
+
+#-----------------------------------------------------------------------------------------------------
+# GET RESTAKING NOTIFCATIONS ANSWER FROM THE USER OR TAKE IT FROM THE CONFIG FILE
+#-----------------------------------------------------------------------------------------------------
 
     if get_config_value auto_restaking_noti
     then
@@ -617,12 +615,7 @@ then
       then
         exit 2
       fi
-
-#-----------------------------------------------------------------------------------------------------
-# GET RESTAKING NOTIFCATIONS ANSWER FROM THE USER OR TAKE IT FROM THE CONFIG FILE
-#-----------------------------------------------------------------------------------------------------
-
-      if get_user_answer_yn "DO YOU WANT AUTOMATED RESTAKING NOTIFICATIONS"
+      if get_user_answer_yn "DO YOU WANT TO RECEIVE RESTAKING NOTIFICATIONS"
       then
         auto_restaking_noti=true
         echo "auto_restaking_noti=true" >> "$config_file"
@@ -649,7 +642,7 @@ else
   then
     exit 2
   fi
-  if get_user_answer_yn "DO YOU WANT TO ACTIVATE BP MONITORING"
+  if get_user_answer_yn "DO YOU WANT AUTOBOT TO ACTIVATE BP MONITORING"
   then
     bp_monitoring=true
     echo "bp_monitoring=true" >> "$config_file"
@@ -666,12 +659,15 @@ fi
 
 if $bp_monitoring
 then
-
   if ! crontab -l | grep -v '^#' | grep bpmonitor.sh &>/dev/null
   then
     (crontab -l; echo "$bp_mon_cron_line" ) | crontab -
   fi
 fi
+    
+#-----------------------------------------------------------------------------------------------------
+# GET TELEGRAM TOKEN FROM THE USER OR TAKE IT FROM THE CONFIG FILE
+#-----------------------------------------------------------------------------------------------------
 
 if $auto_vote_noti || $auto_reward_noti || $auto_restaking_noti || $bp_monitoring
 then
@@ -683,17 +679,16 @@ then
     then
       exit 2
     fi
-    
-#-----------------------------------------------------------------------------------------------------
-# GET TELEGRAM TOKEN FROM THE USER OR TAKE IT FROM THE CONFIG FILE
-#-----------------------------------------------------------------------------------------------------
-
     read -p "COPY AND PASTE YOUR TELEGRAM TOKEN: " -e tel_token
     echo "tel_token=$tel_token" >> "$config_file"
     echo 
   fi
 
-  if get_config_value tel_id
+#-----------------------------------------------------------------------------------------------------
+# GET TELEGRAM CHAT ID FROM THE USER OR TAKE IT FROM THE CONFIG FILE
+#-----------------------------------------------------------------------------------------------------
+
+if get_config_value tel_id
   then
     tel_id="$global_value"
   else
@@ -701,11 +696,6 @@ then
     then
       exit 2
     fi
-
-#-----------------------------------------------------------------------------------------------------
-# GET TELEGRAM CHAT ID FROM THE USER OR TAKE IT FROM THE CONFIG FILE
-#-----------------------------------------------------------------------------------------------------
-
     read -p "COPY AND PASTE YOUR TELEGRAM CHAT ID: " -e tel_id
     echo "tel_id=$tel_id" >> "$config_file"
     echo 
@@ -786,7 +776,6 @@ fi
 
 if $auto_vote_noti || $auto_reward_noti || $auto_restaking_noti
 then
-
   tel_message_1="Your vote was casted for $bpaccountnames on $(date)"
   tel_message_2="$total_reward REM was received for $owneraccountname on $(date)"
   tel_message_3="$restake_reward REM was restaked for $owneraccountname on $(date)"
@@ -799,11 +788,11 @@ then
 # TRANSFORM TELEGRAM NOTIFICATION OPTIONS INTO BINARY, FIRST VOTE, SECOND CLAIM, AND THIRD RESTAKE
 #-----------------------------------------------------------------------------------------------------
 
-  if $auto_vote_noti; then option_bin="1"; else option_bin="0"; fi
-  if $auto_reward_noti; then option_bin="${option_bin}1"; else option_bin="${option_bin}0"; fi
-  if $auto_restaking_noti; then option_bin="${option_bin}1"; else option_bin="${option_bin}0"; fi
+ if $auto_vote_noti; then option_bin="1"; else option_bin="0"; fi
+ if $auto_reward_noti; then option_bin="${option_bin}1"; else option_bin="${option_bin}0"; fi
+ if $auto_restaking_noti; then option_bin="${option_bin}1"; else option_bin="${option_bin}0"; fi
 
-  case "$option_bin" in
+ case "$option_bin" in
     100) tel_message="$tel_message_1";;
     010) tel_message="$tel_message_2";;
     001) tel_message="$tel_message_3";;
@@ -812,7 +801,7 @@ then
     101) tel_message="$tel_message_6";;
     111) tel_message="$tel_message_7";;
       *) tel_message="Error in case stament";;
-  esac
+ esac
 
 #-----------------------------------------------------------------------------------------------------
 # SEND ALERT NOTIFCATIONS TO TELEGRAM BOT
