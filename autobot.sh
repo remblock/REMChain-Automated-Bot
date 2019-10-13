@@ -385,8 +385,8 @@ LAST_STATUS="2006-09-04"
 LAST_IRREVERSIBLE_BLOCK_NUM=0
 
 # TIME IS DEFINED IN UTC MILITARY TIME, -4 FOR EASTERN
-
-DOC }
+DOC 
+}
 
 #****************************************************************************************************#
 #                                       MAIN PROGRAM FUNCTIONS                                       #
