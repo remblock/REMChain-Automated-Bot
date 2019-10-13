@@ -38,19 +38,19 @@ bp_monitor_script_path="/root/remblock/autobot/bpmonitor.sh"
 bp_monitor_config_path="/root/remblock/autobot/bp-monitor-config.conf"
 
 #-----------------------------------------------------------------------------------------------------
-# MINUTES TO WAIT BETWEEN EXECUTIONS OF THE SCRIPT
+# MINUTES TO WAIT BETWEEN EACH EXECUTIONS OF THE SCRIPT
 #-----------------------------------------------------------------------------------------------------
 
 minutes_to_wait=1442
 
 #-----------------------------------------------------------------------------------------------------
-# CRON LINE CREATED FOR THE BP MONITORING SCRIPT
+# CRON LINE IS CREATED FOR THE BP MONITORING SCRIPT
 #-----------------------------------------------------------------------------------------------------
 
 bp_mon_cron_line="* * * * * /root/remblock/autobot/bpmonitor.sh"
 
 #-----------------------------------------------------------------------------------------------------
-# INITIATE BOOLEAN VARIABLES
+# INITIATE BOOLEAN VARIABLES FOR THE AUTOBOT
 #-----------------------------------------------------------------------------------------------------
 
 auto_vote=false
@@ -62,23 +62,23 @@ auto_restaking_noti=false
 bp_monitoring=false
 
 #-----------------------------------------------------------------------------------------------------
-# VERIFY IF REQUIRED PACKAGES ARE INSTALLED, IF NOT INSTALL THEM
+# CHECK IF THE REQUIRED PACKAGES WERE INSTALLED, IF NOT INSTALL THEM
 #-----------------------------------------------------------------------------------------------------
 
 if ! dpkg -l | awk '{print $2}' | grep -w at &>/dev/null
 then
-  echo "at package not installed, installing it..."
+  echo "at package was not installed, installing it now..."
   apt-get install at -y
 fi
 
 if ! dpkg -l | awk '{print $2}' | grep -w bc &>/dev/null
 then
-  echo "bc package not installed, installing it..."
+  echo "bc package was not installed, installing it now..."
   apt-get install bc -y
 fi
 
 #-----------------------------------------------------------------------------------------------------
-# CHECK IF THE AT MODE MUST BE ENABLE, TO AVOID PRINTING ANY OUTPUT
+# CHECK THE CONDITION OF THE AT MODE, IT MUST BE ENABLE TO AVOID PRINTING ANY OUTPUT
 #-----------------------------------------------------------------------------------------------------
 
 at=false
@@ -151,13 +151,13 @@ cat << 'DOC' > $bp_monitor_script_path
 #!/bin/bash
 
 #-----------------------------------------------------------------------------------------------------
-# LOAD VARIABLES FROM CONFIG FILE
+# GET VARIABLES FROM THE CONFIG SOURCE
 #-----------------------------------------------------------------------------------------------------
 
 source "/root/remblock/autobot/bp-monitor-config.conf"
 
 #-----------------------------------------------------------------------------------------------------
-# CONFIG FILE WHERE THE TELEGRAM DETAILS ARE LOADED FROM
+# GET TELEGRAM API DETAILS FROM THE CONFIG FILE
 #-----------------------------------------------------------------------------------------------------
 
 tel_config_file="/root/remblock/autobot/config"
@@ -169,7 +169,7 @@ now_s=$(date -d $now +%s)
 now_n=$(date -d $now +%s%N)
 
 #-----------------------------------------------------------------------------------------------------
-# GET TELEGRAM CONFIGURATION FROM CONFIG FILE
+# GET TELEGRAM CONFIGURATION FROM THE CONFIG FILE
 #-----------------------------------------------------------------------------------------------------
 
 tel_token="$(grep -v '^#' "$tel_config_file" | grep '^tel_token=' | awk -F '=' '{print $2}')"
@@ -193,7 +193,7 @@ modified_diff=$(( $now_s - $log_last_modified_s ))
 log_byte_size=$(stat -c%s $NODE_LOG_FILE)
 
 #-----------------------------------------------------------------------------------------------------
-# IF LOG FILE HAS NOT BEEN MODIFIED WITHIN THE LAST 5 MINUTES
+# IF THE LOG FILE HAS NOT BEEN MODIFIED WITHIN THE LAST 5 MINUTES
 #-----------------------------------------------------------------------------------------------------
 
 if [ $modified_diff -ge 300 ]; then
@@ -201,7 +201,7 @@ if [ $modified_diff -ge 300 ]; then
 fi
 
 #-----------------------------------------------------------------------------------------------------
-# IF LOG FILE IS LARGER THAN THE SPECIFIED THRESHOLD
+# IF THE LOG FILE IS LARGER THAN THE SPECIFIED THRESHOLD
 #-----------------------------------------------------------------------------------------------------
 
 if [ $(( $log_byte_size / 1000000)) -gt $MAX_LOG_SIZE ]; then
@@ -215,7 +215,7 @@ fi
 get_info_response="$(remcli get info)"
 
 #-----------------------------------------------------------------------------------------------------
-# IF RESPONSE IS EMPTY OR THAT OF FAILED CONNECTION 
+# IF THE RESPONSE WAS EMPTY OR THAT OF A FAILED CONNECTION 
 #-----------------------------------------------------------------------------------------------------
 
 if [[ -z "${get_info_response// }" ]] || [[ "Failed" =~ ^$get_info_response ]]; then
@@ -226,7 +226,7 @@ else
     block_diff=$(( head_block_num - li_block_num ))
    
 #-----------------------------------------------------------------------------------------------------
-# ALERT IF THE GAP BETWEEN THE HEAD AND LAST BLOCK IS MORE THAN 3 MINS
+# ALERT IF THE GAP BETWEEN THE HEAD AND LAST BLOCK IS MORE THAN 3 MINUTES
 #-----------------------------------------------------------------------------------------------------
 
     if (( block_diff / 2 / 60 > 3 )); then
@@ -255,7 +255,7 @@ fi
 net_peers_response="$(remcli net peers)"
 
 #-----------------------------------------------------------------------------------------------------
-# IF RESPONCE IS EMPTY OR THAT OF A FAILED CONNECTION
+# IF THE RESPONCE IS EMPTY OR THAT OF A FAILED CONNECTION
 #-----------------------------------------------------------------------------------------------------
 
 if [[ -z "${net_peers_response// }" ]] || [[ "Failed" =~ ^$net_peers_response ]]; then
@@ -264,7 +264,7 @@ else
     last_handshake=$(jq '.[0].last_handshake.time | tonumber' <<< ${net_peers_response})
 
 #-----------------------------------------------------------------------------------------------------
-# IF THE PEER TIME IS OLDER THAN 3 MINS IN NANOSECONDS
+# IF THE PEER TIME IS OLDER THAN 3 MINUTES IN NANOSECONDS
 #-----------------------------------------------------------------------------------------------------
 
     if [ $last_handshake -eq 0 ] ; then
@@ -337,7 +337,7 @@ ${i}"
 ---------------------------------------"
 
 #-----------------------------------------------------------------------------------------------------
-# SEND MONITORING DAILY SUMMARY TO TELEGRAM
+# SEND MONITORING DAILY SUMMARY TO TELEGRAM BOT
 #-----------------------------------------------------------------------------------------------------
 
     curl -s -X POST https://api.telegram.org/bot$tel_token/sendMessage -d chat_id=$tel_id -d text="$summary" &>/dev/null
@@ -364,19 +364,19 @@ CONFIG_FILE="config.conf"
 NODE_LOG_FILE="/root/remnode.log"
 
 #-----------------------------------------------------------------------------------------------------
-# IF THE LOG FILE EXCEEDS THE SPECFIED MB IT WILL BE EMPTIED
+# IF THE LOG FILE EXCEEDS THE SPECFIED MB, IT WILL BE EMPTIED
 #-----------------------------------------------------------------------------------------------------
 
 MAX_LOG_SIZE=100
 
 #-----------------------------------------------------------------------------------------------------
-# CRON RUNS EVERY MINUTE, BUT ALERTS CAN BE BASED ON THE THRESHOLD
+# CRON RUNS EVERY MINUTE, BUT TELEGRAM ALERTS CAN BE BASED ON THE THRESHOLD MINUTES
 #-----------------------------------------------------------------------------------------------------
 
 ALERT_THRESHOLD=30
 
 #-----------------------------------------------------------------------------------------------------
-# SCRIPT CHECK IN ONCE A DAY TO CONFIRM THAT ITS STILL ACTIVE
+# MONITOR SCRIPT CHECKS IN ONCE A DAY TO CONFIRM THAT ITS STILL ACTIVE
 #-----------------------------------------------------------------------------------------------------
 
 DAILY_STATUS_AT="11:30"
