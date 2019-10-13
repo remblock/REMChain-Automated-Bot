@@ -323,7 +323,7 @@ fi
 
 if [ $(date +%H:%M) == $DAILY_STATUS_AT ]; then
     summary="Daily Summary 
----------------------------------------" 
+-------------------------------------------" 
     summary="${summary}
 Cron job is still running, scheduled to check in at ${DAILY_STATUS_AT} UTC every day."
 
@@ -334,7 +334,7 @@ ${i}"
     done
 
     summary="${summary} 
----------------------------------------"
+-------------------------------------------"
 
 #-----------------------------------------------------------------------------------------------------
 # SEND MONITORING DAILY SUMMARY TO TELEGRAM BOT
