@@ -726,7 +726,7 @@ then
   if $auto_reward
   then
     previous=$(remcli get currency balance rem.token $owneraccountname | awk '{print $1}')
-    remcli system claimrewards $owneraccountname -p $owneraccountname@claim -f &>/dev/null
+    remcli system claimrewards $owneraccountname -x 120 -p $owneraccountname@claim -f &>/dev/null
     after=$(remcli get currency balance rem.token $owneraccountname  | awk '{print $1}')
     total_reward=$(echo "$after - $previous"|bc)
   fi
@@ -754,7 +754,7 @@ else
   if $auto_reward
   then
     previous=$(remcli get currency balance rem.token $owneraccountname | awk '{print $1}')
-    remcli system claimrewards $owneraccountname -p $owneraccountname@claim -f
+    remcli system claimrewards $owneraccountname -x 120 -p $owneraccountname@claim -f
     after=$(remcli get currency balance rem.token $owneraccountname  | awk '{print $1}')
     total_reward=$(echo "$after - $previous"|bc)
   fi
