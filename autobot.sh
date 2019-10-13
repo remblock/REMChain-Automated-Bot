@@ -291,8 +291,8 @@ if [ ${#alerts[@]} -gt 0 ]; then
 
     if [ $diff_s -ge $(( $ALERT_THRESHOLD * 60 )) ]; then
 
-        alert="Alert (${ALERT_THRESHOLD} minute frequency) 
----------------------------------------"
+        alert="BP Monitor Alert (${ALERT_THRESHOLD} minute frequency) 
+-----------------------------------------------"
         for i in "${alerts[@]}"
         do
             alert="${alert} 
@@ -300,7 +300,7 @@ ${i}"
         done
 
         alert="${alert} 
----------------------------------------"
+-----------------------------------------------"
 
 #-----------------------------------------------------------------------------------------------------
 # SEND ALERTS TO YOUR TELEGRAM BOT 
