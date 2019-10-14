@@ -776,13 +776,59 @@ fi
 
 if $auto_vote_noti || $auto_reward_noti || $auto_restaking_noti
 then
-  tel_message_1="Your vote was casted for $bpaccountnames on $(date)"
-  tel_message_2="$total_reward REM was received for $owneraccountname on $(date)"
-  tel_message_3="$restake_reward REM was restaked for $owneraccountname on $(date)"
-  tel_message_4="$total_reward REM was received for $owneraccountname and your vote was casted for $bpaccountnames on $(date)"
-  tel_message_5="$total_reward REM was received and $restake_reward REM was restaked for $owneraccountname on $(date)"
-  tel_message_6="$restake_reward REM was restaked for $owneraccountname and your vote was casted for $bpaccountnames on $(date)"
-  tel_message_7="$total_reward REM was received and $restake_reward REM was restaked for $owneraccountname and your vote was casted for $bpaccountnames on $(date)"
+tel_message_1="
+
+"${owneraccountname^}" Daily Summary
+--------------------------------------
+Date: $(date +"%d-%m-%Y")
+Producer Votes: $bpaccountnames"
+
+tel_message_2="
+
+"${owneraccountname^}" Daily Summary
+--------------------------------------
+Date: $(date +"%d-%m-%Y")
+Claimed Rewards: $total_reward REM"
+  
+tel_message_3="
+
+"${owneraccountname^}" Daily Summary
+--------------------------------------
+Date: $(date +"%d-%m-%Y")
+Restaked Rewards: $restake_reward REM"
+
+tel_message_4="
+
+"${owneraccountname^}" Daily Summary
+--------------------------------------
+Date: $(date +"%d-%m-%Y")
+Claimed Rewards: $total_reward REM
+Producer Votes: $bpaccountnames"
+
+tel_message_5="
+
+"${owneraccountname^}" Daily Summary
+--------------------------------------
+Date: $(date +"%d-%m-%Y")
+Claimed Rewards: $total_reward REM
+Restaked Rewards: $restake_reward REM"
+  
+tel_message_6="
+
+"${owneraccountname^}" Daily Summary
+--------------------------------------
+Date: $(date +"%d-%m-%Y")
+Restaked Rewards: $restake_reward REM
+Producer Votes: $bpaccountnames"
+  
+tel_message_7="
+
+"${owneraccountname^}" Daily Summary
+--------------------------------------
+Date: $(date +"%d-%m-%Y")
+Claimed Rewards: $total_reward REM
+Restaked Rewards: $restake_reward REM
+Producer Votes: $bpaccountnames"
 
 #-----------------------------------------------------------------------------------------------------
 # TRANSFORM TELEGRAM NOTIFICATION OPTIONS INTO BINARY, FIRST VOTE, SECOND CLAIM, AND THIRD RESTAKE
