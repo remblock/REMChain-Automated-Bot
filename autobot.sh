@@ -160,20 +160,19 @@ source "/root/remblock/autobot/bp-monitor-config.conf"
 # GET TELEGRAM API DETAILS FROM THE CONFIG FILE
 #-----------------------------------------------------------------------------------------------------
 
-tel_config_file="/root/remblock/autobot/config"
-
 alerts=()
 messages=()
-now=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
 now_s=$(date -d $now +%s)
 now_n=$(date -d $now +%s%N)
+now=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
+telegram_config_file="/root/remblock/autobot/config"
 
 #-----------------------------------------------------------------------------------------------------
 # GET TELEGRAM CONFIGURATION FROM THE CONFIG FILE
 #-----------------------------------------------------------------------------------------------------
 
 telegram_token="$(grep -v '^#' "$telegram_config_file" | grep '^telegram_token=' | awk -F '=' '{print $2}')"
-telegram_id="$(grep -v '^#' "$telegram_config_file" | grep '^telegram_id=' | awk -F '=' '{print $2}')"
+telegram_chatid="$(grep -v '^#' "$telegram_config_file" | grep '^telegram_chatid=' | awk -F '=' '{print $2}')"
 
 #-----------------------------------------------------------------------------------------------------
 # SCHEDULE CRON FOR THE BP MONITOR SCRIPT
@@ -306,7 +305,7 @@ ${i}"
 # SEND ALERTS TO YOUR TELEGRAM BOT 
 #-----------------------------------------------------------------------------------------------------
 
-        curl -s -X POST https://api.telegram.org/bot$telegram_token/sendMessage -d chat_id=$telegram_id -d text="$alert" &>/dev/null
+        curl -s -X POST https://api.telegram.org/bot$telegram_token/sendMessage -d chat_id=$telegram_chatid -d text="$alert" &>/dev/null
 
 #-----------------------------------------------------------------------------------------------------
 # UPDATE THE TIMESTAMP IN THE CONFIG FILE
@@ -340,7 +339,7 @@ ${i}"
 # SEND MONITORING DAILY SUMMARY TO TELEGRAM BOT
 #-----------------------------------------------------------------------------------------------------
 
-    curl -s -X POST https://api.telegram.org/bot$telegram_token/sendMessage -d chat_id=$telegram_id -d text="$summary" &>/dev/null
+    curl -s -X POST https://api.telegram.org/bot$telegram_token/sendMessage -d chat_id=$telegram_chatid -d text="$summary" &>/dev/null
 
 #-----------------------------------------------------------------------------------------------------
 # UPDATE THE TIMESTAMP IN THE CONFIG FILE
@@ -686,16 +685,16 @@ then
 # GET TELEGRAM CHAT ID FROM THE USER OR TAKE IT FROM THE CONFIG FILE
 #-----------------------------------------------------------------------------------------------------
 
-if get_config_value telegram_id
+if get_config_value telegram_chatid
   then
-    telegram_id="$global_value"
+    telegram_chatid="$global_value"
   else
     if $at
     then
       exit 2
     fi
-    read -p "COPY AND PASTE YOUR TELEGRAM CHAT ID: " -e telegram_id
-    echo "telegram_id=$telegram_id" >> "$config_file"
+    read -p "COPY AND PASTE YOUR TELEGRAM CHAT ID: " -e telegram_chatid
+    echo "telegram_chatid=$telegram_chatid" >> "$config_file"
     echo 
   fi
 fi
@@ -851,5 +850,5 @@ Producer Votes: $bpaccountnames"
 # SEND ALERT NOTIFCATIONS TO TELEGRAM BOT
 #-----------------------------------------------------------------------------------------------------
 
-  curl -s -X POST https://api.telegram.org/bot$telegram_token/sendMessage -d chat_id=$telegram_id -d text="$telegram_message" &>/dev/null
+  curl -s -X POST https://api.telegram.org/bot$telegram_token/sendMessage -d chat_id=$telegram_chatid -d text="$telegram_message" &>/dev/null
 fi
