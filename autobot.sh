@@ -56,9 +56,9 @@ bp_mon_cron_line="* * * * * /root/remblock/autobot/bpmonitor.sh"
 auto_vote=false
 auto_reward=false
 auto_restaking=false
-auto_vote_noti=false
-auto_reward_noti=false
-auto_restaking_noti=false
+auto_vote_alert=false
+auto_reward_alert=false
+auto_restaking_alert=false
 bp_monitoring=false
 
 #-----------------------------------------------------------------------------------------------------
@@ -459,33 +459,32 @@ fi
 
 if $auto_vote
 then
-
-  if get_config_value bpaccountnames
-  then
-    bpaccountnames="$global_value"
-  else
-    if $at
-    then
-      exit 2
-    fi
-    read -p "THE BLOCK PRODUCERS THAT YOU WANT TO VOTE FOR: " -e bpaccountnames
-    if [ -z "$bpaccountnames" ]
-    then
-      bpaccountnames="$owneraccountname"
-    fi
-    echo "bpaccountnames=$bpaccountnames" >> "$config_file"
-    echo 
-  fi
+ if get_config_value bpaccountnames
+ then
+   bpaccountnames="$global_value"
+else
+   if $at
+   then
+     exit 2
+   fi
+   read -p "THE BLOCK PRODUCERS THAT YOU WANT TO VOTE FOR: " -e bpaccountnames
+   if [ -z "$bpaccountnames" ]
+   then
+     bpaccountnames="$owneraccountname"
+   fi
+   echo "bpaccountnames=$bpaccountnames" >> "$config_file"
+   echo 
+ fi
     
 #-----------------------------------------------------------------------------------------------------
 # GET VOTING NOTIFCATIONS ANSWER FROM THE USER OR TAKE IT FROM THE CONFIG FILE
 #-----------------------------------------------------------------------------------------------------
       
-  if get_config_value auto_vote_noti
+  if get_config_value auto_vote_alert
   then
     if [ "$global_value" = "true" ]
     then
-      auto_vote_noti=true
+      auto_vote_alert=true
     fi
   else
     if $at
@@ -494,14 +493,13 @@ then
     fi
     if get_user_answer_yn "DO YOU WANT TO RECEIVE VOTING NOTIFICATIONS"
     then
-      auto_vote_noti=true
-      echo "auto_vote_noti=true" >> "$config_file"
+      auto_vote_alert=true
+      echo "auto_vote_alert=true" >> "$config_file"
     else
-      echo "auto_vote_noti=false" >> "$config_file"
+      echo "auto_vote_alert=false" >> "$config_file"
     fi
     echo 
   fi
-
 fi
 
 #-----------------------------------------------------------------------------------------------------
@@ -535,11 +533,11 @@ fi
 
 if $auto_reward
 then
-  if get_config_value auto_reward_noti
+  if get_config_value auto_reward_alert
   then
     if [ "$global_value" = "true" ]
     then
-      auto_reward_noti=true
+      auto_reward_alert=true
     fi
   else
     if $at
@@ -548,10 +546,10 @@ then
     fi
     if get_user_answer_yn "DO YOU WANT TO RECEIVE REWARD NOTIFICATIONS"
     then
-      auto_reward_noti=true
-      echo "auto_reward_noti=true" >> "$config_file"
+      auto_reward_alert=true
+      echo "auto_reward_alert=true" >> "$config_file"
     else
-      echo "auto_reward_noti=false" >> "$config_file"
+      echo "auto_reward_alert=false" >> "$config_file"
     fi
     echo 
   fi
@@ -604,11 +602,11 @@ then
 # GET RESTAKING NOTIFCATIONS ANSWER FROM THE USER OR TAKE IT FROM THE CONFIG FILE
 #-----------------------------------------------------------------------------------------------------
 
-    if get_config_value auto_restaking_noti
+    if get_config_value auto_restaking_alert
     then
       if [ "$global_value" = "true" ]
       then
-        auto_restaking_noti=true
+        auto_restaking_alert=true
       fi
     else
       if $at
@@ -617,10 +615,10 @@ then
       fi
       if get_user_answer_yn "DO YOU WANT TO RECEIVE RESTAKING NOTIFICATIONS"
       then
-        auto_restaking_noti=true
-        echo "auto_restaking_noti=true" >> "$config_file"
+        auto_restaking_alert=true
+        echo "auto_restaking_alert=true" >> "$config_file"
       else
-        echo "auto_restaking_noti=false" >> "$config_file"
+        echo "auto_restaking_alert=false" >> "$config_file"
       fi
       echo 
     fi
@@ -669,7 +667,7 @@ fi
 # GET TELEGRAM TOKEN FROM THE USER OR TAKE IT FROM THE CONFIG FILE
 #-----------------------------------------------------------------------------------------------------
 
-if $auto_vote_noti || $auto_reward_noti || $auto_restaking_noti || $bp_monitoring
+if $auto_vote_alert || $auto_reward_alert || $auto_restaking_alert || $bp_monitoring
 then
   if get_config_value tel_token
   then
@@ -774,7 +772,7 @@ fi
 # CONFIGUARATION FOR THE TELEGRAM ALERT NOTIFCATIONS
 #-----------------------------------------------------------------------------------------------------
 
-if $auto_vote_noti || $auto_reward_noti || $auto_restaking_noti
+if $auto_vote_alert || $auto_reward_alert || $auto_restaking_alert
 then
 tel_message_1="
 
@@ -834,9 +832,9 @@ Producer Votes: $bpaccountnames"
 # TRANSFORM TELEGRAM NOTIFICATION OPTIONS INTO BINARY, FIRST VOTE, SECOND CLAIM, AND THIRD RESTAKE
 #-----------------------------------------------------------------------------------------------------
 
- if $auto_vote_noti; then option_bin="1"; else option_bin="0"; fi
- if $auto_reward_noti; then option_bin="${option_bin}1"; else option_bin="${option_bin}0"; fi
- if $auto_restaking_noti; then option_bin="${option_bin}1"; else option_bin="${option_bin}0"; fi
+ if $auto_vote_alert; then option_bin="1"; else option_bin="0"; fi
+ if $auto_reward_alert; then option_bin="${option_bin}1"; else option_bin="${option_bin}0"; fi
+ if $auto_restaking_alert; then option_bin="${option_bin}1"; else option_bin="${option_bin}0"; fi
 
  case "$option_bin" in
     100) tel_message="$tel_message_1";;
