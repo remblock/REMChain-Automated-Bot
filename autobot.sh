@@ -778,7 +778,7 @@ telegram_message_1="
 "${owneraccountname^}" Daily Summary
 --------------------------------------
 Date: $(date +"%d-%m-%Y")
-Producer Votes: $bpaccountnames"
+Voted Producers: $bpaccountnames"
 
 telegram_message_2="
 
@@ -800,7 +800,7 @@ telegram_message_4="
 --------------------------------------
 Date: $(date +"%d-%m-%Y")
 Claimed Rewards: $total_reward REM
-Producer Votes: $bpaccountnames"
+Voted Producers: $bpaccountnames"
 
 telegram_message_5="
 
@@ -816,7 +816,7 @@ telegram_message_6="
 --------------------------------------
 Date: $(date +"%d-%m-%Y")
 Restaked Rewards: $restake_reward REM
-Producer Votes: $bpaccountnames"
+Voted Producers: $bpaccountnames"
   
 telegram_message_7="
 
@@ -825,7 +825,7 @@ telegram_message_7="
 Date: $(date +"%d-%m-%Y")
 Claimed Rewards: $total_reward REM
 Restaked Rewards: $restake_reward REM
-Producer Votes: $bpaccountnames"
+Voted Producers: $bpaccountnames"
 
 #-----------------------------------------------------------------------------------------------------
 # TRANSFORM TELEGRAM NOTIFICATION OPTIONS INTO BINARY, FIRST VOTE, SECOND CLAIM, AND THIRD RESTAKE
