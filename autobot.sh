@@ -172,8 +172,8 @@ now_n=$(date -d $now +%s%N)
 # GET TELEGRAM CONFIGURATION FROM THE CONFIG FILE
 #-----------------------------------------------------------------------------------------------------
 
-tel_token="$(grep -v '^#' "$tel_config_file" | grep '^tel_token=' | awk -F '=' '{print $2}')"
-tel_id="$(grep -v '^#' "$tel_config_file" | grep '^tel_id=' | awk -F '=' '{print $2}')"
+telegram_token="$(grep -v '^#' "$telegram_config_file" | grep '^telegram_token=' | awk -F '=' '{print $2}')"
+telegram_id="$(grep -v '^#' "$telegram_config_file" | grep '^telegram_id=' | awk -F '=' '{print $2}')"
 
 #-----------------------------------------------------------------------------------------------------
 # SCHEDULE CRON FOR THE BP MONITOR SCRIPT
@@ -306,7 +306,7 @@ ${i}"
 # SEND ALERTS TO YOUR TELEGRAM BOT 
 #-----------------------------------------------------------------------------------------------------
 
-        curl -s -X POST https://api.telegram.org/bot$tel_token/sendMessage -d chat_id=$tel_id -d text="$alert" &>/dev/null
+        curl -s -X POST https://api.telegram.org/bot$telegram_token/sendMessage -d chat_id=$telegram_id -d text="$alert" &>/dev/null
 
 #-----------------------------------------------------------------------------------------------------
 # UPDATE THE TIMESTAMP IN THE CONFIG FILE
@@ -340,7 +340,7 @@ ${i}"
 # SEND MONITORING DAILY SUMMARY TO TELEGRAM BOT
 #-----------------------------------------------------------------------------------------------------
 
-    curl -s -X POST https://api.telegram.org/bot$tel_token/sendMessage -d chat_id=$tel_id -d text="$summary" &>/dev/null
+    curl -s -X POST https://api.telegram.org/bot$telegram_token/sendMessage -d chat_id=$telegram_id -d text="$summary" &>/dev/null
 
 #-----------------------------------------------------------------------------------------------------
 # UPDATE THE TIMESTAMP IN THE CONFIG FILE
@@ -669,16 +669,16 @@ fi
 
 if $auto_vote_alert || $auto_reward_alert || $auto_restaking_alert || $bp_monitoring
 then
-  if get_config_value tel_token
+  if get_config_value telegram_token
   then
-    tel_token="$global_value"
+    telegram_token="$global_value"
   else
     if $at
     then
       exit 2
     fi
-    read -p "COPY AND PASTE YOUR TELEGRAM TOKEN: " -e tel_token
-    echo "tel_token=$tel_token" >> "$config_file"
+    read -p "COPY AND PASTE YOUR TELEGRAM TOKEN: " -e telegram_token
+    echo "telegram_token=$telegram_token" >> "$config_file"
     echo 
   fi
 
@@ -686,16 +686,16 @@ then
 # GET TELEGRAM CHAT ID FROM THE USER OR TAKE IT FROM THE CONFIG FILE
 #-----------------------------------------------------------------------------------------------------
 
-if get_config_value tel_id
+if get_config_value telegram_id
   then
-    tel_id="$global_value"
+    telegram_id="$global_value"
   else
     if $at
     then
       exit 2
     fi
-    read -p "COPY AND PASTE YOUR TELEGRAM CHAT ID: " -e tel_id
-    echo "tel_id=$tel_id" >> "$config_file"
+    read -p "COPY AND PASTE YOUR TELEGRAM CHAT ID: " -e telegram_id
+    echo "telegram_id=$telegram_id" >> "$config_file"
     echo 
   fi
 fi
@@ -774,28 +774,28 @@ fi
 
 if $auto_vote_alert || $auto_reward_alert || $auto_restaking_alert
 then
-tel_message_1="
+telegram_message_1="
 
 "${owneraccountname^}" Daily Summary
 --------------------------------------
 Date: $(date +"%d-%m-%Y")
 Producer Votes: $bpaccountnames"
 
-tel_message_2="
+telegram_message_2="
 
 "${owneraccountname^}" Daily Summary
 --------------------------------------
 Date: $(date +"%d-%m-%Y")
 Claimed Rewards: $total_reward REM"
   
-tel_message_3="
+telegram_message_3="
 
 "${owneraccountname^}" Daily Summary
 --------------------------------------
 Date: $(date +"%d-%m-%Y")
 Restaked Rewards: $restake_reward REM"
 
-tel_message_4="
+telegram_message_4="
 
 "${owneraccountname^}" Daily Summary
 --------------------------------------
@@ -803,7 +803,7 @@ Date: $(date +"%d-%m-%Y")
 Claimed Rewards: $total_reward REM
 Producer Votes: $bpaccountnames"
 
-tel_message_5="
+telegram_message_5="
 
 "${owneraccountname^}" Daily Summary
 --------------------------------------
@@ -811,7 +811,7 @@ Date: $(date +"%d-%m-%Y")
 Claimed Rewards: $total_reward REM
 Restaked Rewards: $restake_reward REM"
   
-tel_message_6="
+telegram_message_6="
 
 "${owneraccountname^}" Daily Summary
 --------------------------------------
@@ -819,7 +819,7 @@ Date: $(date +"%d-%m-%Y")
 Restaked Rewards: $restake_reward REM
 Producer Votes: $bpaccountnames"
   
-tel_message_7="
+telegram_message_7="
 
 "${owneraccountname^}" Daily Summary
 --------------------------------------
@@ -837,19 +837,19 @@ Producer Votes: $bpaccountnames"
  if $auto_restaking_alert; then option_bin="${option_bin}1"; else option_bin="${option_bin}0"; fi
 
  case "$option_bin" in
-    100) tel_message="$tel_message_1";;
-    010) tel_message="$tel_message_2";;
-    001) tel_message="$tel_message_3";;
-    110) tel_message="$tel_message_4";;
-    011) tel_message="$tel_message_5";;
-    101) tel_message="$tel_message_6";;
-    111) tel_message="$tel_message_7";;
-      *) tel_message="Error in case stament";;
+    100) telegram_message="$telegram_message_1";;
+    010) telegram_message="$telegram_message_2";;
+    001) telegram_message="$telegram_message_3";;
+    110) telegram_message="$telegram_message_4";;
+    011) telegram_message="$telegram_message_5";;
+    101) telegram_message="$telegram_message_6";;
+    111) telegram_message="$telegram_message_7";;
+      *) telegram_message="Error in case stament";;
  esac
 
 #-----------------------------------------------------------------------------------------------------
 # SEND ALERT NOTIFCATIONS TO TELEGRAM BOT
 #-----------------------------------------------------------------------------------------------------
 
-  curl -s -X POST https://api.telegram.org/bot$tel_token/sendMessage -d chat_id=$tel_id -d text="$tel_message" &>/dev/null
+  curl -s -X POST https://api.telegram.org/bot$telegram_token/sendMessage -d chat_id=$telegram_id -d text="$telegram_message" &>/dev/null
 fi
