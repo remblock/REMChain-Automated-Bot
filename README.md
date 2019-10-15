@@ -1,4 +1,4 @@
-# Automated Bot + Telegram Notifications
+# Autobot
 
 This bot is fully customisable, allowing the user to choose whether to have their votes, claims and even a percentage of their claimed rewards restaked automatically daily. Please note in order for this to work you need to have your **vote**, **claim** and **stake** account permissions setup.<br>
 <br>
