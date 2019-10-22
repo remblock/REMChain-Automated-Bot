@@ -35,7 +35,7 @@ config_file="/root/remblock/autobot/config"
 #-----------------------------------------------------------------------------------------------------
 
 bp_monitor_script_path="/root/remblock/autobot/bpmonitor.sh"
-bp_monitor_config_path="/root/remblock/autobot/bp-monitor-config.conf"
+bp_monitor_config_path="$config_file"
 
 #-----------------------------------------------------------------------------------------------------
 # MINUTES TO WAIT BETWEEN EACH EXECUTIONS OF THE SCRIPT
@@ -50,6 +50,14 @@ minutes_to_wait=1442
 bp_mon_cron_line="* * * * * /root/remblock/autobot/bpmonitor.sh"
 
 #-----------------------------------------------------------------------------------------------------
+# START AND STOP SERVER COMMANDS FILES PATH
+#-----------------------------------------------------------------------------------------------------
+
+start_server_commands_path="/root/remblock/autobot/start_server_commands.sh"
+stop_server_commands_path="/root/remblock/autobot/stop_server_commands.sh"
+service_definition_path="/etc/systemd/system/autobot.service"
+
+#-----------------------------------------------------------------------------------------------------
 # INITIATE BOOLEAN VARIABLES FOR THE AUTOBOT SCRIPT
 #-----------------------------------------------------------------------------------------------------
 
@@ -60,6 +68,10 @@ auto_vote_alert=false
 auto_reward_alert=false
 auto_restaking_alert=false
 bp_monitoring=false
+vote_failed=false
+reward_failed=false
+restaking_failed=false
+send_message=false
 
 #-----------------------------------------------------------------------------------------------------
 # CHECK IF THE REQUIRED PACKAGES WERE INSTALLED, IF NOT INSTALL THEM
@@ -143,6 +155,51 @@ function get_config_value(){
 }
 
 #-----------------------------------------------------------------------------------------------------
+# CREATE START STOP SERVICES
+#-----------------------------------------------------------------------------------------------------
+function create_start_stop_service {
+if [ ! -f "$start_server_commands_path" ]
+then
+cat << 'DOC' > "$start_server_commands_path"
+#!/bin/sh
+. /root/.profile
+remnode --config-dir ./config/ --data-dir ./data/ >> remnode.log 2>&1 &
+/root/remblock/autobot/autobot.sh
+DOC
+chmod u+x "$start_server_commands_path"
+fi
+
+if [ ! -f "$stop_server_commands_path" ]
+then
+cat << 'DOC' > "$stop_server_commands_path"
+#!/bin/sh
+/usr/bin/killall remcli
+sleep 15
+DOC
+chmod u+x $stop_server_commands_path
+fi
+
+if [ ! -f "$service_definition_path" ]
+then
+cat << DOC > "$service_definition_path"
+[Unit]
+Description=Run Autobot rem commands at Start and Stop
+
+[Service]
+Type=oneshot
+RemainAfterExit=true
+ExecStart=$start_server_commands_path
+ExecStop=$stop_server_commands_path
+
+[Install]
+WantedBy=multi-user.target
+DOC
+systemctl enable autobot &> /dev/null
+fi
+
+}
+
+#-----------------------------------------------------------------------------------------------------
 # CREATE BP MONITOR SCRIPT FILE
 #-----------------------------------------------------------------------------------------------------
 
@@ -154,7 +211,18 @@ cat << 'DOC' > $bp_monitor_script_path
 # GET VARIABLES FROM THE CONFIG SOURCE
 #-----------------------------------------------------------------------------------------------------
 
-source "/root/remblock/autobot/bp-monitor-config.conf"
+source "/root/remblock/autobot/config"
+
+#Install/update crontab line
+if [ ! -z "$ALERT_THRESHOLD" ]
+then
+  #Fix crontab to match time in ALERT_THRESHOLD
+  CRON_CMD="/root/remblock/autobot/bpmonitor.sh"
+  #Remove previous line of cron
+  crontab -u root -l | grep -v 'bpmonitor.sh'  | crontab -u root -
+  #Add new line that matches desired interval time
+(crontab -u root -l ; echo "*/$ALERT_THRESHOLD * * * * $CRON_CMD") | crontab -u root -
+fi
 
 #-----------------------------------------------------------------------------------------------------
 # GET TELEGRAM API DETAILS FROM THE CONFIG FILE
@@ -277,50 +345,36 @@ fi
 
 if [ ${#alerts[@]} -gt 0 ]; then
 
-#-----------------------------------------------------------------------------------------------------
-# IF WE HAVEN'T SENT A MONITORING ALERT RECENTLY
-#-----------------------------------------------------------------------------------------------------
-
-    last_alert_s=$(date -d $LAST_ALERT +%s)
-    diff_s=$(( $now_s - $last_alert_s ))
-
-#-----------------------------------------------------------------------------------------------------
-# THE TIME DIFFERENCE IS IN SECONDS, ALERT THRESHOLD IS IN MINUTES 
-#-----------------------------------------------------------------------------------------------------
-
-    if [ $diff_s -ge $(( $ALERT_THRESHOLD * 60 )) ]; then
-
-        alert="BP Monitor Alert (${ALERT_THRESHOLD} minute frequency) 
+    alert="BP Monitor Alert (${ALERT_THRESHOLD} minute frequency) 
 -----------------------------------------------"
-        for i in "${alerts[@]}"
-        do
+    for i in "${alerts[@]}"
+    do
             alert="${alert} 
 ${i}"
-        done
+    done
 
-        alert="${alert} 
+    alert="${alert} 
 -----------------------------------------------"
 
 #-----------------------------------------------------------------------------------------------------
 # SEND ALERTS TO YOUR TELEGRAM BOT 
 #-----------------------------------------------------------------------------------------------------
 
-        curl -s -X POST https://api.telegram.org/bot$telegram_token/sendMessage -d chat_id=$telegram_chatid -d text="$alert" &>/dev/null
+     curl -s -X POST https://api.telegram.org/bot$telegram_token/sendMessage -d chat_id=$telegram_chatid -d text="$alert" &>/dev/null
 
 #-----------------------------------------------------------------------------------------------------
 # UPDATE THE TIMESTAMP IN THE CONFIG FILE
 #-----------------------------------------------------------------------------------------------------
 
-        sed -i "s/LAST_ALERT=.*/LAST_ALERT=$now/" $SCRIPT_DIR/$CONFIG_FILE
+    sed -i "s/LAST_ALERT=.*/LAST_ALERT=$now/" $SCRIPT_DIR/$CONFIG_FILE
 
-    fi
 fi
 
 #-----------------------------------------------------------------------------------------------------
 # SEND MONITORING DAILY SUMMARY NOTIFICATIONS
 #-----------------------------------------------------------------------------------------------------
 
-if [ $(date +%H:%M) == $DAILY_STATUS_AT ]; then
+if [ $(date +%H:%M) == $DAILY_STATUS_AT ] && [ "$DAILY_SUM_ENABLED" == "true" ]; then
     summary="Daily Summary 
 -------------------------------------------" 
     summary="${summary}
@@ -355,7 +409,12 @@ chmod u+x $bp_monitor_script_path
 # CREATE BP MONITOR CONFIG FILE
 #-----------------------------------------------------------------------------------------------------
 
-cat << 'DOC' > $bp_monitor_config_path
+if ! grep '^SCRIPT_FILE=' "$bp_monitor_config_path" &>/dev/null
+then
+cat << 'DOC' >> "$bp_monitor_config_path"
+#-----------------------------------------------------------------------------------------------------
+# START OF BPMONITOR CONFIGURATION
+#-----------------------------------------------------------------------------------------------------
 NODE_NAME=""
 SCRIPT_DIR="/root/remblock/autobot"
 SCRIPT_FILE="/root/remblock/autobot/bpmonitor.sh"
@@ -370,15 +429,17 @@ NODE_LOG_FILE="/root/remnode.log"
 MAX_LOG_SIZE=100
 
 #-----------------------------------------------------------------------------------------------------
-# CRON RUNS EVERY MINUTE, BUT TELEGRAM ALERTS CAN BE BASED ON THE THRESHOLD MINUTES
+# CRON WILL RUN IN EVERY ALERT_THRESHOLD MINUTE SPECIFIED
 #-----------------------------------------------------------------------------------------------------
 
 ALERT_THRESHOLD=30
+CRON_CMD="/root/remblock/autobot/bpmonitor.sh"
 
 #-----------------------------------------------------------------------------------------------------
 # MONITOR SCRIPT CHECKS IN ONCE A DAY TO CONFIRM THAT ITS STILL ACTIVE
 #-----------------------------------------------------------------------------------------------------
 
+DAILY_SUM_ENABLED="false"
 DAILY_STATUS_AT="11:30"
 LAST_ALERT="2006-09-04"
 LAST_STATUS="2006-09-04"
@@ -386,11 +447,17 @@ LAST_IRREVERSIBLE_BLOCK_NUM=0
 
 # TIME IS DEFINED IN UTC MILITARY TIME, -4 FOR EASTERN
 DOC
+#Run the script a first time so it create the crontab line
+bash $bp_monitor_script_path &>/dev/null
+fi
 }
 
 #****************************************************************************************************#
 #                                       MAIN PROGRAM FUNCTIONS                                       #
 #****************************************************************************************************#
+
+#Every time the script runs it will check if the service is installed, if not it will install it
+create_start_stop_service
 
 #-----------------------------------------------------------------------------------------------------
 # ASK USER FOR THEIR OWNER ACCOUNT NAME OR TAKE IT FROM THE CONFIG FILE
@@ -471,7 +538,7 @@ else
    then
      bpaccountnames="$owneraccountname"
    fi
-   echo "bpaccountnames=$bpaccountnames" >> "$config_file"
+   echo "bpaccountnames=\"$bpaccountnames\"" >> "$config_file"
    echo 
  fi
     
@@ -643,7 +710,6 @@ else
   then
     bp_monitoring=true
     echo "bp_monitoring=true" >> "$config_file"
-    create_bp_monitor_files
   else
     echo "bp_monitoring=false" >> "$config_file"
   fi
@@ -656,9 +722,9 @@ fi
 
 if $bp_monitoring
 then
-  if ! crontab -l | grep -v '^#' | grep bpmonitor.sh &>/dev/null
+  if [ ! -f "$bp_monitor_script_path" ]
   then
-    (crontab -l; echo "$bp_mon_cron_line" ) | crontab -
+    create_bp_monitor_files
   fi
 fi
     
@@ -703,152 +769,104 @@ fi
 # REMCLI COMMANDS FOR UNLOCKING YOUR WALLET
 #-----------------------------------------------------------------------------------------------------
 
-if $at
-then
-  remcli wallet unlock --password $walletpassword &>/dev/null
+output=$(remcli wallet unlock --password $walletpassword 2>&1)
+if ! $at; then echo $output; fi
 
 #-----------------------------------------------------------------------------------------------------
 # REMCLI COMMAND FOR CASTING YOUR VOTES
 #-----------------------------------------------------------------------------------------------------
 
-  if $auto_vote
-  then
-    remcli system voteproducer prods $owneraccountname $bpaccountnames -p $owneraccountname@vote -f &>/dev/null
-  fi
+if $auto_vote
+then
+  output=$(remcli system voteproducer prods $owneraccountname $bpaccountnames -p $owneraccountname@vote -f 2>&1)
+  if ! $at; then echo $output; fi
+  if [[ ! "$output" =~ "executed transaction" ]]; then vote_failed=true; fi
+fi
   
 #-----------------------------------------------------------------------------------------------------
 # REMCLI COMMAND FOR CLAIMING YOUR REWARDS
 #-----------------------------------------------------------------------------------------------------
-  
-  if $auto_reward
-  then
-    previous=$(remcli get currency balance rem.token $owneraccountname | awk '{print $1}')
-    remcli system claimrewards $owneraccountname -x 120 -p $owneraccountname@claim -f &>/dev/null
-    after=$(remcli get currency balance rem.token $owneraccountname  | awk '{print $1}')
-    total_reward=$(echo "$after - $previous"|bc)
-  fi
+
+if $auto_reward
+then
+  previous=$(remcli get currency balance rem.token $owneraccountname | awk '{print $1}')
+  output=$(remcli system claimrewards $owneraccountname -x 120 -p $owneraccountname@claim -f 2>&1)
+  if ! $at; then echo $output; fi
+  if [[ ! "$output" =~ "already claimed rewards" ]]; then reward_failed=true; fi
+  after=$(remcli get currency balance rem.token $owneraccountname  | awk '{print $1}')
+  total_reward=$(echo "$after - $previous"|bc)
+fi
   
 #-----------------------------------------------------------------------------------------------------
 # REMCLI COMMAND FOR RESTAKING YOUR REWARDS
 #-----------------------------------------------------------------------------------------------------
 
-  if $auto_restaking
+if $auto_restaking
+then
+  if (( restakingpercentage == 100 ))
   then
-    if (( restakingpercentage == 100 ))
-    then
-      restake_reward="$total_reward"
-    else
-      restake_reward=$(echo "scale=4; ( $total_reward / 100 ) * $restakingpercentage" | bc )
-    fi
-    remcli system delegatebw $owneraccountname $owneraccountname "$restake_reward REM" -x 120 -p $owneraccountname@stake -f &>/dev/null
+    restake_reward="$total_reward"
+  else
+    restake_reward=$(echo "scale=4; ( $total_reward / 100 ) * $restakingpercentage" | bc )
   fi
-else
-  remcli wallet unlock --password $walletpassword
-  if $auto_vote
-  then
-    remcli system voteproducer prods $owneraccountname $bpaccountnames -p $owneraccountname@vote -f
-  fi
-  if $auto_reward
-  then
-    previous=$(remcli get currency balance rem.token $owneraccountname | awk '{print $1}')
-    remcli system claimrewards $owneraccountname -x 120 -p $owneraccountname@claim -f
-    after=$(remcli get currency balance rem.token $owneraccountname  | awk '{print $1}')
-    total_reward=$(echo "$after - $previous"|bc)
-  fi
-  if $auto_restaking
-  then
-    if (( restakingpercentage == 100 ))
-    then
-      restake_reward="$total_reward"
-    else
-      restake_reward=$(echo "scale=4; ( $total_reward / 100 ) * $restakingpercentage" | bc )
-    fi
-    remcli system delegatebw $owneraccountname $owneraccountname "$restake_reward REM" -x 120 -p $owneraccountname@stake -f
-  fi
+  output=$(remcli system delegatebw $owneraccountname $owneraccountname "$restake_reward REM" -x 120 -p $owneraccountname@stake -f 2>&1)
+  if ! $at; then echo $output; fi
+  if [[ ! "$output" =~ "executed transaction" ]]; then restaking_failed=true; fi
 fi
 
+#If an error occured, send the the notification and exit the script
+
 #-----------------------------------------------------------------------------------------------------
-# CONFIGUARATION FOR THE TELEGRAM ALERT NOTIFCATIONS
+# PREPARE MESSAGE TO SEND TO TELEGRAM
 #-----------------------------------------------------------------------------------------------------
 
-if $auto_vote_alert || $auto_reward_alert || $auto_restaking_alert
+if [ ! -z "$telegram_chatid" ]
 then
-telegram_message_1="
+  telegram_message="
 
 "${owneraccountname^}" Daily Summary
 --------------------------------------
-Date: $(date +"%d-%m-%Y")
-Voted Producers: $bpaccountnames"
-
-telegram_message_2="
-
-"${owneraccountname^}" Daily Summary
---------------------------------------
-Date: $(date +"%d-%m-%Y")
+Date: $(date +"%d-%m-%Y")"
+  if $vote_failed
+  then
+    telegram_message="$telegram_message
+Producer Votes: Failed"
+    send_message=true
+  elif $auto_vote_alert
+  then
+    telegram_message="$telegram_message
+Producer Votes: $bpaccountnames"
+    send_message=true
+  fi
+  if $reward_failed
+  then
+    telegram_message="$telegram_message
+Claimed Rewards: Failed"
+    send_message=true
+  elif $auto_reward_alert
+  then
+    telegram_message="$telegram_message
 Claimed Rewards: $total_reward REM"
-  
-telegram_message_3="
-
-"${owneraccountname^}" Daily Summary
---------------------------------------
-Date: $(date +"%d-%m-%Y")
+    send_message=true
+  fi
+  if $restaking_failed
+  then
+    telegram_message="$telegram_message
+Restaked Rewards: Failed"
+    send_message=true
+  elif $auto_restaking_alert
+  then
+    telegram_message="$telegram_message
 Restaked Rewards: $restake_reward REM"
-
-telegram_message_4="
-
-"${owneraccountname^}" Daily Summary
---------------------------------------
-Date: $(date +"%d-%m-%Y")
-Claimed Rewards: $total_reward REM
-Voted Producers: $bpaccountnames"
-
-telegram_message_5="
-
-"${owneraccountname^}" Daily Summary
---------------------------------------
-Date: $(date +"%d-%m-%Y")
-Claimed Rewards: $total_reward REM
-Restaked Rewards: $restake_reward REM"
+    send_message=true
+  fi
   
-telegram_message_6="
-
-"${owneraccountname^}" Daily Summary
---------------------------------------
-Date: $(date +"%d-%m-%Y")
-Restaked Rewards: $restake_reward REM
-Voted Producers: $bpaccountnames"
+#-----------------------------------------------------------------------------------------------------
+# SEND ALERT NOTIFCATIONS TO TELEGRAM BOT (IF THERE'S SOMETHING TO SEND)
+#-----------------------------------------------------------------------------------------------------
   
-telegram_message_7="
-
-"${owneraccountname^}" Daily Summary
---------------------------------------
-Date: $(date +"%d-%m-%Y")
-Claimed Rewards: $total_reward REM
-Restaked Rewards: $restake_reward REM
-Voted Producers: $bpaccountnames"
-
-#-----------------------------------------------------------------------------------------------------
-# TRANSFORM TELEGRAM NOTIFICATION OPTIONS INTO BINARY, FIRST VOTE, SECOND CLAIM, AND THIRD RESTAKE
-#-----------------------------------------------------------------------------------------------------
-
- if $auto_vote_alert; then option_bin="1"; else option_bin="0"; fi
- if $auto_reward_alert; then option_bin="${option_bin}1"; else option_bin="${option_bin}0"; fi
- if $auto_restaking_alert; then option_bin="${option_bin}1"; else option_bin="${option_bin}0"; fi
-
- case "$option_bin" in
-    100) telegram_message="$telegram_message_1";;
-    010) telegram_message="$telegram_message_2";;
-    001) telegram_message="$telegram_message_3";;
-    110) telegram_message="$telegram_message_4";;
-    011) telegram_message="$telegram_message_5";;
-    101) telegram_message="$telegram_message_6";;
-    111) telegram_message="$telegram_message_7";;
-      *) telegram_message="Error in case stament";;
- esac
-
-#-----------------------------------------------------------------------------------------------------
-# SEND ALERT NOTIFCATIONS TO TELEGRAM BOT
-#-----------------------------------------------------------------------------------------------------
-
-  curl -s -X POST https://api.telegram.org/bot$telegram_token/sendMessage -d chat_id=$telegram_chatid -d text="$telegram_message" &>/dev/null
+  if $send_message
+  then
+    curl -s -X POST https://api.telegram.org/bot$telegram_token/sendMessage -d chat_id=$telegram_chatid -d text="$telegram_message" &>/dev/null
+  fi
 fi
