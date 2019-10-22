@@ -860,13 +860,14 @@ Restaked Rewards: Failed"
 Restaked Rewards: $restake_reward REM"
     send_message=true
   fi
-  
+
 #-----------------------------------------------------------------------------------------------------
 # SEND ALERT NOTIFCATIONS TO TELEGRAM BOT (IF THERE'S SOMETHING TO SEND)
 #-----------------------------------------------------------------------------------------------------
-  
+
   if $send_message
   then
+    sleep 120 #wait to mins before sending the notification
     curl -s -X POST https://api.telegram.org/bot$telegram_token/sendMessage -d chat_id=$telegram_chatid -d text="$telegram_message" &>/dev/null
   fi
 fi
