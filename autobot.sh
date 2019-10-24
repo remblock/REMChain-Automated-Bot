@@ -792,7 +792,7 @@ then
   previous=$(remcli get currency balance rem.token $owneraccountname | awk '{print $1}')
   output=$(remcli system claimrewards $owneraccountname -x 120 -p $owneraccountname@claim -f 2>&1)
   if ! $at; then echo $output; fi
-  if [[ ! "$output" =~ "already claimed rewards" ]]; then reward_failed=true; fi
+  if [[ "$output" =~ "already claimed rewards" ]]; then reward_failed=true; fi
   after=$(remcli get currency balance rem.token $owneraccountname  | awk '{print $1}')
   total_reward=$(echo "$after - $previous"|bc)
 fi
@@ -860,11 +860,11 @@ Restaked Rewards: Failed"
 Restaked Rewards: $restake_reward REM"
     send_message=true
   fi
-
+  
 #-----------------------------------------------------------------------------------------------------
 # SEND ALERT NOTIFCATIONS TO TELEGRAM BOT (IF THERE'S SOMETHING TO SEND)
 #-----------------------------------------------------------------------------------------------------
-
+  
   if $send_message
   then
     sleep 120 #wait to mins before sending the notification
