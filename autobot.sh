@@ -827,17 +827,6 @@ then
 "${owneraccountname^}" Daily Summary
 --------------------------------------
 Date: $(date +"%d-%m-%Y")"
-  if $vote_failed
-  then
-    telegram_message="$telegram_message
-Producer Votes: Failed"
-    send_message=true
-  elif $auto_vote_alert
-  then
-    telegram_message="$telegram_message
-Producer Votes: $bpaccountnames"
-    send_message=true
-  fi
   if $reward_failed
   then
     telegram_message="$telegram_message
@@ -858,6 +847,17 @@ Restaked Rewards: Failed"
   then
     telegram_message="$telegram_message
 Restaked Rewards: $restake_reward REM"
+    send_message=true
+  fi
+  if $vote_failed
+  then
+    telegram_message="$telegram_message
+Block Producer Votes: Failed"
+    send_message=true
+  elif $auto_vote_alert
+  then
+    telegram_message="$telegram_message
+Block Producer Votes: $bpaccountnames"
     send_message=true
   fi
   
