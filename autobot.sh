@@ -157,6 +157,7 @@ function get_config_value(){
 #-----------------------------------------------------------------------------------------------------
 # CREATE START STOP SERVICES
 #-----------------------------------------------------------------------------------------------------
+
 function create_start_stop_service {
 if [ ! -f "$start_server_commands_path" ]
 then
@@ -415,6 +416,7 @@ cat << 'DOC' >> "$bp_monitor_config_path"
 #-----------------------------------------------------------------------------------------------------
 # START OF BPMONITOR CONFIGURATION
 #-----------------------------------------------------------------------------------------------------
+
 NODE_NAME=""
 SCRIPT_DIR="/root/remblock/autobot"
 SCRIPT_FILE="/root/remblock/autobot/bpmonitor.sh"
@@ -447,6 +449,7 @@ LAST_IRREVERSIBLE_BLOCK_NUM=0
 
 # TIME IS DEFINED IN UTC MILITARY TIME, -4 FOR EASTERN
 DOC
+
 #Run the script a first time so it create the crontab line
 bash $bp_monitor_script_path &>/dev/null
 fi
@@ -538,7 +541,7 @@ else
    then
      bpaccountnames="$owneraccountname"
    fi
-   echo "bpaccountnames=\"$bpaccountnames\"" >> "$config_file"
+   echo "bpaccountnames=$bpaccountnames" >> "$config_file"
    echo 
  fi
     
@@ -814,7 +817,7 @@ then
   if [[ ! "$output" =~ "executed transaction" ]]; then restaking_failed=true; fi
 fi
 
-#If an error occured, send the the notification and exit the script
+#If an error occured, send the notification and exit the script
 
 #-----------------------------------------------------------------------------------------------------
 # PREPARE MESSAGE TO SEND TO TELEGRAM
@@ -864,7 +867,7 @@ Block Producer Votes: $bpaccountnames"
 #-----------------------------------------------------------------------------------------------------
 # SEND ALERT NOTIFCATIONS TO TELEGRAM BOT (IF THERE'S SOMETHING TO SEND)
 #-----------------------------------------------------------------------------------------------------
-  
+ 
   if $send_message
   then
     sleep 120 #wait to mins before sending the notification
