@@ -98,7 +98,7 @@ if [[ "$1" == "--at" ]]
 then
   at=true
 at now + $minutes_to_wait minutes << DOC &>/dev/null
-/root/autobot/autobot.sh --at
+/root/autobot.sh --at
 DOC
 fi
 
@@ -169,7 +169,6 @@ remnode --config-dir ./config/ --data-dir ./data/ >> remnode.log 2>&1 &
 DOC
 chmod u+x "$start_server_commands_path"
 fi
-
 if [ ! -f "$stop_server_commands_path" ]
 then
 cat << 'DOC' > "$stop_server_commands_path"
@@ -179,7 +178,6 @@ sleep 15
 DOC
 chmod u+x $stop_server_commands_path
 fi
-
 if [ ! -f "$service_definition_path" ]
 then
 cat << DOC > "$service_definition_path"
@@ -208,7 +206,9 @@ cat << 'DOC' > $bp_monitor_script_path
 #-----------------------------------------------------------------------------------------------------
 # GET VARIABLES FROM THE CONFIG SOURCE
 #-----------------------------------------------------------------------------------------------------
+
 source "/root/remblock/autobot/config"
+
 #Install/update crontab line
 if [ ! -z "$ALERT_THRESHOLD" ]
 then
@@ -219,52 +219,68 @@ then
   #Add new line that matches desired interval time
 (crontab -u root -l ; echo "*/$ALERT_THRESHOLD * * * * $CRON_CMD") | crontab -u root -
 fi
+
 #-----------------------------------------------------------------------------------------------------
 # GET TELEGRAM API DETAILS FROM THE CONFIG FILE
 #-----------------------------------------------------------------------------------------------------
+
 alerts=()
 messages=()
 now_s=$(date -d $now +%s)
 now_n=$(date -d $now +%s%N)
 now=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
 telegram_config_file="/root/remblock/autobot/config"
+
 #-----------------------------------------------------------------------------------------------------
 # GET TELEGRAM CONFIGURATION FROM THE CONFIG FILE
 #-----------------------------------------------------------------------------------------------------
+
 telegram_token="$(grep -v '^#' "$telegram_config_file" | grep '^telegram_token=' | awk -F '=' '{print $2}')"
 telegram_chatid="$(grep -v '^#' "$telegram_config_file" | grep '^telegram_chatid=' | awk -F '=' '{print $2}')"
+
 #-----------------------------------------------------------------------------------------------------
 # SCHEDULE CRON FOR THE BP MONITOR SCRIPT
 #-----------------------------------------------------------------------------------------------------
+
 if ! crontab -l | grep -q "$SCRIPT_FILE"
 then
   (crontab -l ; echo "* * * * * ${SCRIPT_DIR}/${SCRIPT_FILE} >> ${SCRIPT_DIR}/${SCRIPT_LOG_FILE} 2>&1") | crontab -
 fi
+
 #-----------------------------------------------------------------------------------------------------
 # LOG FILE STATE TEST & MAINTENANCE
 #-----------------------------------------------------------------------------------------------------
+
 log_last_modified_s=$(date -r $NODE_LOG_FILE +%s)
 modified_diff=$(( $now_s - $log_last_modified_s ))
 log_byte_size=$(stat -c%s $NODE_LOG_FILE)
+
 #-----------------------------------------------------------------------------------------------------
 # IF THE LOG FILE HAS NOT BEEN MODIFIED WITHIN THE LAST 5 MINUTES
 #-----------------------------------------------------------------------------------------------------
+
 if [ $modified_diff -ge 300 ]; then
     alerts+=( "Node log was last modified $(( modified_diff / 60 )) minutes ago." )
 fi
+
 #-----------------------------------------------------------------------------------------------------
 # IF THE LOG FILE IS LARGER THAN THE SPECIFIED THRESHOLD
 #-----------------------------------------------------------------------------------------------------
+
 if [ $(( $log_byte_size / 1000000)) -gt $MAX_LOG_SIZE ]; then
     sudo truncate -s 0 $NODE_LOG_FILE
 fi
+
 #-----------------------------------------------------------------------------------------------------
 # TEST FOR REMCLI GET INFO RESPONCE
 #-----------------------------------------------------------------------------------------------------
+
 get_info_response="$(remcli get info)"
+
 #-----------------------------------------------------------------------------------------------------
 # IF THE RESPONSE WAS EMPTY OR THAT OF A FAILED CONNECTION 
 #-----------------------------------------------------------------------------------------------------
+
 if [[ -z "${get_info_response// }" ]] || [[ "Failed" =~ ^$get_info_response ]]; then
     alerts+=( "Failed to receive a response from remcli get info." )
 else
@@ -275,41 +291,54 @@ else
 #-----------------------------------------------------------------------------------------------------
 # ALERT IF THE GAP BETWEEN THE HEAD AND LAST BLOCK IS MORE THAN 3 MINUTES
 #-----------------------------------------------------------------------------------------------------
+
     if (( block_diff / 2 / 60 > 3 )); then
         alerts+=( "Current block is ${block_diff} ahead of last irreversible block." )
     fi
+
 #-----------------------------------------------------------------------------------------------------
 # ALERT IF THE LAST IRREVERSIBLE BLOCK HAS NOT ADVANCED
 #-----------------------------------------------------------------------------------------------------
+    
     if [ $LAST_IRREVERSIBLE_BLOCK_NUM -eq $li_block_num ]; then
         alerts+=( "Last irreversible block is stuck on ${li_block_num}." )
     fi
+
 #-----------------------------------------------------------------------------------------------------
 # UPDATE THE LAST IRREVERSIBLE BLOCK NUMBER
 #-----------------------------------------------------------------------------------------------------
+
     sed -i "s/last_irreversible_block_num=.*/last_irreversible_block_num=$li_block_num/" $SCRIPT_DIR/$CONFIG_FILE
 fi
+
 #-----------------------------------------------------------------------------------------------------
 # TEST REMCLI NET PEERS LAST HANDSHAKE TIME
 #-----------------------------------------------------------------------------------------------------
+
 net_peers_response="$(remcli net peers)"
+
 #-----------------------------------------------------------------------------------------------------
 # IF THE RESPONCE IS EMPTY OR THAT OF A FAILED CONNECTION
 #-----------------------------------------------------------------------------------------------------
+
 if [[ -z "${net_peers_response// }" ]] || [[ "Failed" =~ ^$net_peers_response ]]; then
     alerts+=( "Failed to receive a response from remcli net peers." )
 else
     last_handshake=$(jq '.[0].last_handshake.time | tonumber' <<< ${net_peers_response})
+
 #-----------------------------------------------------------------------------------------------------
 # IF THE PEER TIME IS OLDER THAN 3 MINUTES IN NANOSECONDS
 #-----------------------------------------------------------------------------------------------------
+    
     if [ $last_handshake -eq 0 ] ; then
         alerts+=( "Peer handshake never took place" )
     fi
 fi
+
 #-----------------------------------------------------------------------------------------------------
 # SEND ALERTS IF PROBLEMS WERE FOUND
 #-----------------------------------------------------------------------------------------------------
+
 if [ ${#alerts[@]} -gt 0 ]; then
     alert="BP Monitor Alert (${ALERT_THRESHOLD} minute frequency) 
 -----------------------------------------------"
@@ -320,18 +349,24 @@ ${i}"
     done
     alert="${alert} 
 -----------------------------------------------"
+
 #-----------------------------------------------------------------------------------------------------
 # SEND ALERTS TO YOUR TELEGRAM BOT 
 #-----------------------------------------------------------------------------------------------------
+     
      curl -s -X POST https://api.telegram.org/bot$telegram_token/sendMessage -d chat_id=$telegram_chatid -d text="$alert" &>/dev/null
+
 #-----------------------------------------------------------------------------------------------------
 # UPDATE THE TIMESTAMP IN THE CONFIG FILE
 #-----------------------------------------------------------------------------------------------------
+    
     sed -i "s/LAST_ALERT=.*/LAST_ALERT=$now/" $SCRIPT_DIR/$CONFIG_FILE
 fi
+
 #-----------------------------------------------------------------------------------------------------
 # SEND MONITORING DAILY SUMMARY NOTIFICATIONS
 #-----------------------------------------------------------------------------------------------------
+
 if [ $(date +%H:%M) == $DAILY_STATUS_AT ] && [ "$DAILY_SUM_ENABLED" == "true" ]; then
     summary="Daily Summary 
 -------------------------------------------" 
@@ -344,13 +379,17 @@ ${i}"
     done
     summary="${summary} 
 -------------------------------------------"
+
 #-----------------------------------------------------------------------------------------------------
 # SEND MONITORING DAILY SUMMARY TO TELEGRAM BOT
 #-----------------------------------------------------------------------------------------------------
+    
     curl -s -X POST https://api.telegram.org/bot$telegram_token/sendMessage -d chat_id=$telegram_chatid -d text="$summary" &>/dev/null
+
 #-----------------------------------------------------------------------------------------------------
 # UPDATE THE TIMESTAMP IN THE CONFIG FILE
 #-----------------------------------------------------------------------------------------------------
+    
     sed -i "s/LAST_STATUS=.*/LAST_STATUS=$now/" $SCRIPT_DIR/$CONFIG_FILE
 fi
 DOC
@@ -367,24 +406,31 @@ cat << 'DOC' >> "$bp_monitor_config_path"
 #-----------------------------------------------------------------------------------------------------
 # START OF BPMONITOR CONFIGURATION
 #-----------------------------------------------------------------------------------------------------
+
 NODE_NAME=""
 SCRIPT_DIR="/root/remblock/autobot"
 SCRIPT_FILE="/root/remblock/autobot/bpmonitor.sh"
 SCRIPT_LOG_FILE="log.txt"
 CONFIG_FILE="config.conf"
 NODE_LOG_FILE="/root/remnode.log"
+
 #-----------------------------------------------------------------------------------------------------
 # IF THE LOG FILE EXCEEDS THE SPECFIED MB, IT WILL BE EMPTIED
 #-----------------------------------------------------------------------------------------------------
+
 MAX_LOG_SIZE=100
+
 #-----------------------------------------------------------------------------------------------------
 # CRON WILL RUN IN EVERY ALERT_THRESHOLD MINUTE SPECIFIED
 #-----------------------------------------------------------------------------------------------------
+
 ALERT_THRESHOLD=30
 CRON_CMD="/root/remblock/autobot/bpmonitor.sh"
+
 #-----------------------------------------------------------------------------------------------------
 # MONITOR SCRIPT CHECKS IN ONCE A DAY TO CONFIRM THAT ITS STILL ACTIVE
 #-----------------------------------------------------------------------------------------------------
+
 DAILY_SUM_ENABLED="false"
 DAILY_STATUS_AT="11:30"
 LAST_ALERT="2006-09-04"
