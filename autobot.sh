@@ -97,9 +97,9 @@ at=false
 if [[ "$1" == "--at" ]]
 then
   at=true
-  at now + $minutes_to_wait minutes << DOC &>/dev/null
-  /root/autobot.sh --at
-  DOC
+at now + $minutes_to_wait minutes << DOC &>/dev/null
+/root/autobot/autobot.sh --at
+DOC
 fi
 
 #-----------------------------------------------------------------------------------------------------
@@ -134,7 +134,7 @@ function get_user_answer_yn(){
     case "$answer" in
       yes|y) return 0 ;;
       no|n) return 1 ;;
-      *) echo  "Invalid Answer (yes/y/no/n expected)";continue;;
+      *) echo  "  Invalid Answer, (yes/y/no/n expected)";continue;;
     esac
   done
 }
@@ -163,7 +163,7 @@ if [ ! -f "$start_server_commands_path" ]
 then
 cat << 'DOC' > "$start_server_commands_path"
 #!/bin/sh
-./root/.profile
+. /root/.profile
 remnode --config-dir ./config/ --data-dir ./data/ >> remnode.log 2>&1 &
 /root/autobot.sh
 DOC
@@ -185,13 +185,11 @@ then
 cat << DOC > "$service_definition_path"
 [Unit]
 Description=Run Autobot REMCLI Commands At Start And Stop
-
 [Service]
 Type=oneshot
 RemainAfterExit=true
 ExecStart=$start_server_commands_path
 ExecStop=$stop_server_commands_path
-
 [Install]
 WantedBy=multi-user.target
 DOC
@@ -207,13 +205,10 @@ fi
 function create_bp_monitor_files(){
 cat << 'DOC' > $bp_monitor_script_path
 #!/bin/bash
-
 #-----------------------------------------------------------------------------------------------------
 # GET VARIABLES FROM THE CONFIG SOURCE
 #-----------------------------------------------------------------------------------------------------
-
 source "/root/remblock/autobot/config"
-
 #Install/update crontab line
 if [ ! -z "$ALERT_THRESHOLD" ]
 then
@@ -222,70 +217,54 @@ then
   #Remove previous line of cron
   crontab -u root -l | grep -v 'bpmonitor.sh'  | crontab -u root -
   #Add new line that matches desired interval time
-  (crontab -u root -l ; echo "*/$ALERT_THRESHOLD * * * * $CRON_CMD") | crontab -u root -
+(crontab -u root -l ; echo "*/$ALERT_THRESHOLD * * * * $CRON_CMD") | crontab -u root -
 fi
-
 #-----------------------------------------------------------------------------------------------------
 # GET TELEGRAM API DETAILS FROM THE CONFIG FILE
 #-----------------------------------------------------------------------------------------------------
-
 alerts=()
 messages=()
 now_s=$(date -d $now +%s)
 now_n=$(date -d $now +%s%N)
 now=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
 telegram_config_file="/root/remblock/autobot/config"
-
 #-----------------------------------------------------------------------------------------------------
 # GET TELEGRAM CONFIGURATION FROM THE CONFIG FILE
 #-----------------------------------------------------------------------------------------------------
-
 telegram_token="$(grep -v '^#' "$telegram_config_file" | grep '^telegram_token=' | awk -F '=' '{print $2}')"
 telegram_chatid="$(grep -v '^#' "$telegram_config_file" | grep '^telegram_chatid=' | awk -F '=' '{print $2}')"
-
 #-----------------------------------------------------------------------------------------------------
 # SCHEDULE CRON FOR THE BP MONITOR SCRIPT
 #-----------------------------------------------------------------------------------------------------
-
 if ! crontab -l | grep -q "$SCRIPT_FILE"
 then
   (crontab -l ; echo "* * * * * ${SCRIPT_DIR}/${SCRIPT_FILE} >> ${SCRIPT_DIR}/${SCRIPT_LOG_FILE} 2>&1") | crontab -
 fi
-
 #-----------------------------------------------------------------------------------------------------
 # LOG FILE STATE TEST & MAINTENANCE
 #-----------------------------------------------------------------------------------------------------
-
 log_last_modified_s=$(date -r $NODE_LOG_FILE +%s)
 modified_diff=$(( $now_s - $log_last_modified_s ))
 log_byte_size=$(stat -c%s $NODE_LOG_FILE)
-
 #-----------------------------------------------------------------------------------------------------
 # IF THE LOG FILE HAS NOT BEEN MODIFIED WITHIN THE LAST 5 MINUTES
 #-----------------------------------------------------------------------------------------------------
-
 if [ $modified_diff -ge 300 ]; then
-     alerts+=( "Node log was last modified $(( modified_diff / 60 )) minutes ago." )
+    alerts+=( "Node log was last modified $(( modified_diff / 60 )) minutes ago." )
 fi
-
 #-----------------------------------------------------------------------------------------------------
 # IF THE LOG FILE IS LARGER THAN THE SPECIFIED THRESHOLD
 #-----------------------------------------------------------------------------------------------------
-
 if [ $(( $log_byte_size / 1000000)) -gt $MAX_LOG_SIZE ]; then
-     sudo truncate -s 0 $NODE_LOG_FILE
+    sudo truncate -s 0 $NODE_LOG_FILE
 fi
-
 #-----------------------------------------------------------------------------------------------------
 # TEST FOR REMCLI GET INFO RESPONCE
 #-----------------------------------------------------------------------------------------------------
-
 get_info_response="$(remcli get info)"
-
 #-----------------------------------------------------------------------------------------------------
 # IF THE RESPONSE WAS EMPTY OR THAT OF A FAILED CONNECTION 
 #-----------------------------------------------------------------------------------------------------
-
 if [[ -z "${get_info_response// }" ]] || [[ "Failed" =~ ^$get_info_response ]]; then
     alerts+=( "Failed to receive a response from remcli get info." )
 else
@@ -296,56 +275,42 @@ else
 #-----------------------------------------------------------------------------------------------------
 # ALERT IF THE GAP BETWEEN THE HEAD AND LAST BLOCK IS MORE THAN 3 MINUTES
 #-----------------------------------------------------------------------------------------------------
-
     if (( block_diff / 2 / 60 > 3 )); then
         alerts+=( "Current block is ${block_diff} ahead of last irreversible block." )
     fi
-
 #-----------------------------------------------------------------------------------------------------
 # ALERT IF THE LAST IRREVERSIBLE BLOCK HAS NOT ADVANCED
 #-----------------------------------------------------------------------------------------------------
-
     if [ $LAST_IRREVERSIBLE_BLOCK_NUM -eq $li_block_num ]; then
         alerts+=( "Last irreversible block is stuck on ${li_block_num}." )
     fi
-
 #-----------------------------------------------------------------------------------------------------
 # UPDATE THE LAST IRREVERSIBLE BLOCK NUMBER
 #-----------------------------------------------------------------------------------------------------
-
     sed -i "s/last_irreversible_block_num=.*/last_irreversible_block_num=$li_block_num/" $SCRIPT_DIR/$CONFIG_FILE
 fi
-
 #-----------------------------------------------------------------------------------------------------
 # TEST REMCLI NET PEERS LAST HANDSHAKE TIME
 #-----------------------------------------------------------------------------------------------------
-
 net_peers_response="$(remcli net peers)"
-
 #-----------------------------------------------------------------------------------------------------
 # IF THE RESPONCE IS EMPTY OR THAT OF A FAILED CONNECTION
 #-----------------------------------------------------------------------------------------------------
-
 if [[ -z "${net_peers_response// }" ]] || [[ "Failed" =~ ^$net_peers_response ]]; then
     alerts+=( "Failed to receive a response from remcli net peers." )
 else
     last_handshake=$(jq '.[0].last_handshake.time | tonumber' <<< ${net_peers_response})
-
 #-----------------------------------------------------------------------------------------------------
 # IF THE PEER TIME IS OLDER THAN 3 MINUTES IN NANOSECONDS
 #-----------------------------------------------------------------------------------------------------
-
     if [ $last_handshake -eq 0 ] ; then
         alerts+=( "Peer handshake never took place" )
     fi
 fi
-
 #-----------------------------------------------------------------------------------------------------
 # SEND ALERTS IF PROBLEMS WERE FOUND
 #-----------------------------------------------------------------------------------------------------
-
 if [ ${#alerts[@]} -gt 0 ]; then
-
     alert="BP Monitor Alert (${ALERT_THRESHOLD} minute frequency) 
 -----------------------------------------------"
     for i in "${alerts[@]}"
@@ -353,53 +318,39 @@ if [ ${#alerts[@]} -gt 0 ]; then
             alert="${alert} 
 ${i}"
     done
-
     alert="${alert} 
 -----------------------------------------------"
-
 #-----------------------------------------------------------------------------------------------------
 # SEND ALERTS TO YOUR TELEGRAM BOT 
 #-----------------------------------------------------------------------------------------------------
-
      curl -s -X POST https://api.telegram.org/bot$telegram_token/sendMessage -d chat_id=$telegram_chatid -d text="$alert" &>/dev/null
-
 #-----------------------------------------------------------------------------------------------------
 # UPDATE THE TIMESTAMP IN THE CONFIG FILE
 #-----------------------------------------------------------------------------------------------------
-
     sed -i "s/LAST_ALERT=.*/LAST_ALERT=$now/" $SCRIPT_DIR/$CONFIG_FILE
-
 fi
-
 #-----------------------------------------------------------------------------------------------------
 # SEND MONITORING DAILY SUMMARY NOTIFICATIONS
 #-----------------------------------------------------------------------------------------------------
-
 if [ $(date +%H:%M) == $DAILY_STATUS_AT ] && [ "$DAILY_SUM_ENABLED" == "true" ]; then
     summary="Daily Summary 
 -------------------------------------------" 
     summary="${summary}
 Cron job is still running, scheduled to check in at ${DAILY_STATUS_AT} UTC every day."
-
     for i in "${messages[@]}"
     do
         summary="${summary}
 ${i}"
     done
-
     summary="${summary} 
 -------------------------------------------"
-
 #-----------------------------------------------------------------------------------------------------
 # SEND MONITORING DAILY SUMMARY TO TELEGRAM BOT
 #-----------------------------------------------------------------------------------------------------
-
     curl -s -X POST https://api.telegram.org/bot$telegram_token/sendMessage -d chat_id=$telegram_chatid -d text="$summary" &>/dev/null
-
 #-----------------------------------------------------------------------------------------------------
 # UPDATE THE TIMESTAMP IN THE CONFIG FILE
 #-----------------------------------------------------------------------------------------------------
-
     sed -i "s/LAST_STATUS=.*/LAST_STATUS=$now/" $SCRIPT_DIR/$CONFIG_FILE
 fi
 DOC
@@ -416,37 +367,29 @@ cat << 'DOC' >> "$bp_monitor_config_path"
 #-----------------------------------------------------------------------------------------------------
 # START OF BPMONITOR CONFIGURATION
 #-----------------------------------------------------------------------------------------------------
-
 NODE_NAME=""
 SCRIPT_DIR="/root/remblock/autobot"
 SCRIPT_FILE="/root/remblock/autobot/bpmonitor.sh"
 SCRIPT_LOG_FILE="log.txt"
 CONFIG_FILE="config.conf"
 NODE_LOG_FILE="/root/remnode.log"
-
 #-----------------------------------------------------------------------------------------------------
 # IF THE LOG FILE EXCEEDS THE SPECFIED MB, IT WILL BE EMPTIED
 #-----------------------------------------------------------------------------------------------------
-
 MAX_LOG_SIZE=100
-
 #-----------------------------------------------------------------------------------------------------
 # CRON WILL RUN IN EVERY ALERT_THRESHOLD MINUTE SPECIFIED
 #-----------------------------------------------------------------------------------------------------
-
 ALERT_THRESHOLD=30
 CRON_CMD="/root/remblock/autobot/bpmonitor.sh"
-
 #-----------------------------------------------------------------------------------------------------
 # MONITOR SCRIPT CHECKS IN ONCE A DAY TO CONFIRM THAT ITS STILL ACTIVE
 #-----------------------------------------------------------------------------------------------------
-
 DAILY_SUM_ENABLED="false"
 DAILY_STATUS_AT="11:30"
 LAST_ALERT="2006-09-04"
 LAST_STATUS="2006-09-04"
 LAST_IRREVERSIBLE_BLOCK_NUM=0
-
 # TIME IS DEFINED IN UTC MILITARY TIME, -4 FOR EASTERN
 DOC
 
@@ -528,10 +471,10 @@ fi
 
 if $auto_vote
 then
-  if get_config_value bpaccountnames
-  then
-    bpaccountnames="$global_value"
- else
+ if get_config_value bpaccountnames
+ then
+   bpaccountnames="$global_value"
+else
    if $at
    then
      exit 2
@@ -542,31 +485,31 @@ then
      bpaccountnames="$owneraccountname"
    fi
    echo "bpaccountnames=$bpaccountnames" >> "$config_file"
-  echo 
-fi
+   echo 
+ fi
     
 #-----------------------------------------------------------------------------------------------------
 # GET VOTING NOTIFCATIONS ANSWER FROM THE USER OR TAKE IT FROM THE CONFIG FILE
 #-----------------------------------------------------------------------------------------------------
       
-if get_config_value auto_vote_alert
-then
-  if [ "$global_value" = "true" ]
+  if get_config_value auto_vote_alert
   then
-    auto_vote_alert=true
-  fi
-else
-  if $at
-  then
-    exit 2
-  fi
-  if get_user_answer_yn "DO YOU WANT TO RECEIVE VOTING NOTIFICATIONS"
-  then
-    auto_vote_alert=true
-    echo "auto_vote_alert=true" >> "$config_file"
+    if [ "$global_value" = "true" ]
+    then
+      auto_vote_alert=true
+    fi
   else
-    echo "auto_vote_alert=false" >> "$config_file"
-  fi
+    if $at
+    then
+      exit 2
+    fi
+    if get_user_answer_yn "DO YOU WANT TO RECEIVE VOTING NOTIFICATIONS"
+    then
+      auto_vote_alert=true
+      echo "auto_vote_alert=true" >> "$config_file"
+    else
+      echo "auto_vote_alert=false" >> "$config_file"
+    fi
     echo 
   fi
 fi
@@ -620,75 +563,75 @@ then
     else
       echo "auto_reward_alert=false" >> "$config_file"
     fi
-  echo 
-fi
+    echo 
+  fi
 
 #-----------------------------------------------------------------------------------------------------
 # GET AUTOMATED RESTAKING ANSWER FROM THE USER OR TAKE IT FROM THE CONFIG FILE
 #-----------------------------------------------------------------------------------------------------
 
-if get_config_value auto_restaking
-then
-  if [ "$global_value" = "true" ]
+  if get_config_value auto_restaking
   then
-    auto_restaking=true
-  fi
-else
-  if $at
-  then
-    exit 2
-  fi
-  if get_user_answer_yn "DO YOU WANT AUTOBOT TO AUTO RESTAKE YOUR REWARDS"
-  then
-    auto_restaking=true
-    echo "auto_restaking=true" >> "$config_file"
+    if [ "$global_value" = "true" ]
+    then
+      auto_restaking=true
+    fi
   else
-    echo "auto_restaking=false" >> "$config_file"
+    if $at
+    then
+      exit 2
+    fi
+    if get_user_answer_yn "DO YOU WANT AUTOBOT TO AUTO RESTAKE YOUR REWARDS"
+    then
+      auto_restaking=true
+      echo "auto_restaking=true" >> "$config_file"
+    else
+      echo "auto_restaking=false" >> "$config_file"
+    fi
+    echo 
   fi
- echo 
-fi
 
 #-----------------------------------------------------------------------------------------------------
 # GET THE RESTAKING PERCENTAGE FROM THE USER OR TAKE IT FROM THE CONFIG FILE
 #-----------------------------------------------------------------------------------------------------
 
-if $auto_restaking
-then
-  if get_config_value restakingpercentage
+  if $auto_restaking
   then
-    restakingpercentage="$global_value"
-  else
-    if $at
+    if get_config_value restakingpercentage
     then
-      exit 2
+      restakingpercentage="$global_value"
+    else
+      if $at
+      then
+        exit 2
+      fi
+      read -p "PLEASE SET YOUR RESTAKING PERCENTAGE: " -e restakingpercentage
+      echo "restakingpercentage=$restakingpercentage" >> "$config_file"
+      echo 
     fi
-    read -p "PLEASE SET YOUR RESTAKING PERCENTAGE: " -e restakingpercentage
-    echo "restakingpercentage=$restakingpercentage" >> "$config_file"
-  echo 
-fi
 
 #-----------------------------------------------------------------------------------------------------
 # GET RESTAKING NOTIFCATIONS ANSWER FROM THE USER OR TAKE IT FROM THE CONFIG FILE
 #-----------------------------------------------------------------------------------------------------
 
-if get_config_value auto_restaking_alert
-then
-  if [ "$global_value" = "true" ]
-  then
-    auto_restaking_alert=true
-  fi
-  else
-    if $at
+    if get_config_value auto_restaking_alert
     then
-      exit 2
-    fi
-    if get_user_answer_yn "DO YOU WANT TO RECEIVE RESTAKING NOTIFICATIONS"
-    then
-      auto_restaking_alert=true
-      echo "auto_restaking_alert=true" >> "$config_file"
+      if [ "$global_value" = "true" ]
+      then
+        auto_restaking_alert=true
+      fi
     else
-      echo "auto_restaking_alert=false" >> "$config_file"
-    fi
+      if $at
+      then
+        exit 2
+      fi
+      if get_user_answer_yn "DO YOU WANT TO RECEIVE RESTAKING NOTIFICATIONS"
+      then
+        auto_restaking_alert=true
+        echo "auto_restaking_alert=true" >> "$config_file"
+      else
+        echo "auto_restaking_alert=false" >> "$config_file"
+      fi
       echo 
     fi
   fi
@@ -747,8 +690,8 @@ then
     fi
     read -p "COPY AND PASTE YOUR TELEGRAM TOKEN: " -e telegram_token
     echo "telegram_token=$telegram_token" >> "$config_file"
-  echo 
-fi
+    echo 
+  fi
 
 #-----------------------------------------------------------------------------------------------------
 # GET TELEGRAM CHAT ID FROM THE USER OR TAKE IT FROM THE CONFIG FILE
@@ -817,7 +760,7 @@ then
   if [[ ! "$output" =~ "executed transaction" ]]; then restaking_failed=true; fi
 fi
 
-#If an error occured, send a notification and exit the script
+#If an error occured, send the notification and exit the script
 
 #-----------------------------------------------------------------------------------------------------
 # PREPARE MESSAGE TO SEND TO TELEGRAM
@@ -826,7 +769,6 @@ fi
 if [ ! -z "$telegram_chatid" ]
 then
   telegram_message="
-
 "${owneraccountname^}" Daily Summary
 --------------------------------------
 Date: $(date +"%d-%m-%Y")"
