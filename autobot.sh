@@ -90,16 +90,16 @@ then
 fi
 
 #-----------------------------------------------------------------------------------------------------
-# CHECK THE CONDITION OF THE AT MODE, IT MUST BE ENABLE TO AVOID PRINTING ANY OUTPUT
+# CHECK IF THE AT CONDITION IS ENABLE TO AVOID PRINTING ANY OUTPUT
 #-----------------------------------------------------------------------------------------------------
 
 at=false
 if [[ "$1" == "--at" ]]
 then
   at=true
-at now + $minutes_to_wait minutes << DOC &>/dev/null
-/root/remblock/autobot/autobot.sh --at
-DOC
+  at now + $minutes_to_wait minutes << DOC &>/dev/null
+  /root/autobot.sh --at
+  DOC
 fi
 
 #-----------------------------------------------------------------------------------------------------
@@ -134,7 +134,7 @@ function get_user_answer_yn(){
     case "$answer" in
       yes|y) return 0 ;;
       no|n) return 1 ;;
-      *) echo  "  Invalid answer, (yes/y/no/n expected)";continue;;
+      *) echo  "Invalid Answer (yes/y/no/n expected)";continue;;
     esac
   done
 }
@@ -163,9 +163,9 @@ if [ ! -f "$start_server_commands_path" ]
 then
 cat << 'DOC' > "$start_server_commands_path"
 #!/bin/sh
-. /root/.profile
+./root/.profile
 remnode --config-dir ./config/ --data-dir ./data/ >> remnode.log 2>&1 &
-/root/remblock/autobot/autobot.sh
+/root/autobot.sh
 DOC
 chmod u+x "$start_server_commands_path"
 fi
@@ -184,7 +184,7 @@ if [ ! -f "$service_definition_path" ]
 then
 cat << DOC > "$service_definition_path"
 [Unit]
-Description=Run Autobot rem commands at Start and Stop
+Description=Run Autobot REMCLI Commands At Start And Stop
 
 [Service]
 Type=oneshot
@@ -222,7 +222,7 @@ then
   #Remove previous line of cron
   crontab -u root -l | grep -v 'bpmonitor.sh'  | crontab -u root -
   #Add new line that matches desired interval time
-(crontab -u root -l ; echo "*/$ALERT_THRESHOLD * * * * $CRON_CMD") | crontab -u root -
+  (crontab -u root -l ; echo "*/$ALERT_THRESHOLD * * * * $CRON_CMD") | crontab -u root -
 fi
 
 #-----------------------------------------------------------------------------------------------------
@@ -265,7 +265,7 @@ log_byte_size=$(stat -c%s $NODE_LOG_FILE)
 #-----------------------------------------------------------------------------------------------------
 
 if [ $modified_diff -ge 300 ]; then
-    alerts+=( "Node log was last modified $(( modified_diff / 60 )) minutes ago." )
+     alerts+=( "Node log was last modified $(( modified_diff / 60 )) minutes ago." )
 fi
 
 #-----------------------------------------------------------------------------------------------------
@@ -273,7 +273,7 @@ fi
 #-----------------------------------------------------------------------------------------------------
 
 if [ $(( $log_byte_size / 1000000)) -gt $MAX_LOG_SIZE ]; then
-    sudo truncate -s 0 $NODE_LOG_FILE
+     sudo truncate -s 0 $NODE_LOG_FILE
 fi
 
 #-----------------------------------------------------------------------------------------------------
@@ -528,10 +528,10 @@ fi
 
 if $auto_vote
 then
- if get_config_value bpaccountnames
- then
-   bpaccountnames="$global_value"
-else
+  if get_config_value bpaccountnames
+  then
+    bpaccountnames="$global_value"
+ else
    if $at
    then
      exit 2
@@ -542,31 +542,31 @@ else
      bpaccountnames="$owneraccountname"
    fi
    echo "bpaccountnames=$bpaccountnames" >> "$config_file"
-   echo 
- fi
+  echo 
+fi
     
 #-----------------------------------------------------------------------------------------------------
 # GET VOTING NOTIFCATIONS ANSWER FROM THE USER OR TAKE IT FROM THE CONFIG FILE
 #-----------------------------------------------------------------------------------------------------
       
-  if get_config_value auto_vote_alert
+if get_config_value auto_vote_alert
+then
+  if [ "$global_value" = "true" ]
   then
-    if [ "$global_value" = "true" ]
-    then
-      auto_vote_alert=true
-    fi
+    auto_vote_alert=true
+  fi
+else
+  if $at
+  then
+    exit 2
+  fi
+  if get_user_answer_yn "DO YOU WANT TO RECEIVE VOTING NOTIFICATIONS"
+  then
+    auto_vote_alert=true
+    echo "auto_vote_alert=true" >> "$config_file"
   else
-    if $at
-    then
-      exit 2
-    fi
-    if get_user_answer_yn "DO YOU WANT TO RECEIVE VOTING NOTIFICATIONS"
-    then
-      auto_vote_alert=true
-      echo "auto_vote_alert=true" >> "$config_file"
-    else
-      echo "auto_vote_alert=false" >> "$config_file"
-    fi
+    echo "auto_vote_alert=false" >> "$config_file"
+  fi
     echo 
   fi
 fi
@@ -620,75 +620,75 @@ then
     else
       echo "auto_reward_alert=false" >> "$config_file"
     fi
-    echo 
-  fi
+  echo 
+fi
 
 #-----------------------------------------------------------------------------------------------------
 # GET AUTOMATED RESTAKING ANSWER FROM THE USER OR TAKE IT FROM THE CONFIG FILE
 #-----------------------------------------------------------------------------------------------------
 
-  if get_config_value auto_restaking
+if get_config_value auto_restaking
+then
+  if [ "$global_value" = "true" ]
   then
-    if [ "$global_value" = "true" ]
-    then
-      auto_restaking=true
-    fi
-  else
-    if $at
-    then
-      exit 2
-    fi
-    if get_user_answer_yn "DO YOU WANT AUTOBOT TO AUTO RESTAKE YOUR REWARDS"
-    then
-      auto_restaking=true
-      echo "auto_restaking=true" >> "$config_file"
-    else
-      echo "auto_restaking=false" >> "$config_file"
-    fi
-    echo 
+    auto_restaking=true
   fi
+else
+  if $at
+  then
+    exit 2
+  fi
+  if get_user_answer_yn "DO YOU WANT AUTOBOT TO AUTO RESTAKE YOUR REWARDS"
+  then
+    auto_restaking=true
+    echo "auto_restaking=true" >> "$config_file"
+  else
+    echo "auto_restaking=false" >> "$config_file"
+  fi
+ echo 
+fi
 
 #-----------------------------------------------------------------------------------------------------
 # GET THE RESTAKING PERCENTAGE FROM THE USER OR TAKE IT FROM THE CONFIG FILE
 #-----------------------------------------------------------------------------------------------------
 
-  if $auto_restaking
+if $auto_restaking
+then
+  if get_config_value restakingpercentage
   then
-    if get_config_value restakingpercentage
+    restakingpercentage="$global_value"
+  else
+    if $at
     then
-      restakingpercentage="$global_value"
-    else
-      if $at
-      then
-        exit 2
-      fi
-      read -p "PLEASE SET YOUR RESTAKING PERCENTAGE: " -e restakingpercentage
-      echo "restakingpercentage=$restakingpercentage" >> "$config_file"
-      echo 
+      exit 2
     fi
+    read -p "PLEASE SET YOUR RESTAKING PERCENTAGE: " -e restakingpercentage
+    echo "restakingpercentage=$restakingpercentage" >> "$config_file"
+  echo 
+fi
 
 #-----------------------------------------------------------------------------------------------------
 # GET RESTAKING NOTIFCATIONS ANSWER FROM THE USER OR TAKE IT FROM THE CONFIG FILE
 #-----------------------------------------------------------------------------------------------------
 
-    if get_config_value auto_restaking_alert
+if get_config_value auto_restaking_alert
+then
+  if [ "$global_value" = "true" ]
+  then
+    auto_restaking_alert=true
+  fi
+  else
+    if $at
     then
-      if [ "$global_value" = "true" ]
-      then
-        auto_restaking_alert=true
-      fi
+      exit 2
+    fi
+    if get_user_answer_yn "DO YOU WANT TO RECEIVE RESTAKING NOTIFICATIONS"
+    then
+      auto_restaking_alert=true
+      echo "auto_restaking_alert=true" >> "$config_file"
     else
-      if $at
-      then
-        exit 2
-      fi
-      if get_user_answer_yn "DO YOU WANT TO RECEIVE RESTAKING NOTIFICATIONS"
-      then
-        auto_restaking_alert=true
-        echo "auto_restaking_alert=true" >> "$config_file"
-      else
-        echo "auto_restaking_alert=false" >> "$config_file"
-      fi
+      echo "auto_restaking_alert=false" >> "$config_file"
+    fi
       echo 
     fi
   fi
@@ -747,8 +747,8 @@ then
     fi
     read -p "COPY AND PASTE YOUR TELEGRAM TOKEN: " -e telegram_token
     echo "telegram_token=$telegram_token" >> "$config_file"
-    echo 
-  fi
+  echo 
+fi
 
 #-----------------------------------------------------------------------------------------------------
 # GET TELEGRAM CHAT ID FROM THE USER OR TAKE IT FROM THE CONFIG FILE
@@ -817,7 +817,7 @@ then
   if [[ ! "$output" =~ "executed transaction" ]]; then restaking_failed=true; fi
 fi
 
-#If an error occured, send the notification and exit the script
+#If an error occured, send a notification and exit the script
 
 #-----------------------------------------------------------------------------------------------------
 # PREPARE MESSAGE TO SEND TO TELEGRAM
