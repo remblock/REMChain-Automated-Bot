@@ -97,8 +97,8 @@ at=false
 if [[ "$1" == "--at" ]]
 then
   at=true
-at now + $minutes_to_wait minutes << DOC &>/dev/null
-/root/autobot.sh --at
+  at now + $minutes_to_wait minutes << DOC &>/dev/null
+  /root/autobot.sh --at
 DOC
 fi
 
@@ -134,17 +134,16 @@ function get_user_answer_yn(){
     case "$answer" in
       yes|y) return 0 ;;
       no|n) return 1 ;;
-      *) echo  "  Invalid Answer [yes/y/no/n expected]";continue;;
+      *) echo  "Invalid Answer [yes/y/no/n expected]";continue;;
     esac
   done
 }
-
-function get_config_value(){
 
 #-----------------------------------------------------------------------------------------------------
 # GLOBAL VALUE IS USED AS A GLOBAL VARIABLE TO RETURN THE RESULT
 #-----------------------------------------------------------------------------------------------------
 
+function get_config_value(){
   global_value=$(grep -v '^#' "$config_file" | grep "^$1=" | awk -F '=' '{print $2}')
   if [ -z "$global_value" ]
   then
@@ -159,8 +158,8 @@ function get_config_value(){
 #-----------------------------------------------------------------------------------------------------
 
 function create_start_stop_service {
-if [ ! -f "$start_server_commands_path" ]
-then
+  if [ ! -f "$start_server_commands_path" ]
+  then
 cat << 'DOC' > "$start_server_commands_path"
 #!/bin/sh
 . /root/.profile
@@ -193,7 +192,6 @@ WantedBy=multi-user.target
 DOC
 systemctl enable autobot &> /dev/null
 fi
-
 }
 
 #-----------------------------------------------------------------------------------------------------
@@ -533,19 +531,19 @@ else
      bpaccountnames="$owneraccountname"
    fi
    echo "bpaccountnames=$bpaccountnames" >> "$config_file"
-   echo 
- fi
+  echo 
+fi
     
 #-----------------------------------------------------------------------------------------------------
 # GET VOTING NOTIFCATIONS ANSWER FROM THE USER OR TAKE IT FROM THE CONFIG FILE
 #-----------------------------------------------------------------------------------------------------
       
-  if get_config_value auto_vote_alert
+if get_config_value auto_vote_alert
+then
+  if [ "$global_value" = "true" ]
   then
-    if [ "$global_value" = "true" ]
-    then
-      auto_vote_alert=true
-    fi
+    auto_vote_alert=true
+  fi
   else
     if $at
     then
