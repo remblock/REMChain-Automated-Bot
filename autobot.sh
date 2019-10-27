@@ -354,7 +354,7 @@ ${i}"
 # SEND ALERTS TO YOUR TELEGRAM BOT 
 #-----------------------------------------------------------------------------------------------------
      
-     curl -s -X POST https://api.telegram.org/bot$telegram_token/sendMessage -d chat_id=$telegram_chatid -d text="$alert" &>/dev/null
+    curl -s -X POST https://api.telegram.org/bot$telegram_token/sendMessage -d chat_id=$telegram_chatid -d text="$alert" &>/dev/null
 
 #-----------------------------------------------------------------------------------------------------
 # UPDATE THE TIMESTAMP IN THE CONFIG FILE
@@ -436,6 +436,7 @@ DAILY_STATUS_AT="11:30"
 LAST_ALERT="2006-09-04"
 LAST_STATUS="2006-09-04"
 LAST_IRREVERSIBLE_BLOCK_NUM=0
+
 # TIME IS DEFINED IN UTC MILITARY TIME, -4 FOR EASTERN
 DOC
 
@@ -806,10 +807,8 @@ then
   if [[ ! "$output" =~ "executed transaction" ]]; then restaking_failed=true; fi
 fi
 
-#If an error occured, send the notification and exit the script
-
 #-----------------------------------------------------------------------------------------------------
-# PREPARE MESSAGE TO SEND TO TELEGRAM
+# PREPARE NOTIFCATIONS TO SEND TO TELEGRAM
 #-----------------------------------------------------------------------------------------------------
 
 if [ ! -z "$telegram_chatid" ]
