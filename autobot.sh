@@ -129,12 +129,12 @@ fi
 function get_user_answer_yn(){
   while :
   do
-    read -p "$1 (y/n): " answer
+    read -p "$1 [y/n]: " answer
     answer="$(echo $answer | tr '[:upper:]' '[:lower:]')"  
     case "$answer" in
       yes|y) return 0 ;;
       no|n) return 1 ;;
-      *) echo  "  Invalid Answer, (yes/y/no/n expected)";continue;;
+      *) echo  "  Invalid Answer [yes/y/no/n expected]";continue;;
     esac
   done
 }
@@ -203,13 +203,14 @@ fi
 function create_bp_monitor_files(){
 cat << 'DOC' > $bp_monitor_script_path
 #!/bin/bash
+
 #-----------------------------------------------------------------------------------------------------
 # GET VARIABLES FROM THE CONFIG SOURCE
 #-----------------------------------------------------------------------------------------------------
 
 source "/root/remblock/autobot/config"
 
-#Install/update crontab line
+#Install and update crontab line
 if [ ! -z "$ALERT_THRESHOLD" ]
 then
   #Fix crontab to match time in ALERT_THRESHOLD
@@ -217,7 +218,7 @@ then
   #Remove previous line of cron
   crontab -u root -l | grep -v 'bpmonitor.sh'  | crontab -u root -
   #Add new line that matches desired interval time
-(crontab -u root -l ; echo "*/$ALERT_THRESHOLD * * * * $CRON_CMD") | crontab -u root -
+ (crontab -u root -l ; echo "*/$ALERT_THRESHOLD * * * * $CRON_CMD") | crontab -u root -
 fi
 
 #-----------------------------------------------------------------------------------------------------
@@ -437,7 +438,7 @@ LAST_ALERT="2006-09-04"
 LAST_STATUS="2006-09-04"
 LAST_IRREVERSIBLE_BLOCK_NUM=0
 
-# TIME IS DEFINED IN UTC MILITARY TIME, -4 FOR EASTERN
+#Time is defined in UTC military time, -4 for eastern
 DOC
 
 #Run the script a first time so it create the crontab line
@@ -857,7 +858,7 @@ Block Producer Votes: $bpaccountnames"
  
   if $send_message
   then
-    sleep 120 #wait to mins before sending the notification
+    sleep 120 #Wait to mins before sending the notification
     curl -s -X POST https://api.telegram.org/bot$telegram_token/sendMessage -d chat_id=$telegram_chatid -d text="$telegram_message" &>/dev/null
   fi
 fi
