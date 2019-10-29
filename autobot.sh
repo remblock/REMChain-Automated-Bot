@@ -400,8 +400,9 @@ chmod u+x $bp_monitor_script_path
 if ! grep '^SCRIPT_FILE=' "$bp_monitor_config_path" &>/dev/null
 then
 cat << 'DOC' >> "$bp_monitor_config_path"
+
 #-----------------------------------------------------------------------------------------------------
-# START OF BPMONITOR CONFIGURATION
+# START OF BP MONITOR CONFIGURATION
 #-----------------------------------------------------------------------------------------------------
 
 NODE_NAME=""
