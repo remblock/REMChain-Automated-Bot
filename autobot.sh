@@ -374,19 +374,19 @@ Cron job is still running, scheduled to check in at ${DAILY_STATUS_AT} UTC every
         summary="${summary}
 ${i}"
     done
-    summary="${summary} 
+    summary="${summary}
 -------------------------------------------"
 
 #-----------------------------------------------------------------------------------------------------
 # SEND MONITORING DAILY SUMMARY TO TELEGRAM BOT
 #-----------------------------------------------------------------------------------------------------
-    
+
    curl -s -X POST https://api.telegram.org/bot$telegram_token/sendMessage -d chat_id=$telegram_chatid -d text="$summary" &>/dev/null
 
 #-----------------------------------------------------------------------------------------------------
 # UPDATE THE TIMESTAMP IN THE CONFIG FILE
 #-----------------------------------------------------------------------------------------------------
-    
+
    sed -i "s/LAST_STATUS=.*/LAST_STATUS=$now/" $SCRIPT_DIR/$CONFIG_FILE
 fi
 DOC
