@@ -153,7 +153,7 @@ function get_config_value(){
 }
 
 #-----------------------------------------------------------------------------------------------------
-# CREATE START STOP SERVICES
+# CREATE START AND STOP SERVICES
 #-----------------------------------------------------------------------------------------------------
 
 function create_start_stop_service {
@@ -179,7 +179,7 @@ if [ ! -f "$service_definition_path" ]
 then
 cat << DOC > "$service_definition_path"
 [Unit]
-Description=Run Autobot REMCLI Commands At Start And Stop
+Description=RUN AUTOBOT REMCLI COMMANDS AT START AND STOP
 [Service]
 Type=oneshot
 RemainAfterExit=true
@@ -253,7 +253,7 @@ modified_diff=$(( $now_s - $log_last_modified_s ))
 log_byte_size=$(stat -c%s $NODE_LOG_FILE)
 
 #-----------------------------------------------------------------------------------------------------
-# IF THE LOG FILE HAS NOT BEEN MODIFIED WITHIN THE LAST 5 MINUTES
+# IF THE LOG FILE HAS NOT BEEN MODIFIED WITHIN THE LAST 3 MINUTES
 #-----------------------------------------------------------------------------------------------------
 
 if [ $modified_diff -ge 300 ]; then
@@ -421,7 +421,7 @@ MAX_LOG_SIZE=100
 # CRON WILL RUN IN EVERY ALERT_THRESHOLD MINUTE SPECIFIED
 #-----------------------------------------------------------------------------------------------------
 
-ALERT_THRESHOLD=15
+ALERT_THRESHOLD=3
 CRON_CMD="/root/remblock/autobot/bpmonitor.sh"
 
 #-----------------------------------------------------------------------------------------------------
@@ -435,6 +435,7 @@ LAST_STATUS="2006-09-04"
 LAST_IRREVERSIBLE_BLOCK_NUM=0
 
 #Time is defined in UTC military time, -4 for eastern
+
 DOC
 
 #Run the script a first time so it create the crontab line
