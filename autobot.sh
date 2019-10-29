@@ -275,7 +275,7 @@ fi
 get_info_response="$(remcli get info)"
 
 #-----------------------------------------------------------------------------------------------------
-# IF THE RESPONSE WAS EMPTY OR THAT OF A FAILED CONNECTION 
+# IF THE RESPONSE WAS EMPTY OR THAT OF A FAILED CONNECTION
 #-----------------------------------------------------------------------------------------------------
 
 if [[ -z "${get_info_response// }" ]] || [[ "Failed" =~ ^$get_info_response ]]; then
@@ -284,7 +284,7 @@ else
     head_block_num="$(jq '.head_block_num | tonumber' <<< ${get_info_response})"
     li_block_num="$(jq '.last_irreversible_block_num | tonumber' <<< ${get_info_response})"
     block_diff=$(( head_block_num - li_block_num ))
-   
+
 #-----------------------------------------------------------------------------------------------------
 # ALERT IF THE GAP BETWEEN THE HEAD AND LAST BLOCK IS MORE THAN 3 MINUTES
 #-----------------------------------------------------------------------------------------------------
@@ -296,7 +296,7 @@ else
 #-----------------------------------------------------------------------------------------------------
 # ALERT IF THE LAST IRREVERSIBLE BLOCK HAS NOT ADVANCED
 #-----------------------------------------------------------------------------------------------------
-    
+
     if [ $LAST_IRREVERSIBLE_BLOCK_NUM -eq $li_block_num ]; then
         alerts+=( "Last irreversible block is stuck on ${li_block_num}." )
     fi
@@ -326,7 +326,7 @@ else
 #-----------------------------------------------------------------------------------------------------
 # IF THE PEER TIME IS OLDER THAN 3 MINUTES IN NANOSECONDS
 #-----------------------------------------------------------------------------------------------------
-    
+
     if [ $last_handshake -eq 0 ] ; then
         alerts+=( "Peer handshake never took place" )
     fi
@@ -337,26 +337,26 @@ fi
 #-----------------------------------------------------------------------------------------------------
 
 if [ ${#alerts[@]} -gt 0 ]; then
-    alert="BP Monitor Alert (${ALERT_THRESHOLD} minute frequency) 
+    alert="BP Monitor Alert (${ALERT_THRESHOLD} minute frequency)
 -----------------------------------------------"
     for i in "${alerts[@]}"
     do
-            alert="${alert} 
+            alert="${alert}
 ${i}"
     done
-    alert="${alert} 
+    alert="${alert}
 -----------------------------------------------"
 
 #-----------------------------------------------------------------------------------------------------
-# SEND ALERTS TO YOUR TELEGRAM BOT 
+# SEND ALERTS TO YOUR TELEGRAM BOT
 #-----------------------------------------------------------------------------------------------------
-     
+
    curl -s -X POST https://api.telegram.org/bot$telegram_token/sendMessage -d chat_id=$telegram_chatid -d text="$alert" &>/dev/null
 
 #-----------------------------------------------------------------------------------------------------
 # UPDATE THE TIMESTAMP IN THE CONFIG FILE
 #-----------------------------------------------------------------------------------------------------
-    
+
    sed -i "s/LAST_ALERT=.*/LAST_ALERT=$now/" $SCRIPT_DIR/$CONFIG_FILE
 fi
 
@@ -365,8 +365,8 @@ fi
 #-----------------------------------------------------------------------------------------------------
 
 if [ $(date +%H:%M) == $DAILY_STATUS_AT ] && [ "$DAILY_SUM_ENABLED" == "true" ]; then
-    summary="Daily Summary 
--------------------------------------------" 
+    summary="Daily Summary
+-------------------------------------------"
     summary="${summary}
 Cron job is still running, scheduled to check in at ${DAILY_STATUS_AT} UTC every day."
     for i in "${messages[@]}"
