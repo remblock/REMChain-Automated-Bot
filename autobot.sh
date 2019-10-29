@@ -161,9 +161,8 @@ function create_start_stop_service {
   then
 cat << 'DOC' > "$start_server_commands_path"
 #!/bin/sh
-. /root/.profile
-remnode --config-dir ./config/ --data-dir ./data/ >> remnode.log 2>&1 &
-/root/autobot.sh
+/usr/bin/nohup /usr/bin/remnode --config-dir /root/config/ --data-dir /root/data/ >>/root/remnode.log 2>>/root/remnode.log &
+/usr/bin/nohup /root/autobot.sh &>/dev/null &
 DOC
 chmod u+x "$start_server_commands_path"
 fi
@@ -409,7 +408,7 @@ NODE_NAME=""
 SCRIPT_DIR="/root/remblock/autobot"
 SCRIPT_FILE="/root/remblock/autobot/bpmonitor.sh"
 SCRIPT_LOG_FILE="log.txt"
-CONFIG_FILE="config.conf"
+CONFIG_FILE="config"
 NODE_LOG_FILE="/root/remnode.log"
 
 #-----------------------------------------------------------------------------------------------------
@@ -422,7 +421,7 @@ MAX_LOG_SIZE=100
 # CRON WILL RUN IN EVERY ALERT_THRESHOLD MINUTE SPECIFIED
 #-----------------------------------------------------------------------------------------------------
 
-ALERT_THRESHOLD=30
+ALERT_THRESHOLD=15
 CRON_CMD="/root/remblock/autobot/bpmonitor.sh"
 
 #-----------------------------------------------------------------------------------------------------
