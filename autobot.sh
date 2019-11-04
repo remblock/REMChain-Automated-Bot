@@ -162,7 +162,11 @@ function create_start_stop_service {
 cat << 'DOC' > "$start_server_commands_path"
 #!/bin/sh
 /usr/bin/nohup /usr/bin/remnode --config-dir /root/config/ --data-dir /root/data/ >>/root/remnode.log 2>>/root/remnode.log &
-/usr/bin/nohup /root/autobot.sh &>/dev/null &
+sleep 30
+if ! tail -n1 /root/remnode.log | grep 'on_incoming_block' &>/dev/null
+then
+   /usr/bin/nohup /usr/bin/remnode --config-dir  /root/config/ --data-dir /root/data/ --replay-blockchain --hard-replay-blockchain --genesis-json genesis.json &
+fi
 DOC
 chmod u+x "$start_server_commands_path"
 fi
@@ -655,7 +659,8 @@ then
       echo "restakingpercentage=$restakingpercentage" >> "$config_file"
       echo 
     fi
-
+    restakingpercentage=$(echo $restakingpercentage | tr -d '%' )
+    
 #-----------------------------------------------------------------------------------------------------
 # GET RESTAKING NOTIFCATION ANSWER FROM THE USER OR TAKE IT FROM THE CONFIG FILE
 #-----------------------------------------------------------------------------------------------------
