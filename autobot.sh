@@ -203,11 +203,6 @@ fi
 function create_bp_monitor_files(){
 cat << 'DOC' > $bp_monitor_script_path
 #!/bin/bash
-
-#****************************************************************************************************#
-#                                        BP MONITOR SCRIPT                                           #
-#****************************************************************************************************#
-
 #This script need to be called via cron every minute
 
 #PATH to used commands
@@ -215,49 +210,38 @@ PATH="/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/snap/bin"
 #Load configuration variables and values
 source "/root/remblock/autobot/config" &>/dev/null
 now_epoch="$(date +%s)"
-now_date="$(date)"
+now_date="$(date +%d-%m-%Y)"
 owneraccountname="$owner"
 
-#-----------------------------------------------------------------------------------------------------
-# INSTALL CRONTAB LINE IF IT DOES NOT EXISTS
-#-----------------------------------------------------------------------------------------------------
-
-if [ ! -z "$bpm_cron_cmd" ] && ! crontab -u root -l | grep -v '^ *#' | grep "$bpm_cron_cmd"
+#Install crontab line if it does not exists
+if [ ! -z "$bpm_cron_cmd" ] && ! crontab -u root -l | grep -v '^ *#' | grep "$bpm_cron_cmd" &>/dev/null
 then
   (crontab -u root -l ; echo "*/1 * * * * $bpm_cron_cmd") | crontab -u root -
 fi
 
-#-----------------------------------------------------------------------------------------------------
-# CREATE BP MONITOR FOLDER FOR TEMPORAL INFORMATION
-#-----------------------------------------------------------------------------------------------------
-
+#Create bpmonitor folder for temporal information
 if [ ! -z "$bpm_temp_dir" ] && [ ! -d "$bpm_temp_dir" ]
 then
   mkdir "$bpm_temp_dir"
 fi
 
-#****************************************************************************************************#
-#                                        FUNCTION DEFINITIONS                                        #
-#****************************************************************************************************#
+#Function definitions
 
-#-----------------------------------------------------------------------------------------------------
-# ADD A MESSAGE TO BE SENT LATER, IF THERE ARE MORE LINES THAN PERMITED IN THE QUEUE
-#-----------------------------------------------------------------------------------------------------
-
+#Add a message to be sent later, if there are more lines than permited in the queue, delete the older ones
 function add_message_to_queue(){
   #If the log is at maximum capacity, delete exceding lines
   if [ -f "$bpm_temp_dir/msg_queue.txt" ] && (( $(wc -l "$bpm_temp_dir/msg_queue.txt" | awk '{print $1}') >= bpm_max_queued_msg_lines ))
   then
     echo "$(tail -$((bpm_max_queued_msg_lines -1)) $bpm_temp_dir/msg_queue.txt)" > $bpm_temp_dir/msg_queue.txt
   fi
-  echo "$now_date: $1" >> $bpm_temp_dir/msg_queue.txt
+  echo -e "Date: $now_date\n $1" >> $bpm_temp_dir/msg_queue.txt
 }
 
 #Send the queued messages to telegram and empty the queue
 function send_telegram_messages(){
   if [ ! -z "$telegram_token" ] && [ ! -z "$telegram_chatid" ]
   then
-    curl -s -X POST https://api.telegram.org/bot$telegram_token/sendMessage -d chat_id=$telegram_chatid -d text="$(cat $bpm_temp_dir/msg_queue.txt)" &>/dev/null
+    curl -s -X POST https://api.telegram.org/bot$telegram_token/sendMessage -d chat_id=$telegram_chatid -d text="$(echo -e "BP Warning Alert\n--------------------------------------";cat $bpm_temp_dir/msg_queue.txt)" &>/dev/null
     #clean the msg queue file
     > $bpm_temp_dir/msg_queue.txt
     echo $now_epoch > "$bpm_temp_dir/last_send_message_epoch.txt"
@@ -277,6 +261,7 @@ function send_warnings(){
       send_telegram_messages
     fi
   fi
+
 }
 
 #Translate the time format from the remnode log to epoch time
@@ -349,7 +334,7 @@ function check_last_iblock(){
   else
     last_block_id=$(cat "$bpm_temp_dir/last_iblock.txt")
     last_irr_block_id="$(remcli get info | grep -w 'last_irreversible_block_num' | awk '{print $2}' | tr -d ',')"
-    if (( last_block_id <= last_irr_block_id ))
+    if (( last_block_id == last_irr_block_id ))
     then
       add_message_to_queue "$owneraccountname last irreversible block is stuck on ${last_irr_block_id}."
     else
@@ -391,10 +376,9 @@ function check_disk_and_ram(){
   fi
 }
 
-#****************************************************************************************************#
-#                                       MAIN PROGRAM FUNCTIONS                                       #
-#****************************************************************************************************#
 
+
+#MAIN SCRIPT
 if [ "$(echo $bpm_check_producer | tr '[:upper:]' '[:lower:]' )" == "true" ]
 then 
   check_produce_minutes
@@ -473,6 +457,7 @@ fi
 
 #Every time the script runs it will check if the service is installed, if not it will install it
 create_start_stop_service
+
 
 #Fill possible missing config variables
 
@@ -769,8 +754,10 @@ then
     then
       auto_transfer=true
       echo "auto_transfer=true" >> "$config_file"
+      echo
       read -p "PLEASE SET YOUR TRANSFER ACCOUNT NAME: " auto_transfer_acct
       echo "auto_transfer_acct=$auto_transfer_acct" >> "$config_file"
+      echo
       read -p "PLEASE SET YOUR TRANSFER PERCENTAGE: " auto_transfer_perc
       echo "auto_transfer_perc=$auto_transfer_perc" >> "$config_file"
     else
@@ -889,7 +876,7 @@ fi
 
 if $auto_transfer
 then
-  remcli transfer $owneraccountname $auto_transfer_acct "$total_reward REM" -x 120 -p $owneraccountname@$transfer_permission -f 2>&1
+  remcli transfer $owneraccountname $auto_transfer_acct  "$total_reward REM" -x 120 -p $owneraccountname@$transfer_permission -f 2>&1
 fi
   
 #-----------------------------------------------------------------------------------------------------
