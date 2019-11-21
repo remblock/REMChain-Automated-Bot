@@ -203,6 +203,11 @@ fi
 function create_bp_monitor_files(){
 cat << 'DOC' > $bp_monitor_script_path
 #!/bin/bash
+
+#****************************************************************************************************#
+#                                        BP MONITOR SCRIPT                                           #
+#****************************************************************************************************#
+
 #This script need to be called via cron every minute
 
 #PATH to used commands
@@ -213,21 +218,32 @@ now_epoch="$(date +%s)"
 now_date="$(date)"
 owneraccountname="$owner"
 
-#Install crontab line if it does not exists
+#-----------------------------------------------------------------------------------------------------
+# INSTALL CRONTAB LINE IF IT DOES NOT EXISTS
+#-----------------------------------------------------------------------------------------------------
+
 if [ ! -z "$bpm_cron_cmd" ] && ! crontab -u root -l | grep -v '^ *#' | grep "$bpm_cron_cmd"
 then
   (crontab -u root -l ; echo "*/1 * * * * $bpm_cron_cmd") | crontab -u root -
 fi
 
-#Create bpmonitor folder for temporal information
+#-----------------------------------------------------------------------------------------------------
+# CREATE BP MONITOR FOLDER FOR TEMPORAL INFORMATION
+#-----------------------------------------------------------------------------------------------------
+
 if [ ! -z "$bpm_temp_dir" ] && [ ! -d "$bpm_temp_dir" ]
 then
   mkdir "$bpm_temp_dir"
 fi
 
-#Function definitions
+#****************************************************************************************************#
+#                                        FUNCTION DEFINITIONS                                        #
+#****************************************************************************************************#
 
-#Add a message to be sent later, if there are more lines than permited in the queue, delete the older ones
+#-----------------------------------------------------------------------------------------------------
+# ADD A MESSAGE TO BE SENT LATER, IF THERE ARE MORE LINES THAN PERMITED IN THE QUEUE
+#-----------------------------------------------------------------------------------------------------
+
 function add_message_to_queue(){
   #If the log is at maximum capacity, delete exceding lines
   if [ -f "$bpm_temp_dir/msg_queue.txt" ] && (( $(wc -l "$bpm_temp_dir/msg_queue.txt" | awk '{print $1}') >= bpm_max_queued_msg_lines ))
@@ -375,9 +391,10 @@ function check_disk_and_ram(){
   fi
 }
 
+#****************************************************************************************************#
+#                                       MAIN PROGRAM FUNCTIONS                                       #
+#****************************************************************************************************#
 
-
-#MAIN SCRIPT
 if [ "$(echo $bpm_check_producer | tr '[:upper:]' '[:lower:]' )" == "true" ]
 then 
   check_produce_minutes
@@ -456,7 +473,6 @@ fi
 
 #Every time the script runs it will check if the service is installed, if not it will install it
 create_start_stop_service
-
 
 #Fill possible missing config variables
 
