@@ -889,7 +889,7 @@ fi
 
 if $auto_transfer
 then
-  remcli system transfer $owneraccountname $auto_transfer_acct  "$total_reward REM" -x 120 -p $owneraccountname@$transfer_permission -f 2>&1
+  remcli system transfer $owneraccountname $auto_transfer_acct "$total_reward REM" -x 120 -p $owneraccountname@$transfer_permission -f 2>&1
 fi
   
 #-----------------------------------------------------------------------------------------------------
