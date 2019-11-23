@@ -250,10 +250,11 @@ function send_telegram_messages(){
 
 #Check warning threshold and send message
 function send_warnings(){
-  if [ ! -f $bpm_temp_dir/last_send_message_epoch.txt ] 
+  if [ ! -f "$bpm_temp_dir/last_send_message_epoch.txt" ] 
   then
-      send_telegram_messages
-  else
+    echo $now_epoch > "$bpm_temp_dir/last_send_message_epoch.txt"
+  elif [ -s "$bpm_temp_dir/last_send_message_epoch.txt" ]
+  then
     config_minutes_in_seconds="$((bpm_warning_alert_threshold * 60))"
     last_msg_epoch=$(cat "$bpm_temp_dir/last_send_message_epoch.txt")
     if (( (now_epoch - last_msg_epoch) >= config_minutes_in_seconds ))
@@ -261,7 +262,6 @@ function send_warnings(){
       send_telegram_messages
     fi
   fi
-
 }
 
 #Translate the time format from the remnode log to epoch time
@@ -296,7 +296,7 @@ function check_log_minutes(){
 function check_remnode_chain(){
   if ! timeout 10s remcli get info 2>&1 | grep server_version &>/dev/null
   then
-    add_message_to_queue "$owneraccountname failed to receive a response from \"remcli get info\""
+	  add_message_to_queue "$owneraccountname failed to receive a response from \"remcli get info\" (check_remnode_chain)"
   fi
 }
 
@@ -304,7 +304,7 @@ function check_remnode_chain(){
 function check_block_minutes(){
   if ! timeout 10s remcli get info 2>&1 | grep server_version &>/dev/null
   then
-    add_message_to_queue "$owneraccountname failed to receive a response from \"remcli get info\""
+	  add_message_to_queue "$owneraccountname failed to receive a response from \"remcli get info\" (check_block_minutes)"
     return
   fi
   last_block_id="$(remcli get info | grep -w 'head_block_num' | awk '{print $2}' | tr -d ',')"
@@ -324,7 +324,7 @@ function check_block_minutes(){
 function check_last_iblock(){
   if ! timeout 10s remcli get info 2>&1 | grep server_version &>/dev/null
   then
-    add_message_to_queue "$owneraccountname failed to receive a response from \"remcli get info\""
+	  add_message_to_queue "$owneraccountname failed to receive a response from \"remcli get info\" (check_last_iblock)"
     return
   fi
   if [ ! -f "$bpm_temp_dir/last_iblock.txt" ]
@@ -347,7 +347,7 @@ function check_last_iblock(){
 function check_net_peers(){
   if ! timeout 10 remcli net peers | grep head_id
   then
-    add_message_to_queue "$owneraccountname failed to receive a response from \"remcli net peers\""
+	  add_message_to_queue "$owneraccountname failed to receive a response from \"remcli net peers\" (check_net_peers)"
     return
   fi
   last_hand_shake_time_ns="$(remcli net peers | grep time | sed -n '1p' | awk '{print $2}' | tr -d '",')"
@@ -440,7 +440,7 @@ bpm_disk_space_threshold=80
 bpm_check_producer=True
 bpm_check_log=False
 bpm_check_info=False
-bpm_check_blocks=False
+bpm_check_blocks=True
 bpm_check_irr_blocks=False
 bpm_check_peers=False
 bpm_check_server=True
