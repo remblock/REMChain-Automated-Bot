@@ -234,13 +234,38 @@ function add_message_to_queue(){
   then
     echo "$(tail -$((bpm_max_queued_msg_lines -1)) $bpm_temp_dir/msg_queue.txt)" > $bpm_temp_dir/msg_queue.txt
   fi
-  echo -e "Date: $now_date\n $1" >> $bpm_temp_dir/msg_queue.txt
+  if ! line_repeated "$1"
+  then
+    echo -e "$1\n" >> "$bpm_temp_dir/msg_queue.txt"
+  fi
+}
+
+#Check if the last line is repeated
+function line_repeated(){
+  if grep "$1" "$bpm_temp_dir/msg_queue.txt" &>/dev/null
+  then
+    return 0
+  else
+    return 1
+  fi
+}
+
+#Remove old lines that only change in minutes displayed
+#It receives only the base of the line befores the numbers curresponding to time
+function remove_lines_repeated_time(){
+  sed -i "/^$1/d" "$bpm_temp_dir/msg_queue.txt"
+}
+
+#Remove 2 consecutive empty lines before sending the message
+function remove_empty_lines(){
+  sed -i '/^$/{N;/^\n$/d;}' "$bpm_temp_dir/msg_queue.txt"
 }
 
 #Send the queued messages to telegram and empty the queue
 function send_telegram_messages(){
   if [ ! -z "$telegram_token" ] && [ ! -z "$telegram_chatid" ]
   then
+    remove_empty_lines
     curl -s -X POST https://api.telegram.org/bot$telegram_token/sendMessage -d chat_id=$telegram_chatid -d text="$(echo -e "BP Warning Alert\n--------------------------------------";cat $bpm_temp_dir/msg_queue.txt)" &>/dev/null
     #clean the msg queue file
     > $bpm_temp_dir/msg_queue.txt
@@ -253,11 +278,10 @@ function send_warnings(){
   if [ ! -f "$bpm_temp_dir/last_send_message_epoch.txt" ] 
   then
     echo $now_epoch > "$bpm_temp_dir/last_send_message_epoch.txt"
-  elif [ -s "$bpm_temp_dir/last_send_message_epoch.txt" ]
-  then
+  else
     config_minutes_in_seconds="$((bpm_warning_alert_threshold * 60))"
     last_msg_epoch=$(cat "$bpm_temp_dir/last_send_message_epoch.txt")
-    if (( (now_epoch - last_msg_epoch) >= config_minutes_in_seconds ))
+    if (( (now_epoch - last_msg_epoch) >= config_minutes_in_seconds )) && (( $(wc -l "$bpm_temp_dir/msg_queue.txt" | awk '{print $1}') > 1 ))
     then
       send_telegram_messages
     fi
@@ -277,6 +301,7 @@ function check_produce_minutes(){
   config_minutes_in_seconds="$((bpm_check_produce_minutes * 60))"
   if (( (now_epoch - last_block_epoch) >= config_minutes_in_seconds ))
   then
+    remove_lines_repeated_time "$owneraccountname last produced a block"
     add_message_to_queue "$owneraccountname last produced a block "$(((now_epoch - last_block_epoch)/60))" minutes ago."
   fi
 }
@@ -287,6 +312,7 @@ function check_log_minutes(){
   config_minutes_in_seconds="$(( bpm_check_log_minutes * 60))"
   if (( (now_epoch - last_write_epoch) >= config_minutes_in_seconds ))
   then
+    remove_lines_repeated_time "$owneraccountname log file was last modified"
     add_message_to_queue "$owneraccountname log file was last modified "$(((now_epoch - last_write_epoch)/60))" minutes ago"
   fi
 }
@@ -296,7 +322,7 @@ function check_log_minutes(){
 function check_remnode_chain(){
   if ! timeout 10s remcli get info 2>&1 | grep server_version &>/dev/null
   then
-	  add_message_to_queue "$owneraccountname failed to receive a response from \"remcli get info\" (check_remnode_chain)"
+    add_message_to_queue "$owneraccountname failed to receive a response from \"remcli get info\""
   fi
 }
 
@@ -304,7 +330,7 @@ function check_remnode_chain(){
 function check_block_minutes(){
   if ! timeout 10s remcli get info 2>&1 | grep server_version &>/dev/null
   then
-	  add_message_to_queue "$owneraccountname failed to receive a response from \"remcli get info\" (check_block_minutes)"
+    add_message_to_queue "$owneraccountname failed to receive a response from \"remcli get info\""
     return
   fi
   last_block_id="$(remcli get info | grep -w 'head_block_num' | awk '{print $2}' | tr -d ',')"
@@ -316,6 +342,7 @@ function check_block_minutes(){
   config_minutes_in_seconds="$((bpm_check_block_minutes * 60))"
   if (( ( last_block_epoch - last_irr_block_epoch ) >= config_minutes_in_seconds ))
   then
+    remove_lines_repeated_time "$owneraccountname current block is"
     add_message_to_queue "$owneraccountname current block is $(((last_block_epoch - last_irr_block_epoch)/60)) ahead of last irreversible."
   fi
 }
@@ -324,7 +351,7 @@ function check_block_minutes(){
 function check_last_iblock(){
   if ! timeout 10s remcli get info 2>&1 | grep server_version &>/dev/null
   then
-	  add_message_to_queue "$owneraccountname failed to receive a response from \"remcli get info\" (check_last_iblock)"
+    add_message_to_queue "$owneraccountname failed to receive a response from \"remcli get info\""
     return
   fi
   if [ ! -f "$bpm_temp_dir/last_iblock.txt" ]
@@ -334,8 +361,9 @@ function check_last_iblock(){
   else
     last_block_id=$(cat "$bpm_temp_dir/last_iblock.txt")
     last_irr_block_id="$(remcli get info | grep -w 'last_irreversible_block_num' | awk '{print $2}' | tr -d ',')"
-    if (( last_block_id == last_irr_block_id ))
+    if [ "$last_block_id" == "$last_irr_block_id" ))
     then
+      remove_lines_repeated_time "$owneraccountname last irreversible block is stuck on"
       add_message_to_queue "$owneraccountname last irreversible block is stuck on ${last_irr_block_id}."
     else
       echo "$last_irr_block_id" > "$bpm_temp_dir/last_iblock.txt"
@@ -345,9 +373,9 @@ function check_last_iblock(){
 
 #Function that tests the "remcli net peers" command for the last handshake time, if the peer time is older than the configured minutes
 function check_net_peers(){
-  if ! timeout 10 remcli net peers | grep head_id
+  if ! timeout 10 remcli net peers | grep head_id &>/dev/null
   then
-	  add_message_to_queue "$owneraccountname failed to receive a response from \"remcli net peers\" (check_net_peers)"
+    add_message_to_queue "$owneraccountname failed to receive a response from \"remcli net peers\""
     return
   fi
   last_hand_shake_time_ns="$(remcli net peers | grep time | sed -n '1p' | awk '{print $2}' | tr -d '",')"
@@ -379,6 +407,7 @@ function check_disk_and_ram(){
 
 
 #MAIN SCRIPT
+
 if [ "$(echo $bpm_check_producer | tr '[:upper:]' '[:lower:]' )" == "true" ]
 then 
   check_produce_minutes
@@ -876,7 +905,7 @@ fi
 
 if $auto_transfer
 then
-  remcli transfer $owneraccountname $auto_transfer_acct  "$total_reward REM" -x 120 -p $owneraccountname@$transfer_permission -f 2>&1
+  remcli transfer $owneraccountname $auto_transfer_acct  "$(( (total_reward*100)/auto_transfer_perc )) REM" -x 120 -p $owneraccountname@$transfer_permission -f 2>&1
 fi
   
 #-----------------------------------------------------------------------------------------------------
@@ -931,12 +960,12 @@ Restaked Rewards: $restake_reward REM"
   if $vote_failed
   then
     telegram_message="$telegram_message
-Block Producer Votes: Failed"
+Voted Block Producers: Failed"
     send_message=true
   elif $auto_vote_alert
   then
     telegram_message="$telegram_message
-Block Producer Votes: $bpaccountnames"
+Voted Block Producers: $bpaccountnames"
     send_message=true
   fi
   
