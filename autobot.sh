@@ -1018,9 +1018,9 @@ Voted Block Producers: $bpaccountnames"
     then
       sleep 120
     else
-      printf  "\n\nWAIT 2 MINUTES FOR THE CONFIRMATION OF THE ABOVE TRANSACTIONS\n\n"
+      printf  "\n\nWAIT 2 MINUTES FOR THE CONFIRMATION OF THE TRANSACTIONS\n\n"
       progress-bar 112
-      printf "\n"
+      printf "\n\n\n"
     fi
     curl -s -X POST https://api.telegram.org/bot$telegram_token/sendMessage -d chat_id=$telegram_chatid -d text="$telegram_message" &>/dev/null
   fi
