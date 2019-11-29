@@ -71,6 +71,7 @@ bp_monitoring=false
 vote_failed=false
 reward_failed=false
 restaking_failed=false
+transfer_failed=false
 send_message=false
 
 #-----------------------------------------------------------------------------------------------------
@@ -124,6 +125,25 @@ fi
 #****************************************************************************************************#
 #                                        FUNCTION DEFINITIONS                                        #
 #****************************************************************************************************#
+
+progress-bar() {
+
+  local duration=${1}
+  already_done() { for ((done=0; done<$elapsed; done++)); do printf "▇"; done }
+  remaining() { for ((remain=$elapsed; remain<$duration; remain++)); do printf " "; done }
+  percentage() { printf "| %s%%" $(( (($elapsed)*100)/($duration)*100/100 )); }
+  clean_line() { printf "\r"; }
+
+  for (( elapsed=1; elapsed<=$duration; elapsed++ )); do
+      already_done; remaining; percentage
+      sleep 1
+      clean_line
+
+  done
+  clean_line
+
+}
+
 
 function get_user_answer_yn(){
   while :
@@ -361,7 +381,7 @@ function check_last_iblock(){
   else
     last_block_id=$(cat "$bpm_temp_dir/last_iblock.txt")
     last_irr_block_id="$(remcli get info | grep -w 'last_irreversible_block_num' | awk '{print $2}' | tr -d ',')"
-    if [ "$last_block_id" == "$last_irr_block_id" ))
+    if [ "$last_block_id" == "$last_irr_block_id" ]
     then
       remove_lines_repeated_time "$owneraccountname last irreversible block is stuck on"
       add_message_to_queue "$owneraccountname last irreversible block is stuck on ${last_irr_block_id}."
@@ -403,8 +423,6 @@ function check_disk_and_ram(){
     add_message_to_queue "$owneraccountname disk usage is over the specified threshold amount."
   fi
 }
-
-
 
 #MAIN SCRIPT
 
@@ -494,7 +512,7 @@ if get_config_value vote_permission
 then
   vote_permission="$global_value"
 else
-  vote_permission="producer"
+  vote_permission="vote"
   echo "vote_permission=$vote_permission" >> "$config_file"
 fi
 
@@ -502,7 +520,7 @@ if get_config_value claim_permission
 then
   claim_permission="$global_value"
 else
-  claim_permission="producer"
+  claim_permission="claim"
   echo "claim_permission=$claim_permission" >> "$config_file"
 fi
 
@@ -510,7 +528,7 @@ if get_config_value stake_permission
 then
   stake_permission="$global_value"
 else
-  stake_permission="producer"
+  stake_permission="stake"
   echo "stake_permission=$stake_permission" >> "$config_file"
 fi
 
@@ -876,7 +894,8 @@ fi
 #-----------------------------------------------------------------------------------------------------
 
 output=$(remcli wallet unlock --password $walletpassword 2>&1)
-if ! $at; then echo $output; fi
+#Uncomment if you want the output of the command printed
+#if ! $at; then echo $output; fi
 
 #-----------------------------------------------------------------------------------------------------
 # REMCLI COMMAND FOR CASTING YOUR VOTES
@@ -885,7 +904,8 @@ if ! $at; then echo $output; fi
 if $auto_vote
 then
   output=$(remcli system voteproducer prods $owneraccountname $bpaccountnames -p $owneraccountname@$vote_permission -f 2>&1)
-  if ! $at; then echo $output; fi
+  #Uncomment if you want the output of the command printed
+  #if ! $at; then echo $output; fi
   if [[ ! "$output" =~ "executed transaction" ]]; then vote_failed=true; fi
 fi
   
@@ -897,7 +917,8 @@ if $auto_reward
 then
   previous=$(remcli get currency balance rem.token $owneraccountname | awk '{print $1}')
   output=$(remcli system claimrewards $owneraccountname -x 120 -p $owneraccountname@$claim_permission -f 2>&1)
-  if ! $at; then echo $output; fi
+  #Uncomment if you want the output of the command printed
+  #if ! $at; then echo $output; fi
   if [[ "$output" =~ "already claimed rewards" ]]; then reward_failed=true; fi
   after=$(remcli get currency balance rem.token $owneraccountname  | awk '{print $1}')
   total_reward=$(echo "$after - $previous"|bc)
@@ -905,7 +926,10 @@ fi
 
 if $auto_transfer
 then
-  remcli transfer $owneraccountname $auto_transfer_acct  "$(( (total_reward*100)/auto_transfer_perc )) REM" -x 120 -p $owneraccountname@$transfer_permission -f 2>&1
+  output=$(remcli transfer $owneraccountname $auto_transfer_acct  "$(( (total_reward*100)/auto_transfer_perc )) REM" -x 120 -p $owneraccountname@$transfer_permission -f 2>&1)
+  #Uncomment if you want the output of the command printed
+  #if ! $at; then echo $output; fi
+  if [[ ! "$output" =~ "executed transaction" ]]; then transfer_failed=true; fi
 fi
   
 #-----------------------------------------------------------------------------------------------------
@@ -921,7 +945,8 @@ then
     restake_reward=$(echo "scale=4; ( $total_reward / 100 ) * $restakingpercentage" | bc )
   fi
   output=$(remcli system delegatebw $owneraccountname $owneraccountname "$restake_reward REM" -x 120 -p $owneraccountname@$stake_permission -f 2>&1)
-  if ! $at; then echo $output; fi
+  #Uncomment if you want the output of the command printed
+  #if ! $at; then echo $output; fi
   if [[ ! "$output" =~ "executed transaction" ]]; then restaking_failed=true; fi
 fi
 
@@ -946,6 +971,18 @@ Claimed Rewards: Failed"
 Claimed Rewards: $total_reward REM"
     send_message=true
   fi
+
+  if $transfer_failed
+  then
+    telegram_message="$telegram_message
+Transfer Rewards: Failed"
+    send_message=true
+  else
+    telegram_message="$telegram_message
+Transfer Rewards: $total_reward REM"
+    send_message=true
+  fi
+
   if $restaking_failed
   then
     telegram_message="$telegram_message
@@ -957,6 +994,7 @@ Restaked Rewards: Failed"
 Restaked Rewards: $restake_reward REM"
     send_message=true
   fi
+
   if $vote_failed
   then
     telegram_message="$telegram_message
@@ -975,7 +1013,15 @@ Voted Block Producers: $bpaccountnames"
  
   if $send_message
   then
-    sleep 120 #Wait to mins before sending the notification
+    #If at option is active, wait without printing the progress bar
+    if $at
+    then
+      sleep 120
+    else
+      printf  "\n\nWAIT 2 MINUTES FOR THE CONFIRMATION OF THE ABOVE TRANSACTIONS\n\n"
+      progress-bar 112
+      printf "\n"
+    fi
     curl -s -X POST https://api.telegram.org/bot$telegram_token/sendMessage -d chat_id=$telegram_chatid -d text="$telegram_message" &>/dev/null
   fi
 fi
