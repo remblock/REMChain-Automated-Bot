@@ -487,7 +487,7 @@ bpm_disk_space_threshold=80
 bpm_check_producer=True
 bpm_check_log=False
 bpm_check_info=False
-bpm_check_blocks=True
+bpm_check_blocks=False
 bpm_check_irr_blocks=False
 bpm_check_peers=False
 bpm_check_server=True
@@ -512,7 +512,7 @@ if get_config_value vote_permission
 then
   vote_permission="$global_value"
 else
-  vote_permission="vote"
+  vote_permission="producer"
   echo "vote_permission=$vote_permission" >> "$config_file"
 fi
 
@@ -520,7 +520,7 @@ if get_config_value claim_permission
 then
   claim_permission="$global_value"
 else
-  claim_permission="claim"
+  claim_permission="producer"
   echo "claim_permission=$claim_permission" >> "$config_file"
 fi
 
@@ -528,7 +528,7 @@ if get_config_value stake_permission
 then
   stake_permission="$global_value"
 else
-  stake_permission="stake"
+  stake_permission="producer"
   echo "stake_permission=$stake_permission" >> "$config_file"
 fi
 
