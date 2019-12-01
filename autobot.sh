@@ -146,7 +146,6 @@ progress-bar() {
 
 }
 
-
 function get_user_answer_yn(){
   while :
   do
@@ -225,6 +224,7 @@ fi
 function create_bp_monitor_files(){
 cat << 'DOC' > $bp_monitor_script_path
 #!/bin/bash
+
 #This script need to be called via cron every minute
 
 #PATH to used commands
@@ -247,7 +247,9 @@ then
   mkdir "$bpm_temp_dir"
 fi
 
-#Function definitions
+#****************************************************************************************************#
+#                                        FUNCTION DEFINITIONS                                        #
+#****************************************************************************************************#
 
 #Add a message to be sent later, if there are more lines than permited in the queue, delete the older ones
 function add_message_to_queue(){
@@ -344,7 +346,6 @@ function check_log_minutes(){
   fi
 }
 
-
 #Function that checks the condition of the remnode chain
 function check_remnode_chain(){
   if ! timeout 10s remcli get info 2>&1 | grep server_version &>/dev/null
@@ -431,7 +432,9 @@ function check_disk_and_ram(){
   fi
 }
 
-#MAIN SCRIPT
+#****************************************************************************************************#
+#                                       MAIN PROGRAM FUNCTIONS                                       #
+#****************************************************************************************************#
 
 if [ "$(echo $bpm_check_producer | tr '[:upper:]' '[:lower:]' )" == "true" ]
 then 
