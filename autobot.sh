@@ -946,7 +946,8 @@ fi
 
 if $auto_transfer
 then
-  output=$(remcli transfer $owneraccountname $auto_transfer_acct "$(( ($total_reward*100)/$auto_transfer_perc )) REM" -x 120 -p $owneraccountname@$transfer_permission -f 2>&1)
+  transfer_amount="$(echo "scale=4; ( $total_reward / 100 ) * $auto_transfer_perc" | bc )"
+  output=$(remcli transfer $owneraccountname $auto_transfer_acct "$transfer_amount REM" -x 120 -p $owneraccountname@$transfer_permission -f 2>&1)
   #Uncomment if you want the output of the command printed
   #if ! $at; then echo $output; fi
   if [[ ! "$output" =~ "executed transaction" ]]; then transfer_failed=true; fi
