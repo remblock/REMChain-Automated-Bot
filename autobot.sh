@@ -816,18 +816,18 @@ then
       echo
       read -p "PLEASE SET YOUR TRANSFER PERCENTAGE: " auto_transfer_perc
       echo "auto_transfer_perc=$auto_transfer_perc" >> "$config_file"
+      echo
       if get_user_answer_yn "DO YOU WANT TO RECEIVE TRANSFER NOTIFICATIONS"
       then
         auto_transfer_alert=true
         echo "auto_transfer_alert=true" >> "$config_file"
       else
         echo "auto_transfer_alert=false" >> "$config_file"
-      fi
-      echo 
+      fi 
     else
       echo "auto_transfer=false" >> "$config_file"
-    fi
-    echo 
+    fi 
+    echo
   fi
 fi
 
