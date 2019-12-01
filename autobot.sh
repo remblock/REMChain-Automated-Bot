@@ -998,6 +998,7 @@ Claimed Rewards: $total_reward REM"
 Transfer Rewards: Failed"
     send_message=true
   elif $auto_transfer_alert
+  then
     telegram_message="$telegram_message
 Transfer Rewards: $total_reward REM"
     send_message=true
