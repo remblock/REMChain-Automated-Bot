@@ -515,7 +515,6 @@ fi
 #Every time the script runs it will check if the service is installed, if not it will install it
 create_start_stop_service
 
-
 #Fill possible missing config variables
 
 if get_config_value vote_permission 
