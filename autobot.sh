@@ -1038,7 +1038,7 @@ Voted Block Producers: $bpaccountnames"
     then
       sleep 120
     else
-      printf  "\n\nWAIT 2 MINUTES FOR THE CONFIRMATION OF THE TRANSACTIONS\n\n"
+      printf  "\n\nWAITING 2 MINUTES FOR THE CONFIRMATION OF THE TRANSACTIONS\n\n"
       progress-bar 112
       printf "\n\n\n"
     fi
