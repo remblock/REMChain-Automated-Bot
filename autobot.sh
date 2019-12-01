@@ -64,9 +64,11 @@ service_definition_path="/etc/systemd/system/autobot.service"
 auto_vote=false
 auto_reward=false
 auto_restaking=false
+auto_transfer=false
 auto_vote_alert=false
 auto_reward_alert=false
 auto_restaking_alert=false
+auto_transfer_alert=false
 bp_monitoring=false
 vote_failed=false
 reward_failed=false
@@ -279,6 +281,11 @@ function remove_lines_repeated_time(){
 #Remove 2 consecutive empty lines before sending the message
 function remove_empty_lines(){
   sed -i '/^$/{N;/^\n$/d;}' "$bpm_temp_dir/msg_queue.txt"
+  #if the first line is empty, delete it
+  if [ "$(head -1 $bpm_temp_dir/msg_queue.txt)" =~ ^$ ] 
+  then
+    sed -i '1d' "$bpm_temp_dir/msg_queue.txt" 
+  fi
 }
 
 #Send the queued messages to telegram and empty the queue
@@ -807,12 +814,19 @@ then
       echo
       read -p "PLEASE SET YOUR TRANSFER PERCENTAGE: " auto_transfer_perc
       echo "auto_transfer_perc=$auto_transfer_perc" >> "$config_file"
+      if get_user_answer_yn "DO YOU WANT TO RECEIVE TRANSFER NOTIFICATIONS"
+      then
+        auto_transfer_alert=true
+        echo "auto_transfer_alert=true" >> "$config_file"
+      else
+        echo "auto_transfer_alert=false" >> "$config_file"
+      fi
+      echo 
     else
-      echo "auto_restaking=false" >> "$config_file"
+      echo "auto_transfer=false" >> "$config_file"
     fi
     echo 
   fi
-
 fi
 
 #-----------------------------------------------------------------------------------------------------
@@ -924,6 +938,10 @@ then
   total_reward=$(echo "$after - $previous"|bc)
 fi
 
+#-----------------------------------------------------------------------------------------------------
+# REMCLI COMMAND FOR TRANSFERING YOUR REWARDS
+#-----------------------------------------------------------------------------------------------------
+
 if $auto_transfer
 then
   output=$(remcli transfer $owneraccountname $auto_transfer_acct "$(( (total_reward*100)/auto_transfer_perc )) REM" -x 120 -p $owneraccountname@$transfer_permission -f 2>&1)
@@ -977,7 +995,7 @@ Claimed Rewards: $total_reward REM"
     telegram_message="$telegram_message
 Transfer Rewards: Failed"
     send_message=true
-  else
+  elif $auto_transfer_alert
     telegram_message="$telegram_message
 Transfer Rewards: $total_reward REM"
     send_message=true
