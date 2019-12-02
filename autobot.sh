@@ -284,7 +284,7 @@ function remove_lines_repeated_time(){
 function remove_empty_lines(){
   sed -i '/^$/{N;/^\n$/d;}' "$bpm_temp_dir/msg_queue.txt"
   #if the first line is empty, delete it
-  if [ "$(head -1 $bpm_temp_dir/msg_queue.txt)" =~ ^$ ] 
+  if ! [[ "$(head -1 $bpm_temp_dir/msg_queue.txt)" =~ [a-zA-Z0-9] ]]
   then
     sed -i '1d' "$bpm_temp_dir/msg_queue.txt" 
   fi
@@ -1030,7 +1030,7 @@ Voted Block Producers: $bpaccountnames"
   fi
   
 #-----------------------------------------------------------------------------------------------------
-# SEND ALERT NOTIFCATIONS TO TELEGRAM BOT (IF THERE'S SOMETHING TO SEND)
+# SEND ALERT NOTIFICATIONS TO TELEGRAM BOT (IF THERE'S SOMETHING TO SEND)
 #-----------------------------------------------------------------------------------------------------
  
   if $send_message
