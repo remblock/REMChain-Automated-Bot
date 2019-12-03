@@ -872,7 +872,7 @@ fi
 # GET TELEGRAM TOKEN FROM THE USER OR TAKE IT FROM THE CONFIG FILE
 #-----------------------------------------------------------------------------------------------------
 
-if $auto_vote_alert || $auto_reward_alert || $auto_restaking_alert || $bp_monitoring
+if $auto_vote_alert || $auto_reward_alert || $auto_restaking_alert || $bp_monitoring || $auto_transfer_alert
 then
   if get_config_value telegram_token
   then
@@ -972,7 +972,7 @@ then
 fi
 
 #-----------------------------------------------------------------------------------------------------
-# PREPARE NOTIFCATIONS TO SEND TO TELEGRAM
+# PREPARE NOTIFICATION TO SEND TO TELEGRAM
 #-----------------------------------------------------------------------------------------------------
 
 if [ ! -z "$telegram_chatid" ]
@@ -1001,7 +1001,7 @@ Transfer Rewards: Failed"
   elif $auto_transfer_alert
   then
     telegram_message="$telegram_message
-Transfer Rewards: $total_reward REM"
+Transfer Rewards: $transfer_amount REM"
     send_message=true
   fi
 
