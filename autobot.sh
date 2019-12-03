@@ -872,7 +872,7 @@ fi
 # GET TELEGRAM TOKEN FROM THE USER OR TAKE IT FROM THE CONFIG FILE
 #-----------------------------------------------------------------------------------------------------
 
-if $auto_vote_alert || $auto_reward_alert || $auto_restaking_alert || $bp_monitoring || $auto_transfer_alert
+if $auto_vote_alert || $auto_reward_alert || $auto_transfer_alert || $auto_restaking_alert || $bp_monitoring
 then
   if get_config_value telegram_token
   then
