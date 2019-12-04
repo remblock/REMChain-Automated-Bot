@@ -752,6 +752,10 @@ then
       echo 
     fi
   fi
+  
+#-----------------------------------------------------------------------------------------------------
+# GET AUTOMATED TRANSFER ANSWER FROM THE USER OR TAKE IT FROM THE CONFIG FILE
+#-----------------------------------------------------------------------------------------------------
 
   if get_config_value auto_transfer
   then
@@ -765,6 +769,11 @@ then
         echo "ERROR: auto_transfer_acct must be set when using auto_transfer"
 	exit 1
       fi
+
+#-----------------------------------------------------------------------------------------------------
+# GET THE TRANSFER PERCENTAGE FROM THE USER OR TAKE IT FROM THE CONFIG FILE
+#-----------------------------------------------------------------------------------------------------
+
       if get_config_value auto_transfer_perc
       then
         auto_transfer_perc="$global_value"
@@ -773,26 +782,37 @@ then
 	exit 1
       fi
     fi
-  else
-    if $at
+
+#-----------------------------------------------------------------------------------------------------
+# GET TRANSFER NOTIFCATION ANSWER FROM THE USER OR TAKE IT FROM THE CONFIG FILE
+#-----------------------------------------------------------------------------------------------------
+
+    if get_config_value auto_transfer_alert
     then
-      exit 2
-    fi
-    if get_user_answer_yn "DO YOU WANT AUTOBOT TO AUTO TRANSFER YOUR REWARDS"
-    then
-      auto_transfer=true
-      echo "auto_transfer=true" >> "$config_file"
-      echo
-      read -p "PLEASE SET YOUR TRANSFER ACCOUNT NAME: " auto_transfer_acct
-      echo "auto_transfer_acct=$auto_transfer_acct" >> "$config_file"
-      echo
-      read -p "PLEASE SET YOUR TRANSFER PERCENTAGE: " auto_transfer_perc
-      echo "auto_transfer_perc=$auto_transfer_perc" >> "$config_file"
-      echo
-      if get_user_answer_yn "DO YOU WANT TO RECEIVE TRANSFER NOTIFICATIONS"
+      if [ "$global_value" = "true" ]
       then
         auto_transfer_alert=true
-        echo "auto_transfer_alert=true" >> "$config_file"
+      fi
+  else
+      if $at
+      then
+        exit 2
+      fi
+      if get_user_answer_yn "DO YOU WANT AUTOBOT TO AUTO TRANSFER YOUR REWARDS"
+      then
+        auto_transfer=true
+        echo "auto_transfer=true" >> "$config_file"
+        echo
+        read -p "PLEASE SET YOUR TRANSFER ACCOUNT NAME: " auto_transfer_acct
+        echo "auto_transfer_acct=$auto_transfer_acct" >> "$config_file"
+        echo
+        read -p "PLEASE SET YOUR TRANSFER PERCENTAGE: " auto_transfer_perc
+        echo "auto_transfer_perc=$auto_transfer_perc" >> "$config_file"
+        echo
+        if get_user_answer_yn "DO YOU WANT TO RECEIVE TRANSFER NOTIFICATIONS"
+        then
+          auto_transfer_alert=true
+          echo "auto_transfer_alert=true" >> "$config_file"
       else
         echo "auto_transfer_alert=false" >> "$config_file"
       fi 
