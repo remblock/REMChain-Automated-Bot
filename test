@@ -821,6 +821,7 @@ else
       echo "ERROR: auto_transfer_acct must be set when using auto_transfer"
       exit 1
     fi
+  fi
   echo 
 fi
   
