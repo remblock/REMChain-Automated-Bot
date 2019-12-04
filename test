@@ -811,18 +811,12 @@ else
   then
     exit 2
   fi
-  if get_user_answer_yn "PLEASE SET YOUR TRANSFER ACCOUNT NAME"
+  read -p "PLEASE SET YOUR TRANSFER ACCOUNT NAME " -e auto_transfer_acct
   then
     auto_transfer=true
-    if get_config_value auto_transfer_acct
-    then
-      auto_transfer_acct="$global_value"
-    else
-      echo "ERROR: auto_transfer_acct must be set when using auto_transfer"
-      exit 1
-    fi
-  fi
-  echo 
+    echo "auto_transfer_acct=$auto_transfer_acct" >> "$config_file"
+    echo 
+  fi 
 fi
   
 #-----------------------------------------------------------------------------------------------------
