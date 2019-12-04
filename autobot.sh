@@ -800,6 +800,13 @@ then
         echo "ERROR: auto_transfer_perc must be set when using auto_transfer"
 	exit 1
       fi
+      if get_config_value auto_transfer_alert
+      then
+        auto_transfer_alert="$global_value"
+      else
+        echo "ERROR: auto_transfer_alert must be set when using auto_transfer"
+	exit 1
+      fi
     fi
   else
     if $at
