@@ -903,7 +903,7 @@ then
 # GET TELEGRAM CHAT ID FROM THE USER OR TAKE IT FROM THE CONFIG FILE
 #-----------------------------------------------------------------------------------------------------
 
-if get_config_value telegram_chatid
+  if get_config_value telegram_chatid
   then
     telegram_chatid="$global_value"
   else
