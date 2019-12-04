@@ -822,10 +822,10 @@ then
       auto_transfer=true
       echo "auto_transfer=true" >> "$config_file"
       echo
-      read -p "PLEASE SET YOUR TRANSFER ACCOUNT NAME: " auto_transfer_acct
+      read -p "PLEASE SET YOUR TRANSFER ACCOUNT NAME: " -e auto_transfer_acct
       echo "auto_transfer_acct=$auto_transfer_acct" >> "$config_file"
       echo
-      read -p "PLEASE SET YOUR TRANSFER PERCENTAGE: " auto_transfer_perc
+      read -p "PLEASE SET YOUR TRANSFER PERCENTAGE: " -e auto_transfer_perc
       auto_transfer_perc=$(echo $auto_transfer_perc | tr -d '%' )
       echo "auto_transfer_perc=$auto_transfer_perc" >> "$config_file"
       echo
