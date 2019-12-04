@@ -812,10 +812,9 @@ else
     exit 2
   fi
   read -p "PLEASE SET YOUR TRANSFER ACCOUNT NAME " -e auto_transfer_acct
-  then
-    auto_transfer=true
-    echo "auto_transfer_acct=$auto_transfer_acct" >> "$config_file"
-    echo 
+  auto_transfer=true
+  echo "auto_transfer_acct=$auto_transfer_acct" >> "$config_file"
+  echo 
   fi 
 fi
   
