@@ -804,7 +804,7 @@ if get_config_value auto_transfer
 then
   if [ "$global_value" = "true" ]
   then
-    auto_transfer=true
+    auto_transfer_acct="$global_value"
   fi
 else
   if $at
