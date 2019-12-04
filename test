@@ -986,7 +986,12 @@ fi
 
 if $auto_transfer
 then
-  transfer_amount="$(echo "scale=4; ( $total_reward / 100 ) * $auto_transfer_perc" | bc )"
+  if (( auto_transfer_perc == 100 ))
+  then
+    transfer_amount="$total_reward"
+  else
+    transfer_amount="$(echo "scale=4; ( $total_reward / 100 ) * $auto_transfer_perc" | bc )"
+  fi
   output=$(remcli transfer $owneraccountname $auto_transfer_acct "$transfer_amount REM" -x 120 -p $owneraccountname@$transfer_permission -f 2>&1)
   #Uncomment if you want the output of the command printed
   #if ! $at; then echo $output; fi
