@@ -1,8 +1,7 @@
 # REMChain-Automated-Bot
 
-This bot is fully customisable, allowing the user to choose whether to have their votes, claims and even a percentage of their claimed rewards restaked automatically daily. Please note in order for this to work you need to have your **vote**, **claim** and **stake** account permissions setup.<br>
+This bot is fully customisable, allowing the user to choose whether to have their votes, claims and even a percentage of their claimed rewards restaked or transfered automatically.<br>
 <br>
-If you haven't refer to [**https://github.com/SooSDExZ/REMChain-Testnet-Scripts**](https://github.com/SooSDExZ/REMChain-Testnet-Scripts) to setup these permissions.
 
 ***
 
@@ -50,7 +49,7 @@ Your Chat ID will be shown in this format **`"id":7041782343`**, based on this e
 
 ***
 
-**Step 3: Download and install the script in root**
+**Step 3: Download and run the script in root**
 <br>
 
 ```
@@ -59,4 +58,5 @@ sudo wget https://github.com/SooSDExZ/REMChain-Automated-Bot/raw/master/autobot.
 ```
 sudo ./autobot.sh
 ```
-**_NOTE: This will only work if you have either setup your key permissions through my Setup-Your-Key-Management scripts or used my latest REMChain-Testnet-Guide scripts._**
+
+**PLEASE NOTE: You will need to change the default account permissions according to yours in the remblock/autobot/config file.**
