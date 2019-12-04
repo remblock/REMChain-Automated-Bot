@@ -686,140 +686,169 @@ then
 # GET AUTOMATED RESTAKING ANSWER FROM THE USER OR TAKE IT FROM THE CONFIG FILE
 #-----------------------------------------------------------------------------------------------------
 
-  if get_config_value auto_restaking
+if get_config_value auto_restaking
+then
+  if [ "$global_value" = "true" ]
+  then
+    auto_restaking=true
+  fi
+else
+  if $at
+  then
+    exit 2
+  fi
+  if get_user_answer_yn "DO YOU WANT AUTOBOT TO AUTO RESTAKE YOUR REWARDS"
+  then
+    auto_restaking=true
+    echo "auto_restaking=true" >> "$config_file"
+  else
+    echo "auto_restaking=false" >> "$config_file"
+  fi
+  echo 
+fi
+
+#-----------------------------------------------------------------------------------------------------
+# GET THE RESTAKING PERCENTAGE FROM THE USER OR TAKE IT FROM THE CONFIG FILE
+#-----------------------------------------------------------------------------------------------------
+
+if $auto_restaking
+then
+  if get_config_value restakingpercentage
+  then
+    restakingpercentage="$global_value"
+  else
+    if $at
+    then
+      exit 2
+    fi
+    read -p "PLEASE SET YOUR RESTAKING PERCENTAGE: " -e restakingpercentage
+    echo "restakingpercentage=$restakingpercentage" >> "$config_file"
+    echo 
+  fi
+  restakingpercentage=$(echo $restakingpercentage | tr -d '%' )
+    
+#-----------------------------------------------------------------------------------------------------
+# GET RESTAKING NOTIFCATION ANSWER FROM THE USER OR TAKE IT FROM THE CONFIG FILE
+#-----------------------------------------------------------------------------------------------------
+
+ if get_config_value auto_restaking_alert
+ then
+   if [ "$global_value" = "true" ]
+   then
+     auto_restaking_alert=true
+   fi
+  else
+    if $at
+    then
+      exit 2
+    fi
+    if get_user_answer_yn "DO YOU WANT TO RECEIVE RESTAKING NOTIFICATIONS"
+    then
+      auto_restaking_alert=true
+      echo "auto_restaking_alert=true" >> "$config_file"
+    else
+      echo "auto_restaking_alert=false" >> "$config_file"
+    fi
+    echo 
+  fi
+fi
+  
+#-----------------------------------------------------------------------------------------------------
+# GET AUTOMATED TRANSFER ANSWER FROM THE USER OR TAKE IT FROM THE CONFIG FILE
+#-----------------------------------------------------------------------------------------------------
+
+if get_config_value auto_transfer
+then
+  if [ "$global_value" = "true" ]
+  then
+    auto_transfer=true
+  fi
+else
+  if $at
+  then
+    exit 2
+  fi
+  if get_user_answer_yn "DO YOU WANT AUTOBOT TO AUTO TRANSFER YOUR REWARDS"
+  then
+    auto_transfer=true
+    echo "auto_transfer=true" >> "$config_file"
+  else
+    echo "auto_transfer=false" >> "$config_file"
+  fi
+  echo 
+fi
+  
+#-----------------------------------------------------------------------------------------------------
+# GET TRANSFER ACCOUNT NAME FROM THE USER OR TAKE IT FROM THE CONFIG FILE
+#-----------------------------------------------------------------------------------------------------
+  
+if get_config_value auto_transfer
+then
+  if [ "$global_value" = "true" ]
+  then
+    auto_transfer=true
+  fi
+else
+  if $at
+  then
+    exit 2
+  fi
+  if get_user_answer_yn "PLEASE SET YOUR TRANSFER ACCOUNT NAME"
+  then
+    auto_transfer=true
+    if get_config_value auto_transfer_acct
+    then
+      auto_transfer_acct="$global_value"
+    else
+      echo "ERROR: auto_transfer_acct must be set when using auto_transfer"
+      exit 1
+    fi
+  echo 
+fi
+  
+#-----------------------------------------------------------------------------------------------------
+# GET THE TRANSFER PERCENTAGE FROM THE USER OR TAKE IT FROM THE CONFIG FILE
+#-----------------------------------------------------------------------------------------------------
+  
+if $auto_transfer
+then
+  if get_config_value auto_transfer_perc
+  then
+    auto_transfer_perc="$global_value"
+  else
+    if $at
+    then
+      exit 2
+    fi
+    read -p "PLEASE SET YOUR TRANSFER PERCENTAGE: " -e auto_transfer_perc
+    echo "auto_transfer_perc=$auto_transfer_perc" >> "$config_file"
+    echo 
+  fi
+  auto_transfer_perc=$(echo $auto_transfer_perc | tr -d '%' )
+    
+#-----------------------------------------------------------------------------------------------------
+# GET TRANSFER NOTIFCATION ANSWER FROM THE USER OR TAKE IT FROM THE CONFIG FILE
+#-----------------------------------------------------------------------------------------------------
+
+  if get_config_value auto_transfer_alert
   then
     if [ "$global_value" = "true" ]
     then
-      auto_restaking=true
+      auto_transfer_alert=true
     fi
   else
     if $at
     then
       exit 2
     fi
-    if get_user_answer_yn "DO YOU WANT AUTOBOT TO AUTO RESTAKE YOUR REWARDS"
+    if get_user_answer_yn "DO YOU WANT TO RECEIVE TRANSFER NOTIFICATIONS"
     then
-      auto_restaking=true
-      echo "auto_restaking=true" >> "$config_file"
+      auto_transfer_alert=true
+      echo "auto_transfer_alert=true" >> "$config_file"
     else
-      echo "auto_restaking=false" >> "$config_file"
+      echo "auto_transfer_alert=false" >> "$config_file"
     fi
     echo 
-  fi
-
-#-----------------------------------------------------------------------------------------------------
-# GET THE RESTAKING PERCENTAGE FROM THE USER OR TAKE IT FROM THE CONFIG FILE
-#-----------------------------------------------------------------------------------------------------
-
-  if $auto_restaking
-  then
-    if get_config_value restakingpercentage
-    then
-      restakingpercentage="$global_value"
-    else
-      if $at
-      then
-        exit 2
-      fi
-      read -p "PLEASE SET YOUR RESTAKING PERCENTAGE: " -e restakingpercentage
-      echo "restakingpercentage=$restakingpercentage" >> "$config_file"
-      echo 
-    fi
-    restakingpercentage=$(echo $restakingpercentage | tr -d '%' )
-    
-#-----------------------------------------------------------------------------------------------------
-# GET RESTAKING NOTIFCATION ANSWER FROM THE USER OR TAKE IT FROM THE CONFIG FILE
-#-----------------------------------------------------------------------------------------------------
-
-    if get_config_value auto_restaking_alert
-    then
-      if [ "$global_value" = "true" ]
-      then
-        auto_restaking_alert=true
-      fi
-    else
-      if $at
-      then
-        exit 2
-      fi
-      if get_user_answer_yn "DO YOU WANT TO RECEIVE RESTAKING NOTIFICATIONS"
-      then
-        auto_restaking_alert=true
-        echo "auto_restaking_alert=true" >> "$config_file"
-      else
-        echo "auto_restaking_alert=false" >> "$config_file"
-      fi
-      echo 
-    fi
-  fi
-  
-#-----------------------------------------------------------------------------------------------------
-# GET AUTOMATED TRANSFER ANSWER FROM THE USER OR TAKE IT FROM THE CONFIG FILE
-#-----------------------------------------------------------------------------------------------------
-
-  if get_config_value auto_transfer
-  then
-    if [ "$global_value" = "true" ]
-    then
-      auto_transfer=true
-      if get_config_value auto_transfer_acct
-      then
-        auto_transfer_acct="$global_value"
-      else
-        echo "ERROR: auto_transfer_acct must be set when using auto_transfer"
-	exit 1
-      fi
-
-#-----------------------------------------------------------------------------------------------------
-# GET THE TRANSFER PERCENTAGE FROM THE USER OR TAKE IT FROM THE CONFIG FILE
-#-----------------------------------------------------------------------------------------------------
-
-      if get_config_value auto_transfer_perc
-      then
-        auto_transfer_perc="$global_value"
-      else
-        echo "ERROR: auto_transfer_perc must be set when using auto_transfer"
-	exit 1
-      fi
-    fi
-
-#-----------------------------------------------------------------------------------------------------
-# GET TRANSFER NOTIFCATION ANSWER FROM THE USER OR TAKE IT FROM THE CONFIG FILE
-#-----------------------------------------------------------------------------------------------------
-
-    if get_config_value auto_transfer_alert
-    then
-      if [ "$global_value" = "true" ]
-      then
-        auto_transfer_alert=true
-      fi
-  else
-      if $at
-      then
-        exit 2
-      fi
-      if get_user_answer_yn "DO YOU WANT AUTOBOT TO AUTO TRANSFER YOUR REWARDS"
-      then
-        auto_transfer=true
-        echo "auto_transfer=true" >> "$config_file"
-        echo
-        read -p "PLEASE SET YOUR TRANSFER ACCOUNT NAME: " auto_transfer_acct
-        echo "auto_transfer_acct=$auto_transfer_acct" >> "$config_file"
-        echo
-        read -p "PLEASE SET YOUR TRANSFER PERCENTAGE: " auto_transfer_perc
-        echo "auto_transfer_perc=$auto_transfer_perc" >> "$config_file"
-        echo
-        if get_user_answer_yn "DO YOU WANT TO RECEIVE TRANSFER NOTIFICATIONS"
-        then
-          auto_transfer_alert=true
-          echo "auto_transfer_alert=true" >> "$config_file"
-      else
-        echo "auto_transfer_alert=false" >> "$config_file"
-      fi 
-    else
-      echo "auto_transfer=false" >> "$config_file"
-    fi 
-    echo
   fi
 fi
 
