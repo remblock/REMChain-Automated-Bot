@@ -780,6 +780,10 @@ then
       echo 
     fi
   fi
+  
+#-----------------------------------------------------------------------------------------------------
+# ASK THE USER FOR THE TRANSFER ACCOUNT NAME, TRANSFER PERCENTAGE AND TRANSFER NOTIFICATIONS
+#-----------------------------------------------------------------------------------------------------
 
   if get_config_value auto_transfer
   then
