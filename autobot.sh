@@ -822,6 +822,7 @@ then
       echo "auto_transfer_acct=$auto_transfer_acct" >> "$config_file"
       echo
       read -p "PLEASE SET YOUR TRANSFER PERCENTAGE: " auto_transfer_perc
+      auto_transfer_perc=$(echo $auto_transfer_perc | tr -d '%' )
       echo "auto_transfer_perc=$auto_transfer_perc" >> "$config_file"
       echo
       if get_user_answer_yn "DO YOU WANT TO RECEIVE TRANSFER NOTIFICATIONS"
