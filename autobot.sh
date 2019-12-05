@@ -948,7 +948,7 @@ then
   rewardoutput=$(remcli system claimrewards $owneraccountname -x 120 -p $owneraccountname@$claim_permission -f 2>&1)
   #Uncomment if you want the output of the command printed
   #if ! $at; then echo $output; fi
-  if [[ ! "$rewardoutput" =~ "already claimed rewards" ]]; then reward_failed=false; fi
+  if [[ ! "$rewardoutput" =~ "executed transaction" ]]; then reward_failed=true; fi
   after=$(remcli get currency balance rem.token $owneraccountname  | awk '{print $1}')
   total_reward=$(echo "$after - $previous"|bc)
 fi
