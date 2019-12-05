@@ -224,19 +224,24 @@ fi
 function create_bp_monitor_files(){
 cat << 'DOC' > $bp_monitor_script_path
 #!/bin/bash
+
 #This script need to be called via cron every minute
+
 #PATH to used commands
 PATH="/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/snap/bin"
+
 #Load configuration variables and values
 source "/root/remblock/autobot/config" &>/dev/null
 now_epoch="$(date +%s)"
 now_date="$(date +%d-%m-%Y)"
 owneraccountname="$owner"
+
 #Install crontab line if it does not exists
 if [ ! -z "$bpm_cron_cmd" ] && ! crontab -u root -l | grep -v '^ *#' | grep "$bpm_cron_cmd" &>/dev/null
 then
   (crontab -u root -l ; echo "*/1 * * * * $bpm_cron_cmd") | crontab -u root -
 fi
+
 #Create bpmonitor folder for temporal information
 if [ ! -z "$bpm_temp_dir" ] && [ ! -d "$bpm_temp_dir" ]
 then
@@ -275,6 +280,7 @@ function line_repeated(){
 function remove_lines_repeated_time(){
   sed -i "/^$1/d" "$bpm_temp_dir/msg_queue.txt"
 }
+
 #Remove 2 consecutive empty lines before sending the message
 function remove_empty_lines(){
   sed -i '/^$/{N;/^\n$/d;}' "$bpm_temp_dir/msg_queue.txt"
@@ -284,6 +290,7 @@ function remove_empty_lines(){
     sed -i '1d' "$bpm_temp_dir/msg_queue.txt" 
   fi
 }
+
 #Send the queued messages to telegram and empty the queue
 function send_telegram_messages(){
   if [ ! -z "$telegram_token" ] && [ ! -z "$telegram_chatid" ]
@@ -434,26 +441,32 @@ if [ "$(echo $bpm_check_producer | tr '[:upper:]' '[:lower:]' )" == "true" ]
 then 
   check_produce_minutes
 fi
+
 if [ "$(echo $bpm_check_log | tr '[:upper:]' '[:lower:]' )" == "true" ]
 then 
   check_log_minutes
 fi
+
 if [ "$(echo $bpm_check_info | tr '[:upper:]' '[:lower:]' )" == "true" ]
 then 
   check_remnode_chain
 fi
+
 if [ "$(echo $bpm_check_blocks | tr '[:upper:]' '[:lower:]' )" == "true" ]
 then 
   check_block_minutes
 fi
+
 if [ "$(echo $bpm_check_irr_blocks | tr '[:upper:]' '[:lower:]' )" == "true" ]
 then 
   check_last_iblock
 fi
+
 if [ "$(echo $bpm_check_peers | tr '[:upper:]' '[:lower:]' )" == "true" ]
 then 
   check_net_peers
 fi
+
 if [ "$(echo $bpm_check_server | tr '[:upper:]' '[:lower:]' )" == "true" ]
 then 
   check_disk_and_ram
@@ -981,52 +994,56 @@ then
 "${owneraccountname^}" Daily Summary
 --------------------------------------
 Date: $(date +"%d-%m-%Y")"
-  if $reward_failed
+  if $auto_reward_alert
   then
-    telegram_message="$telegram_message
+    if $reward_failed
+    then
+      telegram_message="$telegram_message
 Claimed Rewards: Failed"
-    send_message=true
-  elif $auto_reward_alert
-  then
-    telegram_message="$telegram_message
+      send_message=true
+    else
+      telegram_message="$telegram_message
 Claimed Rewards: $total_reward REM"
-    send_message=true
+      send_message=true
   fi
 
-  if $transfer_failed
+  if $auto_transfer_alert
   then
-    telegram_message="$telegram_message
+    if $transfer_failed
+    then
+      telegram_message="$telegram_message
 Transfer Rewards: Failed"
-    send_message=true
-  elif $auto_transfer_alert
-  then
-    telegram_message="$telegram_message
+      send_message=true
+    else
+      telegram_message="$telegram_message
 Transfer Rewards: $transfer_amount REM"
-    send_message=true
+      send_message=true
   fi
 
-  if $restaking_failed
+  if $auto_restaking_alert
   then
-    telegram_message="$telegram_message
+    if $restaking_failed
+    then
+      telegram_message="$telegram_message
 Restaked Rewards: Failed"
-    send_message=true
-  elif $auto_restaking_alert
-  then
-    telegram_message="$telegram_message
+      send_message=true
+    else
+      telegram_message="$telegram_message
 Restaked Rewards: $restake_reward REM"
-    send_message=true
+      send_message=true
   fi
 
-  if $vote_failed
+  if $auto_vote_alert
   then
-    telegram_message="$telegram_message
+    if $vote_failed
+    then
+      telegram_message="$telegram_message
 Voted Block Producers: Failed"
-    send_message=true
-  elif $auto_vote_alert
-  then
-    telegram_message="$telegram_message
+      send_message=true
+    else
+      telegram_message="$telegram_message
 Voted Block Producers: $bpaccountnames"
-    send_message=true
+      send_message=true
   fi
   
 #-----------------------------------------------------------------------------------------------------
