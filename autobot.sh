@@ -996,13 +996,13 @@ then
 Date: $(date +"%d-%m-%Y")"
   if $auto_reward_alert
   then
-    if $reward_failed=true
+    if $reward_failed==true
     then
       telegram_message="$telegram_message
 Claimed Rewards: Failed"
       send_message=true
     else
-      if $reward_failed=false
+      if $reward_failed==false
       then
         telegram_message="$telegram_message
 Claimed Rewards: $total_reward REM"
@@ -1013,13 +1013,13 @@ Claimed Rewards: $total_reward REM"
 
   if $auto_transfer_alert
   then
-    if $transfer_failed=true
+    if $transfer_failed==true
     then
       telegram_message="$telegram_message
 Transfer Rewards: Failed"
       send_message=true
     else
-      if $transfer_failed=false
+      if $transfer_failed==false
       then
         telegram_message="$telegram_message
 Transfer Rewards: $transfer_amount REM"
@@ -1030,13 +1030,13 @@ Transfer Rewards: $transfer_amount REM"
 
   if $auto_restaking_alert
   then
-    if $restaking_failed=true
+    if $restaking_failed==true
     then
       telegram_message="$telegram_message
 Restaked Rewards: Failed"
       send_message=true
     else
-      if $restaking_failed=false
+      if $restaking_failed==false
       then
         telegram_message="$telegram_message
 Restaked Rewards: $restake_reward REM"
@@ -1047,13 +1047,13 @@ Restaked Rewards: $restake_reward REM"
 
   if $auto_vote_alert
   then
-    if $vote_failed=true
+    if $vote_failed==true
     then
       telegram_message="$telegram_message
 Voted Block Producers: Failed"
       send_message=true
     else
-      if $vote_failed=false
+      if $vote_failed==false
       then
         telegram_message="$telegram_message
 Voted Block Producers: $bpaccountnames"
