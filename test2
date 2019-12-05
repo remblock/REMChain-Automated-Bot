@@ -34,8 +34,8 @@ config_file="/root/remblock/autobot2/config"
 # BP MONITOR SCRIPT AND CONFIG PATHS
 #-----------------------------------------------------------------------------------------------------
 
-bp_monitor_script_path="/root/remblock/autobot/bpmonitor.sh"
-bp_monitor_config_path="/root/remblock/autobot/config"
+bp_monitor_script_path="/root/remblock/autobot2/bpmonitor.sh"
+bp_monitor_config_path="$config_file"
 
 #-----------------------------------------------------------------------------------------------------
 # MINUTES TO WAIT BETWEEN EACH EXECUTIONS OF THE SCRIPT
@@ -47,7 +47,7 @@ minutes_to_wait=1442
 # CRON LINE WILL BE CREATED FOR THE BP MONITORING SCRIPT
 #-----------------------------------------------------------------------------------------------------
 
-bp_mon_cron_line="* * * * * /root/remblock/autobot/bpmonitor.sh"
+bp_mon_cron_line="* * * * * /root/remblock/autobot2/bpmonitor.sh"
 
 #-----------------------------------------------------------------------------------------------------
 # START AND STOP SERVER COMMANDS FILES PATH
@@ -224,24 +224,19 @@ fi
 function create_bp_monitor_files(){
 cat << 'DOC' > $bp_monitor_script_path
 #!/bin/bash
-
 #This script need to be called via cron every minute
-
 #PATH to used commands
 PATH="/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/snap/bin"
-
 #Load configuration variables and values
 source "/root/remblock/autobot/config" &>/dev/null
 now_epoch="$(date +%s)"
 now_date="$(date +%d-%m-%Y)"
 owneraccountname="$owner"
-
 #Install crontab line if it does not exists
 if [ ! -z "$bpm_cron_cmd" ] && ! crontab -u root -l | grep -v '^ *#' | grep "$bpm_cron_cmd" &>/dev/null
 then
   (crontab -u root -l ; echo "*/1 * * * * $bpm_cron_cmd") | crontab -u root -
 fi
-
 #Create bpmonitor folder for temporal information
 if [ ! -z "$bpm_temp_dir" ] && [ ! -d "$bpm_temp_dir" ]
 then
@@ -280,7 +275,6 @@ function line_repeated(){
 function remove_lines_repeated_time(){
   sed -i "/^$1/d" "$bpm_temp_dir/msg_queue.txt"
 }
-
 #Remove 2 consecutive empty lines before sending the message
 function remove_empty_lines(){
   sed -i '/^$/{N;/^\n$/d;}' "$bpm_temp_dir/msg_queue.txt"
@@ -290,7 +284,6 @@ function remove_empty_lines(){
     sed -i '1d' "$bpm_temp_dir/msg_queue.txt" 
   fi
 }
-
 #Send the queued messages to telegram and empty the queue
 function send_telegram_messages(){
   if [ ! -z "$telegram_token" ] && [ ! -z "$telegram_chatid" ]
@@ -441,32 +434,26 @@ if [ "$(echo $bpm_check_producer | tr '[:upper:]' '[:lower:]' )" == "true" ]
 then 
   check_produce_minutes
 fi
-
 if [ "$(echo $bpm_check_log | tr '[:upper:]' '[:lower:]' )" == "true" ]
 then 
   check_log_minutes
 fi
-
 if [ "$(echo $bpm_check_info | tr '[:upper:]' '[:lower:]' )" == "true" ]
 then 
   check_remnode_chain
 fi
-
 if [ "$(echo $bpm_check_blocks | tr '[:upper:]' '[:lower:]' )" == "true" ]
 then 
   check_block_minutes
 fi
-
 if [ "$(echo $bpm_check_irr_blocks | tr '[:upper:]' '[:lower:]' )" == "true" ]
 then 
   check_last_iblock
 fi
-
 if [ "$(echo $bpm_check_peers | tr '[:upper:]' '[:lower:]' )" == "true" ]
 then 
   check_net_peers
 fi
-
 if [ "$(echo $bpm_check_server | tr '[:upper:]' '[:lower:]' )" == "true" ]
 then 
   check_disk_and_ram
@@ -932,10 +919,10 @@ output=$(remcli wallet unlock --password $walletpassword 2>&1)
 
 if $auto_vote
 then
-  output=$(remcli system voteproducer prods $owneraccountname $bpaccountnames -p $owneraccountname@$vote_permission -f 2>&1)
+  voteoutput=$(remcli system voteproducer prods $owneraccountname $bpaccountnames -p $owneraccountname@$vote_permission -f 2>&1)
   #Uncomment if you want the output of the command printed
   #if ! $at; then echo $output; fi
-  if [[ ! "$output" =~ "executed transaction" ]]; then vote_failed=true; fi
+  if [[ ! "$voteoutput" =~ "executed transaction" ]]; then vote_failed=true; fi
 fi
   
 #-----------------------------------------------------------------------------------------------------
@@ -945,10 +932,10 @@ fi
 if $auto_reward
 then
   previous=$(remcli get currency balance rem.token $owneraccountname | awk '{print $1}')
-  output=$(remcli system claimrewards $owneraccountname -x 120 -p $owneraccountname@$claim_permission -f 2>&1)
+  rewardoutput=$(remcli system claimrewards $owneraccountname -x 120 -p $owneraccountname@$claim_permission -f 2>&1)
   #Uncomment if you want the output of the command printed
   #if ! $at; then echo $output; fi
-  if [[ "$output" =~ "already claimed rewards" ]]; then reward_failed=true; fi
+  if [[ "$rewardoutput" =~ "already claimed rewards" ]]; then reward_failed=true; fi
   after=$(remcli get currency balance rem.token $owneraccountname  | awk '{print $1}')
   total_reward=$(echo "$after - $previous"|bc)
 fi
@@ -960,10 +947,10 @@ fi
 if $auto_transfer
 then
   transfer_amount="$(echo "scale=4; ( $total_reward / 100 ) * $auto_transfer_perc" | bc )"
-  output=$(remcli transfer $owneraccountname $auto_transfer_acct "$transfer_amount REM" -x 120 -p $owneraccountname@$transfer_permission -f 2>&1)
+  transferoutput=$(remcli transfer $owneraccountname $auto_transfer_acct "$transfer_amount REM" -x 120 -p $owneraccountname@$transfer_permission -f 2>&1)
   #Uncomment if you want the output of the command printed
   #if ! $at; then echo $output; fi
-  if [[ ! "$output" =~ "executed transaction" ]]; then transfer_failed=true; fi
+  if [[ ! "$transferoutput" =~ "executed transaction" ]]; then transfer_failed=true; fi
 fi
   
 #-----------------------------------------------------------------------------------------------------
@@ -978,10 +965,10 @@ then
   else
     restake_reward=$(echo "scale=4; ( $total_reward / 100 ) * $restakingpercentage" | bc )
   fi
-  output=$(remcli system delegatebw $owneraccountname $owneraccountname "$restake_reward REM" -x 120 -p $owneraccountname@$stake_permission -f 2>&1)
+  restakingoutput=$(remcli system delegatebw $owneraccountname $owneraccountname "$restake_reward REM" -x 120 -p $owneraccountname@$stake_permission -f 2>&1)
   #Uncomment if you want the output of the command printed
   #if ! $at; then echo $output; fi
-  if [[ ! "$output" =~ "executed transaction" ]]; then restaking_failed=true; fi
+  if [[ ! "$restakingoutput" =~ "executed transaction" ]]; then restaking_failed=true; fi
 fi
 
 #-----------------------------------------------------------------------------------------------------
