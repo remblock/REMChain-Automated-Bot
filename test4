@@ -945,10 +945,10 @@ fi
 if $auto_reward
 then
   previous=$(remcli get currency balance rem.token $owneraccountname | awk '{print $1}')
-  rewardoutput=$(remcli system claimrewards $owneraccountname -x 120 -p $owneraccountname@$claim_permission -f 2>&1)
+  #rewardoutput=$(remcli system claimrewards $owneraccountname -x 120 -p $owneraccountname@$claim_permission -f 2>&1)
   #Uncomment if you want the output of the command printed
   #if ! $at; then echo $output; fi
-  if [[ ! "$rewardoutput" =~ "executed transaction" ]]; then reward_failed=true; fi
+  #if [[ ! "$rewardoutput" =~ "executed transaction" ]]; then reward_failed=true; fi
   after=$(remcli get currency balance rem.token $owneraccountname  | awk '{print $1}')
   total_reward=$(echo "$after - $previous"|bc)
 fi
@@ -959,7 +959,7 @@ fi
 
 if $auto_transfer
 then
-  transfer_amount="$(echo "scale=4; ( $total_reward / 100 ) * $auto_transfer_perc" | bc )"
+  transfer_amount="$(echo "scale=4; ( $after / 100 ) * $auto_transfer_perc" | bc )"
   transferoutput=$(remcli transfer $owneraccountname $auto_transfer_acct "$transfer_amount REM" -x 120 -p $owneraccountname@$transfer_permission -f 2>&1)
   #Uncomment if you want the output of the command printed
   #if ! $at; then echo $output; fi
@@ -976,7 +976,7 @@ then
   then
     restake_reward="$total_reward"
   else
-    restake_reward=$(echo "scale=4; ( $total_reward / 100 ) * $restakingpercentage" | bc )
+    restake_reward=$(echo "scale=4; ( $after / 100 ) * $restakingpercentage" | bc )
   fi
   restakingoutput=$(remcli system delegatebw $owneraccountname $owneraccountname "$restake_reward REM" -x 120 -p $owneraccountname@$stake_permission -f 2>&1)
   #Uncomment if you want the output of the command printed
@@ -1003,7 +1003,7 @@ Claimed Rewards: Failed"
       send_message=true
     else
       telegram_message="$telegram_message
-Claimed Rewards: $total_reward REM"
+Claimed Rewards: $after REM"
       send_message=true
     fi
   fi
