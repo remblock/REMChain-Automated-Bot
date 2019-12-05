@@ -229,6 +229,7 @@ cat << 'DOC' > $bp_monitor_script_path
 
 #PATH to used commands
 PATH="/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/snap/bin"
+
 #Load configuration variables and values
 source "/root/remblock/autobot/config" &>/dev/null
 now_epoch="$(date +%s)"
