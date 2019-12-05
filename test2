@@ -1005,6 +1005,7 @@ Claimed Rewards: Failed"
       telegram_message="$telegram_message
 Claimed Rewards: $total_reward REM"
       send_message=true
+    fi
   fi
 
   if $auto_transfer_alert
@@ -1018,6 +1019,7 @@ Transfer Rewards: Failed"
       telegram_message="$telegram_message
 Transfer Rewards: $transfer_amount REM"
       send_message=true
+    fi
   fi
 
   if $auto_restaking_alert
@@ -1031,6 +1033,7 @@ Restaked Rewards: Failed"
       telegram_message="$telegram_message
 Restaked Rewards: $restake_reward REM"
       send_message=true
+    fi
   fi
 
   if $auto_vote_alert
@@ -1044,6 +1047,7 @@ Voted Block Producers: Failed"
       telegram_message="$telegram_message
 Voted Block Producers: $bpaccountnames"
       send_message=true
+    fi
   fi
   
 #-----------------------------------------------------------------------------------------------------
