@@ -932,10 +932,10 @@ output=$(remcli wallet unlock --password $walletpassword 2>&1)
 
 if $auto_vote
 then
-  output=$(remcli system voteproducer prods $owneraccountname $bpaccountnames -p $owneraccountname@$vote_permission -f 2>&1)
+  voteoutput=$(remcli system voteproducer prods $owneraccountname $bpaccountnames -p $owneraccountname@$vote_permission -f 2>&1)
   #Uncomment if you want the output of the command printed
   #if ! $at; then echo $output; fi
-  if [[ ! "$output" =~ "executed transaction" ]]; then vote_failed=true; fi
+  if [[ ! "$voteoutput" =~ "executed transaction" ]]; then vote_failed=true; fi
 fi
   
 #-----------------------------------------------------------------------------------------------------
@@ -945,10 +945,10 @@ fi
 if $auto_reward
 then
   previous=$(remcli get currency balance rem.token $owneraccountname | awk '{print $1}')
-  output=$(remcli system claimrewards $owneraccountname -x 120 -p $owneraccountname@$claim_permission -f 2>&1)
+  rewardoutput=$(remcli system claimrewards $owneraccountname -x 120 -p $owneraccountname@$claim_permission -f 2>&1)
   #Uncomment if you want the output of the command printed
   #if ! $at; then echo $output; fi
-  if [[ "$output" =~ "already claimed rewards" ]]; then reward_failed=true; fi
+  if [[ "$rewardoutput" =~ "already claimed rewards" ]]; then reward_failed=true; fi
   after=$(remcli get currency balance rem.token $owneraccountname  | awk '{print $1}')
   total_reward=$(echo "$after - $previous"|bc)
 fi
@@ -960,10 +960,10 @@ fi
 if $auto_transfer
 then
   transfer_amount="$(echo "scale=4; ( $total_reward / 100 ) * $auto_transfer_perc" | bc )"
-  output=$(remcli transfer $owneraccountname $auto_transfer_acct "$transfer_amount REM" -x 120 -p $owneraccountname@$transfer_permission -f 2>&1)
+  transferoutput=$(remcli transfer $owneraccountname $auto_transfer_acct "$transfer_amount REM" -x 120 -p $owneraccountname@$transfer_permission -f 2>&1)
   #Uncomment if you want the output of the command printed
   #if ! $at; then echo $output; fi
-  if [[ ! "$output" =~ "executed transaction" ]]; then transfer_failed=true; fi
+  if [[ ! "$transferoutput" =~ "executed transaction" ]]; then transfer_failed=true; fi
 fi
   
 #-----------------------------------------------------------------------------------------------------
@@ -978,10 +978,10 @@ then
   else
     restake_reward=$(echo "scale=4; ( $total_reward / 100 ) * $restakingpercentage" | bc )
   fi
-  output=$(remcli system delegatebw $owneraccountname $owneraccountname "$restake_reward REM" -x 120 -p $owneraccountname@$stake_permission -f 2>&1)
+  restakingoutput=$(remcli system delegatebw $owneraccountname $owneraccountname "$restake_reward REM" -x 120 -p $owneraccountname@$stake_permission -f 2>&1)
   #Uncomment if you want the output of the command printed
   #if ! $at; then echo $output; fi
-  if [[ ! "$output" =~ "executed transaction" ]]; then restaking_failed=true; fi
+  if [[ ! "$restakingoutput" =~ "executed transaction" ]]; then restaking_failed=true; fi
 fi
 
 #-----------------------------------------------------------------------------------------------------
