@@ -484,8 +484,8 @@ chmod u+x $bp_monitor_script_path
 if ! grep 'bpm_temp_dir' "$bp_monitor_config_path" &>/dev/null
 then
 cat << 'DOC' >> "$bp_monitor_config_path"
-bpm_cron_cmd="/root/remblock/autobot/bpmonitor.sh"
-bpm_temp_dir="/root/remblock/autobot/bpmonitor_temp"
+bpm_cron_cmd="/root/remblock/autobot2/bpmonitor.sh"
+bpm_temp_dir="/root/remblock/autobot2/bpmonitor_temp"
 bpm_remnode_log="/root/remnode.log"
 bpm_warning_alert_threshold=3
 bpm_check_produce_minutes=3
