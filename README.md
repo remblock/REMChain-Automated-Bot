@@ -52,7 +52,7 @@ Your Chat ID will be shown in this format **`"id":7041782343`**, based on this e
 **`STEP 3: DOWNLOAD THE SCRIPTS REQUIRED TO MONITOR AND MANAGE YOUR PRODUCER OR GUARDIAN`**
 <br>
 <br>
-**AUTOBOT 1: Monitoring and Managing Producer**
+**`AUTOBOT 1: Monitoring and Managing Producer`**
 
 ```
 sudo wget https://github.com/SooSDExZ/REMChain-Automated-Bot/raw/master/autobot1 && sudo chmod u+x autobot1 && sudo ./autobot1 --at
@@ -67,7 +67,7 @@ sudo ./autobot1
 
 <br>
 <br>
-**AUTOBOT 2: Managing Guardian 1**
+**`AUTOBOT 2: Managing Guardian 1`**
 
 ```
 sudo wget https://github.com/SooSDExZ/REMChain-Automated-Bot/raw/master/autobot2 && sudo chmod u+x autobot2 && sudo ./autobot2 --at
@@ -82,7 +82,7 @@ sudo ./autobot2
 
 <br>
 
-**AUTOBOT 3: Managing Guardian 2**
+**`AUTOBOT 3: Managing Guardian 2`**
 
 ```
 sudo wget https://github.com/SooSDExZ/REMChain-Automated-Bot/raw/master/autobot3 && sudo chmod u+x autobot3 && sudo ./autobot3 --at
@@ -97,7 +97,7 @@ sudo ./autobot3
 
 <br>
 
-**AUTOBOT 4: Managing Guardian 3**
+**`AUTOBOT 4: Managing Guardian 3`**
 
 ```
 sudo wget https://github.com/SooSDExZ/REMChain-Automated-Bot/raw/master/autobot4 && sudo chmod u+x autobot4 && sudo ./autobot4 --at
@@ -112,7 +112,7 @@ sudo ./autobot4
 
 <br>
 
-**AUTOBOT 5: Managing Guardian 4**
+**`AUTOBOT 5: Managing Guardian 4`**
 
 ```
 sudo wget https://github.com/SooSDExZ/REMChain-Automated-Bot/raw/master/autobot5 && sudo chmod u+x autobot5 && sudo ./autobot5 --at
@@ -127,7 +127,7 @@ sudo ./autobot5
 
 <br>
 
-**AUTOBOT 6: Managing Guardian 5**
+**`AUTOBOT 6: Managing Guardian 5`**
 
 ```
 sudo wget https://github.com/SooSDExZ/REMChain-Automated-Bot/raw/master/autobot6 && sudo chmod u+x autobot6 && sudo ./autobot6 --at
@@ -142,7 +142,7 @@ sudo ./autobot6
 
 <br>
 
-**AUTOBOT 7: Managing Guardian 6**
+**`AUTOBOT 7: Managing Guardian 6`**
 
 ```
 sudo wget https://github.com/SooSDExZ/REMChain-Automated-Bot/raw/master/autobot7 && sudo chmod u+x autobot7 && sudo ./autobot7 --at
@@ -157,7 +157,7 @@ sudo ./autobot7
 
 <br>
 
-**AUTOBOT 8: Managing Guardian 7**
+**`AUTOBOT 8: Managing Guardian 7`**
 
 ```
 sudo wget https://github.com/SooSDExZ/REMChain-Automated-Bot/raw/master/autobot8 && sudo chmod u+x autobot8 && sudo ./autobot8 --at
@@ -172,7 +172,7 @@ sudo ./autobot8
 
 <br>
 
-**AUTOBOT 9: Managing Guardian 8**
+**`AUTOBOT 9: Managing Guardian 8`**
 
 ```
 sudo wget https://github.com/SooSDExZ/REMChain-Automated-Bot/raw/master/autobot9 && sudo chmod u+x autobot9 && sudo ./autobot9 --at
@@ -187,7 +187,7 @@ sudo ./autobot9
 
 <br>
 
-**AUTOBOT 10: Managing Guardian 9**
+**`AUTOBOT 10: Managing Guardian 9`**
 
 ```
 sudo wget https://github.com/SooSDExZ/REMChain-Automated-Bot/raw/master/autobot10 && sudo chmod u+x autobot10 && sudo ./autobot10 --at
@@ -202,7 +202,7 @@ sudo ./autobot10
 
 <br>
 
-**AUTOBOT 11: Managing Guardian 10**
+**`AUTOBOT 11: Managing Guardian 10`**
 
 ```
 sudo wget https://github.com/SooSDExZ/REMChain-Automated-Bot/raw/master/autobot8 && sudo chmod u+x autobot11 && sudo ./autobot11 --at
