@@ -53,10 +53,10 @@ Your Chat ID will be shown in this format **`"id":7041782343`**, based on this e
 <br>
 
 ```
-sudo wget https://github.com/SooSDExZ/REMChain-Automated-Bot/raw/master/autobot.sh && sudo chmod u+x autobot.sh && sudo ./autobot.sh --at
+sudo wget https://github.com/SooSDExZ/REMChain-Automated-Bot/raw/master/autobot1 && sudo chmod u+x autobot1 && sudo ./autobot1 --at
 ```
 ```
-sudo ./autobot.sh
+sudo ./autobot1
 ```
 
-**PLEASE NOTE: You will need to change the default account permissions according to yours in the remblock/autobot/config file.**
+**PLEASE NOTE: You will need to change the default account permissions according to yours in the remblock/autobot1/config file.**
