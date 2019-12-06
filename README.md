@@ -72,7 +72,7 @@ sudo ./autobot1
 ```
 <br>
 
-**PLEASE NOTE: You will need to change the default key permissions in remblock/autobot1/config file.**
+**Please Note: You will need to change the default key permissions in remblock/autobot1/config file.**
 <br>
 
 ***
@@ -89,7 +89,7 @@ sudo ./autobot2
 ```
 <br>
 
-**PLEASE NOTE: You will need to change the default key permissions in remblock/autobot2/config file.**
+**Please Note: You will need to change the default key permissions in remblock/autobot2/config file.**
 <br>
 
 ***
@@ -106,7 +106,7 @@ sudo ./autobot3
 ```
 <br>
 
-**PLEASE NOTE: You will need to change the default key permissions in remblock/autobot3/config file.**
+**Please Note: You will need to change the default key permissions in remblock/autobot3/config file.**
 <br>
 
 ***
@@ -123,7 +123,7 @@ sudo ./autobot4
 ```
 <br>
 
-**PLEASE NOTE: You will need to change the default key permissions in remblock/autobot4/config file.**
+**Please Note: You will need to change the default key permissions in remblock/autobot4/config file.**
 <br>
 
 ***
@@ -140,7 +140,7 @@ sudo ./autobot5
 ```
 <br>
 
-**PLEASE NOTE: You will need to change the default key permissions in remblock/autobot5/config file.**
+**Please Note: You will need to change the default key permissions in remblock/autobot5/config file.**
 <br>
 
 ***
@@ -157,7 +157,7 @@ sudo ./autobot6
 ```
 <br>
 
-**PLEASE NOTE: You will need to change the default key permissions in remblock/autobot6/config file.**
+**Please Note: You will need to change the default key permissions in remblock/autobot6/config file.**
 <br>
 
 ***
@@ -174,7 +174,7 @@ sudo ./autobot7
 ```
 <br>
 
-**PLEASE NOTE: You will need to change the default key permissions in remblock/autobot7/config file.**
+**Please Note: You will need to change the default key permissions in remblock/autobot7/config file.**
 <br>
 
 ***
@@ -191,7 +191,7 @@ sudo ./autobot8
 ```
 <br>
 
-**PLEASE NOTE: You will need to change the default key permissions in remblock/autobot8/config file.**
+**Please Note: You will need to change the default key permissions in remblock/autobot8/config file.**
 <br>
 
 ***
@@ -208,7 +208,7 @@ sudo ./autobot9
 ```
 <br>
 
-**PLEASE NOTE: You will need to change the default key permissions in remblock/autobot9/config file.**
+**Please Note: You will need to change the default key permissions in remblock/autobot9/config file.**
 <br>
 
 ***
@@ -225,7 +225,7 @@ sudo ./autobot10
 ```
 <br>
 
-**PLEASE NOTE: You will need to change the default key permissions in remblock/autobot10/config file.**
+**Please Note: You will need to change the default key permissions in remblock/autobot10/config file.**
 <br>
 
 ***
@@ -242,4 +242,4 @@ sudo ./autobot11
 ```
 <br>
 
-**PLEASE NOTE: You will need to change the default key permissions in remblock/autobot11/config file.**
+**Please Note: You will need to change the default key permissions in remblock/autobot11/config file.**
