@@ -1,6 +1,6 @@
 # REMChain-Automated-Bot
 
-This bot is fully customisable, allowing the user to choose whether to have their votes, claims and even a percentage of their claimed rewards restaked or transfered out automatically every 24 hours.<br>
+REMChain-Automated-Bot is fully customisable, it will allow users to choose whether to have their votes, claims and even a percentage of their claimed rewards restaked or transfered out automatically every 24 hours.<br>
 <br>
 
 ***
