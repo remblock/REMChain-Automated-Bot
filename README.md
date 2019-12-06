@@ -63,6 +63,8 @@ sudo ./autobot1
 
 <br>
 
+***
+
 ```
 sudo wget https://github.com/SooSDExZ/REMChain-Automated-Bot/raw/master/autobot2 && sudo chmod u+x autobot2 && sudo ./autobot2 --at
 ```
@@ -73,6 +75,8 @@ sudo ./autobot2
 **PLEASE NOTE: You will need to change the default key permissions in remblock/autobot2/config file.**
 
 <br>
+
+***
 
 ```
 sudo wget https://github.com/SooSDExZ/REMChain-Automated-Bot/raw/master/autobot3 && sudo chmod u+x autobot3 && sudo ./autobot3 --at
