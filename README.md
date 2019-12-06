@@ -66,7 +66,7 @@ sudo ./autobot1
 ***
 
 <br>
-<br>
+
 **`AUTOBOT 2: Managing Guardian 1`**
 
 ```
