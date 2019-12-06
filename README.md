@@ -70,6 +70,7 @@ sudo wget https://github.com/SooSDExZ/REMChain-Automated-Bot/raw/master/autobot1
 ```
 sudo ./autobot1
 ```
+<br>
 
 **PLEASE NOTE: You will need to change the default key permissions in remblock/autobot1/config file.**
 
@@ -87,6 +88,7 @@ sudo wget https://github.com/SooSDExZ/REMChain-Automated-Bot/raw/master/autobot2
 ```
 sudo ./autobot2
 ```
+<br>
 
 **PLEASE NOTE: You will need to change the default key permissions in remblock/autobot2/config file.**
 
@@ -104,6 +106,7 @@ sudo wget https://github.com/SooSDExZ/REMChain-Automated-Bot/raw/master/autobot3
 ```
 sudo ./autobot3
 ```
+<br>
 
 **PLEASE NOTE: You will need to change the default key permissions in remblock/autobot3/config file.**
 
@@ -121,6 +124,7 @@ sudo wget https://github.com/SooSDExZ/REMChain-Automated-Bot/raw/master/autobot4
 ```
 sudo ./autobot4
 ```
+<br>
 
 **PLEASE NOTE: You will need to change the default key permissions in remblock/autobot4/config file.**
 
@@ -138,6 +142,7 @@ sudo wget https://github.com/SooSDExZ/REMChain-Automated-Bot/raw/master/autobot5
 ```
 sudo ./autobot5
 ```
+<br>
 
 **PLEASE NOTE: You will need to change the default key permissions in remblock/autobot5/config file.**
 
@@ -155,6 +160,7 @@ sudo wget https://github.com/SooSDExZ/REMChain-Automated-Bot/raw/master/autobot6
 ```
 sudo ./autobot6
 ```
+<br>
 
 **PLEASE NOTE: You will need to change the default key permissions in remblock/autobot6/config file.**
 
@@ -172,6 +178,7 @@ sudo wget https://github.com/SooSDExZ/REMChain-Automated-Bot/raw/master/autobot7
 ```
 sudo ./autobot7
 ```
+<br>
 
 **PLEASE NOTE: You will need to change the default key permissions in remblock/autobot7/config file.**
 
@@ -189,6 +196,7 @@ sudo wget https://github.com/SooSDExZ/REMChain-Automated-Bot/raw/master/autobot8
 ```
 sudo ./autobot8
 ```
+<br>
 
 **PLEASE NOTE: You will need to change the default key permissions in remblock/autobot8/config file.**
 
@@ -206,6 +214,7 @@ sudo wget https://github.com/SooSDExZ/REMChain-Automated-Bot/raw/master/autobot9
 ```
 sudo ./autobot9
 ```
+<br>
 
 **PLEASE NOTE: You will need to change the default key permissions in remblock/autobot9/config file.**
 
@@ -223,6 +232,7 @@ sudo wget https://github.com/SooSDExZ/REMChain-Automated-Bot/raw/master/autobot1
 ```
 sudo ./autobot10
 ```
+<br>
 
 **PLEASE NOTE: You will need to change the default key permissions in remblock/autobot10/config file.**
 
@@ -240,5 +250,6 @@ sudo wget https://github.com/SooSDExZ/REMChain-Automated-Bot/raw/master/autobot8
 ```
 sudo ./autobot11
 ```
+<br>
 
 **PLEASE NOTE: You will need to change the default key permissions in remblock/autobot11/config file.**
