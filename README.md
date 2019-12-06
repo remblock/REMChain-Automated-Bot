@@ -56,6 +56,8 @@ Your Chat ID will be shown in this format **`"id":7041782343`**, based on this e
 
 ***
 
+<br>
+
 **`STEP 3: DOWNLOAD THE SCRIPTS REQUIRED TO MONITOR AND MANAGE YOUR PRODUCER OR GUARDIAN`**
 
 <br>
