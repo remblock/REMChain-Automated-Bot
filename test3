@@ -1,7 +1,7 @@
 #!/bin/bash
 
 #****************************************************************************************************#
-#                                             AUTOBOT.SH                                             #
+#                                             AUTOBOT2.SH                                             #
 #****************************************************************************************************#
 
 #-----------------------------------------------------------------------------------------------------
@@ -31,31 +31,10 @@ create_dir="/root/remblock/autobot3"
 config_file="/root/remblock/autobot3/config"
 
 #-----------------------------------------------------------------------------------------------------
-# BP MONITOR SCRIPT AND CONFIG PATHS
-#-----------------------------------------------------------------------------------------------------
-
-bp_monitor_script_path="/root/remblock/autobot/bpmonitor.sh"
-bp_monitor_config_path="/root/remblock/autobot/config"
-
-#-----------------------------------------------------------------------------------------------------
 # MINUTES TO WAIT BETWEEN EACH EXECUTIONS OF THE SCRIPT
 #-----------------------------------------------------------------------------------------------------
 
 minutes_to_wait=1442
-
-#-----------------------------------------------------------------------------------------------------
-# CRON LINE WILL BE CREATED FOR THE BP MONITORING SCRIPT
-#-----------------------------------------------------------------------------------------------------
-
-bp_mon_cron_line="* * * * * /root/remblock/autobot/bpmonitor.sh"
-
-#-----------------------------------------------------------------------------------------------------
-# START AND STOP SERVER COMMANDS FILES PATH
-#-----------------------------------------------------------------------------------------------------
-
-start_server_commands_path="/root/remblock/autobot/start_server_commands.sh"
-stop_server_commands_path="/root/remblock/autobot/stop_server_commands.sh"
-service_definition_path="/etc/systemd/system/autobot.service"
 
 #-----------------------------------------------------------------------------------------------------
 # INITIATE BOOLEAN VARIABLES FOR THE AUTOBOT SCRIPT
@@ -69,7 +48,6 @@ auto_vote_alert=false
 auto_reward_alert=false
 auto_restaking_alert=false
 auto_transfer_alert=false
-bp_monitoring=false
 vote_failed=false
 reward_failed=false
 restaking_failed=false
@@ -171,342 +149,6 @@ function get_config_value(){
   else
     return 0
   fi
-}
-
-#-----------------------------------------------------------------------------------------------------
-# CREATE START AND STOP SERVICES
-#-----------------------------------------------------------------------------------------------------
-
-function create_start_stop_service {
-  if [ ! -f "$start_server_commands_path" ]
-  then
-cat << 'DOC' > "$start_server_commands_path"
-#!/bin/sh
-/usr/bin/nohup /usr/bin/remnode --config-dir /root/config/ --data-dir /root/data/ >>/root/remnode.log 2>>/root/remnode.log &
-sleep 30
-if ! tail -n1 /root/remnode.log | grep 'on_incoming_block' &>/dev/null
-then
-   /usr/bin/nohup /usr/bin/remnode --config-dir  /root/config/ --data-dir /root/data/ --replay-blockchain --hard-replay-blockchain --genesis-json genesis.json &
-fi
-DOC
-chmod u+x "$start_server_commands_path"
-fi
-if [ ! -f "$stop_server_commands_path" ]
-then
-cat << 'DOC' > "$stop_server_commands_path"
-#!/bin/sh
-/usr/bin/killall remcli
-sleep 15
-DOC
-chmod u+x $stop_server_commands_path
-fi
-if [ ! -f "$service_definition_path" ]
-then
-cat << DOC > "$service_definition_path"
-[Unit]
-Description=RUN AUTOBOT REMCLI COMMANDS AT START AND STOP
-[Service]
-Type=oneshot
-RemainAfterExit=true
-ExecStart=$start_server_commands_path
-ExecStop=$stop_server_commands_path
-[Install]
-WantedBy=multi-user.target
-DOC
-systemctl enable autobot &> /dev/null
-fi
-}
-
-#-----------------------------------------------------------------------------------------------------
-# CREATE BP MONITOR SCRIPT FILE
-#-----------------------------------------------------------------------------------------------------
-
-function create_bp_monitor_files(){
-cat << 'DOC' > $bp_monitor_script_path
-#!/bin/bash
-
-#This script need to be called via cron every minute
-
-#PATH to used commands
-PATH="/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/snap/bin"
-
-#Load configuration variables and values
-source "/root/remblock/autobot/config" &>/dev/null
-now_epoch="$(date +%s)"
-now_date="$(date +%d-%m-%Y)"
-owneraccountname="$owner"
-
-#Install crontab line if it does not exists
-if [ ! -z "$bpm_cron_cmd" ] && ! crontab -u root -l | grep -v '^ *#' | grep "$bpm_cron_cmd" &>/dev/null
-then
-  (crontab -u root -l ; echo "*/1 * * * * $bpm_cron_cmd") | crontab -u root -
-fi
-
-#Create bpmonitor folder for temporal information
-if [ ! -z "$bpm_temp_dir" ] && [ ! -d "$bpm_temp_dir" ]
-then
-  mkdir "$bpm_temp_dir"
-fi
-
-#****************************************************************************************************#
-#                                        FUNCTION DEFINITIONS                                        #
-#****************************************************************************************************#
-
-#Add a message to be sent later, if there are more lines than permited in the queue, delete the older ones
-function add_message_to_queue(){
-  #If the log is at maximum capacity, delete exceding lines
-  if [ -f "$bpm_temp_dir/msg_queue.txt" ] && (( $(wc -l "$bpm_temp_dir/msg_queue.txt" | awk '{print $1}') >= bpm_max_queued_msg_lines ))
-  then
-    echo "$(tail -$((bpm_max_queued_msg_lines -1)) $bpm_temp_dir/msg_queue.txt)" > $bpm_temp_dir/msg_queue.txt
-  fi
-  if ! line_repeated "$1"
-  then
-    echo -e "$1\n" >> "$bpm_temp_dir/msg_queue.txt"
-  fi
-}
-
-#Check if the last line is repeated
-function line_repeated(){
-  if grep "$1" "$bpm_temp_dir/msg_queue.txt" &>/dev/null
-  then
-    return 0
-  else
-    return 1
-  fi
-}
-
-#Remove old lines that only change in minutes displayed
-#It receives only the base of the line befores the numbers curresponding to time
-function remove_lines_repeated_time(){
-  sed -i "/^$1/d" "$bpm_temp_dir/msg_queue.txt"
-}
-
-#Remove 2 consecutive empty lines before sending the message
-function remove_empty_lines(){
-  sed -i '/^$/{N;/^\n$/d;}' "$bpm_temp_dir/msg_queue.txt"
-  #if the first line is empty, delete it
-  if ! [[ "$(head -1 $bpm_temp_dir/msg_queue.txt)" =~ [a-zA-Z0-9] ]]
-  then
-    sed -i '1d' "$bpm_temp_dir/msg_queue.txt" 
-  fi
-}
-
-#Send the queued messages to telegram and empty the queue
-function send_telegram_messages(){
-  if [ ! -z "$telegram_token" ] && [ ! -z "$telegram_chatid" ]
-  then
-    remove_empty_lines
-    curl -s -X POST https://api.telegram.org/bot$telegram_token/sendMessage -d chat_id=$telegram_chatid -d text="$(echo -e "BP Warning Alert\n--------------------------------------";cat $bpm_temp_dir/msg_queue.txt)" &>/dev/null
-    #clean the msg queue file
-    > $bpm_temp_dir/msg_queue.txt
-    echo $now_epoch > "$bpm_temp_dir/last_send_message_epoch.txt"
-  fi
-}
-
-#Check warning threshold and send message
-function send_warnings(){
-  if [ ! -f "$bpm_temp_dir/last_send_message_epoch.txt" ] 
-  then
-    echo $now_epoch > "$bpm_temp_dir/last_send_message_epoch.txt"
-  else
-    config_minutes_in_seconds="$((bpm_warning_alert_threshold * 60))"
-    last_msg_epoch=$(cat "$bpm_temp_dir/last_send_message_epoch.txt")
-    if (( (now_epoch - last_msg_epoch) >= config_minutes_in_seconds )) && (( $(wc -l "$bpm_temp_dir/msg_queue.txt" | awk '{print $1}') > 1 ))
-    then
-      send_telegram_messages
-    fi
-  fi
-}
-
-#Translate the time format from the remnode log to epoch time
-function remnodelogtime_to_epoch(){
-  temp_date="$( echo $1 | awk -F '.' '{ print $1}' | tr '-' '/' | tr 'T' ' ')"
-  echo $(date "+%s" -d "$temp_date")
-}
-
-#Function that checks if whether the node has actual produced a block within the past configured max minutes.
-function check_produce_minutes(){
-  last_block_date=$(grep -i "produce_block" $bpm_remnode_log | sed -n '$p' | awk '{print $2}')
-  last_block_epoch=$(remnodelogtime_to_epoch "$last_block_date")
-  config_minutes_in_seconds="$((bpm_check_produce_minutes * 60))"
-  if (( (now_epoch - last_block_epoch) >= config_minutes_in_seconds ))
-  then
-    remove_lines_repeated_time "$owneraccountname last produced a block"
-    add_message_to_queue "$owneraccountname last produced a block "$(((now_epoch - last_block_epoch)/60))" minutes ago."
-  fi
-}
-
-#Function that checks whether the remnode.log file has been modified within the past configured max minutes
-function check_log_minutes(){
-  last_write_epoch=$(date +%s -r "$bpm_remnode_log")
-  config_minutes_in_seconds="$(( bpm_check_log_minutes * 60))"
-  if (( (now_epoch - last_write_epoch) >= config_minutes_in_seconds ))
-  then
-    remove_lines_repeated_time "$owneraccountname log file was last modified"
-    add_message_to_queue "$owneraccountname log file was last modified "$(((now_epoch - last_write_epoch)/60))" minutes ago"
-  fi
-}
-
-#Function that checks the condition of the remnode chain
-function check_remnode_chain(){
-  if ! timeout 10s remcli get info 2>&1 | grep server_version &>/dev/null
-  then
-    add_message_to_queue "$owneraccountname failed to receive a response from \"remcli get info\""
-  fi
-}
-
-#Function that checks gap between head block (head_block_num) and last irreversible block (last_irreversible_block_num) to see if it has been more than the configured minutes
-function check_block_minutes(){
-  if ! timeout 10s remcli get info 2>&1 | grep server_version &>/dev/null
-  then
-    add_message_to_queue "$owneraccountname failed to receive a response from \"remcli get info\""
-    return
-  fi
-  last_block_id="$(remcli get info | grep -w 'head_block_num' | awk '{print $2}' | tr -d ',')"
-  last_irr_block_id="$(remcli get info | grep -w 'last_irreversible_block_num' | awk '{print $2}' | tr -d ',')"
-  last_block_date=$(grep -i "#$last_block_id" $bpm_remnode_log | sed -n '$p' | awk '{print $2}')
-  last_irr_block_date=$(grep -i "#$last_irr_block_id" $bpm_remnode_log | sed -n '$p' | awk '{print $2}')
-  last_block_epoch=$(remnodelogtime_to_epoch "$last_block_date")
-  last_irr_block_epoch=$(remnodelogtime_to_epoch "$last_irr_block_date")
-  config_minutes_in_seconds="$((bpm_check_block_minutes * 60))"
-  if (( ( last_block_epoch - last_irr_block_epoch ) >= config_minutes_in_seconds ))
-  then
-    remove_lines_repeated_time "$owneraccountname current block is"
-    add_message_to_queue "$owneraccountname current block is $(((last_block_epoch - last_irr_block_epoch)/60)) ahead of last irreversible."
-  fi
-}
-
-#Function that checks if the last irreversible block has not advanced.
-function check_last_iblock(){
-  if ! timeout 10s remcli get info 2>&1 | grep server_version &>/dev/null
-  then
-    add_message_to_queue "$owneraccountname failed to receive a response from \"remcli get info\""
-    return
-  fi
-  if [ ! -f "$bpm_temp_dir/last_iblock.txt" ]
-  then
-    last_irr_block_id="$(remcli get info | grep -w 'last_irreversible_block_num' | awk '{print $2}' | tr -d ',')"
-    echo "$last_irr_block_id" > "$bpm_temp_dir/last_iblock.txt"
-  else
-    last_block_id=$(cat "$bpm_temp_dir/last_iblock.txt")
-    last_irr_block_id="$(remcli get info | grep -w 'last_irreversible_block_num' | awk '{print $2}' | tr -d ',')"
-    if [ "$last_block_id" == "$last_irr_block_id" ]
-    then
-      remove_lines_repeated_time "$owneraccountname last irreversible block is stuck on"
-      add_message_to_queue "$owneraccountname last irreversible block is stuck on ${last_irr_block_id}."
-    else
-      echo "$last_irr_block_id" > "$bpm_temp_dir/last_iblock.txt"
-    fi
-  fi
-}
-
-#Function that tests the "remcli net peers" command for the last handshake time, if the peer time is older than the configured minutes
-function check_net_peers(){
-  if ! timeout 10 remcli net peers | grep head_id &>/dev/null
-  then
-    add_message_to_queue "$owneraccountname failed to receive a response from \"remcli net peers\""
-    return
-  fi
-  last_hand_shake_time_ns="$(remcli net peers | grep time | sed -n '1p' | awk '{print $2}' | tr -d '",')"
-  #removing nanoseconds for calculations
-  last_hand_shake_epoch="${last_hand_shake_time_ns:-9}"
-  config_minutes_in_seconds="$((bpm_check_peers_minutes * 60))"
-  if (( ( now_epoch - last_hand_shake_epoch ) >= config_minutes_in_seconds ))
-  then
-    add_message_to_queue "$owneraccountname peer handshake never took place."
-  fi
-}
-
-#Send alerts if disk or ram exceeds the threshold
-function check_disk_and_ram(){
-  ram_used_perc="$(free | grep Mem | awk '{print $3/$2 * 100.0}' | awk -F '.' '{print $1}')"
-  max_ram="$(echo $bpm_ram_usage_threshold | tr -d '%' )"
-  disk_used_perc="$(df -h | grep -w '/' | awk '{print $5}' | tr -d '%')"
-  max_disk="$(echo $bpm_disk_space_threshold | tr -d '%' )"
-  if (( ram_used_perc >= max_ram ))
-  then
-    add_message_to_queue "$owneraccountname ram usage is over the specified threshold amount."
-  fi
-  if (( disk_used_perc >= max_disk ))
-  then
-    add_message_to_queue "$owneraccountname disk usage is over the specified threshold amount."
-  fi
-}
-
-#****************************************************************************************************#
-#                                       MAIN PROGRAM FUNCTIONS                                       #
-#****************************************************************************************************#
-
-if [ "$(echo $bpm_check_producer | tr '[:upper:]' '[:lower:]' )" == "true" ]
-then 
-  check_produce_minutes
-fi
-
-if [ "$(echo $bpm_check_log | tr '[:upper:]' '[:lower:]' )" == "true" ]
-then 
-  check_log_minutes
-fi
-
-if [ "$(echo $bpm_check_info | tr '[:upper:]' '[:lower:]' )" == "true" ]
-then 
-  check_remnode_chain
-fi
-
-if [ "$(echo $bpm_check_blocks | tr '[:upper:]' '[:lower:]' )" == "true" ]
-then 
-  check_block_minutes
-fi
-
-if [ "$(echo $bpm_check_irr_blocks | tr '[:upper:]' '[:lower:]' )" == "true" ]
-then 
-  check_last_iblock
-fi
-
-if [ "$(echo $bpm_check_peers | tr '[:upper:]' '[:lower:]' )" == "true" ]
-then 
-  check_net_peers
-fi
-
-if [ "$(echo $bpm_check_server | tr '[:upper:]' '[:lower:]' )" == "true" ]
-then 
-  check_disk_and_ram
-fi
-
-send_warnings
-DOC
-
-chmod u+x $bp_monitor_script_path
-
-#-----------------------------------------------------------------------------------------------------
-# CREATE BP MONITOR CONFIG FILE
-#-----------------------------------------------------------------------------------------------------
-
-if ! grep 'bpm_temp_dir' "$bp_monitor_config_path" &>/dev/null
-then
-cat << 'DOC' >> "$bp_monitor_config_path"
-bpm_cron_cmd="/root/remblock/autobot/bpmonitor.sh"
-bpm_temp_dir="/root/remblock/autobot/bpmonitor_temp"
-bpm_remnode_log="/root/remnode.log"
-bpm_warning_alert_threshold=3
-bpm_check_produce_minutes=3
-bpm_max_queued_msg_lines=50
-bpm_check_log_minutes=3
-bpm_check_block_minutes=3
-bpm_check_peers_minutes=3
-bpm_ram_usage_threshold=80
-bpm_disk_space_threshold=80
-bpm_check_producer=True
-bpm_check_log=False
-bpm_check_info=False
-bpm_check_blocks=False
-bpm_check_irr_blocks=False
-bpm_check_peers=False
-bpm_check_server=True
-DOC
-
-#Run the script a first time so it create the crontab line
-bash $bp_monitor_script_path &>/dev/null
-fi
 }
 
 #****************************************************************************************************#
@@ -868,18 +510,6 @@ else
   fi
   echo 
 fi
-
-#-----------------------------------------------------------------------------------------------------
-# CHECK IF THE LINE IS ALREADY ON CRON, IF NOT ADD IT INSIDE
-#-----------------------------------------------------------------------------------------------------
-
-if $bp_monitoring
-then
-  if [ ! -f "$bp_monitor_script_path" ]
-  then
-    create_bp_monitor_files
-  fi
-fi
     
 #-----------------------------------------------------------------------------------------------------
 # GET TELEGRAM TOKEN FROM THE USER OR TAKE IT FROM THE CONFIG FILE
@@ -932,10 +562,10 @@ output=$(remcli wallet unlock --password $walletpassword 2>&1)
 
 if $auto_vote
 then
-  output=$(remcli system voteproducer prods $owneraccountname $bpaccountnames -p $owneraccountname@$vote_permission -f 2>&1)
+  voteoutput=$(remcli system voteproducer prods $owneraccountname $bpaccountnames -p $owneraccountname@$vote_permission -f 2>&1)
   #Uncomment if you want the output of the command printed
   #if ! $at; then echo $output; fi
-  if [[ ! "$output" =~ "executed transaction" ]]; then vote_failed=true; fi
+  if [[ ! "$voteoutput" =~ "executed transaction" ]]; then vote_failed=true; fi
 fi
   
 #-----------------------------------------------------------------------------------------------------
@@ -945,10 +575,10 @@ fi
 if $auto_reward
 then
   previous=$(remcli get currency balance rem.token $owneraccountname | awk '{print $1}')
-  output=$(remcli system claimrewards $owneraccountname -x 120 -p $owneraccountname@$claim_permission -f 2>&1)
+  rewardoutput=$(remcli system claimrewards $owneraccountname -x 120 -p $owneraccountname@$claim_permission -f 2>&1)
   #Uncomment if you want the output of the command printed
   #if ! $at; then echo $output; fi
-  if [[ "$output" =~ "already claimed rewards" ]]; then reward_failed=true; fi
+  if [[ ! "$rewardoutput" =~ "executed transaction" ]]; then reward_failed=true; fi
   after=$(remcli get currency balance rem.token $owneraccountname  | awk '{print $1}')
   total_reward=$(echo "$after - $previous"|bc)
 fi
@@ -960,10 +590,10 @@ fi
 if $auto_transfer
 then
   transfer_amount="$(echo "scale=4; ( $total_reward / 100 ) * $auto_transfer_perc" | bc )"
-  output=$(remcli transfer $owneraccountname $auto_transfer_acct "$transfer_amount REM" -x 120 -p $owneraccountname@$transfer_permission -f 2>&1)
+  transferoutput=$(remcli transfer $owneraccountname $auto_transfer_acct "$transfer_amount REM" -x 120 -p $owneraccountname@$transfer_permission -f 2>&1)
   #Uncomment if you want the output of the command printed
   #if ! $at; then echo $output; fi
-  if [[ ! "$output" =~ "executed transaction" ]]; then transfer_failed=true; fi
+  if [[ ! "$transferoutput" =~ "executed transaction" ]]; then transfer_failed=true; fi
 fi
   
 #-----------------------------------------------------------------------------------------------------
@@ -978,10 +608,10 @@ then
   else
     restake_reward=$(echo "scale=4; ( $total_reward / 100 ) * $restakingpercentage" | bc )
   fi
-  output=$(remcli system delegatebw $owneraccountname $owneraccountname "$restake_reward REM" -x 120 -p $owneraccountname@$stake_permission -f 2>&1)
+  restakingoutput=$(remcli system delegatebw $owneraccountname $owneraccountname "$restake_reward REM" -x 120 -p $owneraccountname@$stake_permission -f 2>&1)
   #Uncomment if you want the output of the command printed
   #if ! $at; then echo $output; fi
-  if [[ ! "$output" =~ "executed transaction" ]]; then restaking_failed=true; fi
+  if [[ ! "$restakingoutput" =~ "executed transaction" ]]; then restaking_failed=true; fi
 fi
 
 #-----------------------------------------------------------------------------------------------------
@@ -994,52 +624,60 @@ then
 "${owneraccountname^}" Daily Summary
 --------------------------------------
 Date: $(date +"%d-%m-%Y")"
-  if $reward_failed
+  if $auto_reward_alert
   then
-    telegram_message="$telegram_message
+    if $reward_failed
+    then
+      telegram_message="$telegram_message
 Claimed Rewards: Failed"
-    send_message=true
-  elif $auto_reward_alert
-  then
-    telegram_message="$telegram_message
+      send_message=true
+    else
+      telegram_message="$telegram_message
 Claimed Rewards: $total_reward REM"
-    send_message=true
+      send_message=true
+    fi
   fi
 
-  if $transfer_failed
+  if $auto_transfer_alert
   then
-    telegram_message="$telegram_message
+    if $transfer_failed
+    then
+      telegram_message="$telegram_message
 Transfer Rewards: Failed"
-    send_message=true
-  elif $auto_transfer_alert
-  then
-    telegram_message="$telegram_message
+      send_message=true
+    else
+      telegram_message="$telegram_message
 Transfer Rewards: $transfer_amount REM"
-    send_message=true
+      send_message=true
+    fi
   fi
 
-  if $restaking_failed
+  if $auto_restaking_alert
   then
-    telegram_message="$telegram_message
+    if $restaking_failed
+    then
+      telegram_message="$telegram_message
 Restaked Rewards: Failed"
-    send_message=true
-  elif $auto_restaking_alert
-  then
-    telegram_message="$telegram_message
+      send_message=true
+    else
+      telegram_message="$telegram_message
 Restaked Rewards: $restake_reward REM"
-    send_message=true
+      send_message=true
+    fi
   fi
 
-  if $vote_failed
+  if $auto_vote_alert
   then
-    telegram_message="$telegram_message
+    if $vote_failed
+    then
+      telegram_message="$telegram_message
 Voted Block Producers: Failed"
-    send_message=true
-  elif $auto_vote_alert
-  then
-    telegram_message="$telegram_message
+      send_message=true
+    else
+      telegram_message="$telegram_message
 Voted Block Producers: $bpaccountnames"
-    send_message=true
+      send_message=true
+    fi
   fi
   
 #-----------------------------------------------------------------------------------------------------
