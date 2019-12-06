@@ -5,7 +5,7 @@ This bot is fully customisable, allowing the user to choose whether to have thei
 
 ***
 
-
+<br>
 # Step 1: Create Telegram Bot Using Botfather
 <br>
 
