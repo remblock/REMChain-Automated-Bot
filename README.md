@@ -217,7 +217,6 @@ sudo ./autobot9
 <br>
 
 **PLEASE NOTE: You will need to change the default key permissions in remblock/autobot9/config file.**
-
 <br>
 
 ***
@@ -235,7 +234,6 @@ sudo ./autobot10
 <br>
 
 **PLEASE NOTE: You will need to change the default key permissions in remblock/autobot10/config file.**
-
 <br>
 
 ***
