@@ -37,7 +37,7 @@ Once your bot is created, you can set a custom name, profile photo and descripti
 * Change the description and send it to BotFather.
 
 There are some other useful methods in BotFather which we won't cover in this tutorial like **`/setcommands`**.
-
+<br>
 
 ***
 
