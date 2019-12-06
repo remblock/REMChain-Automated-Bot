@@ -1,7 +1,7 @@
 #!/bin/bash
 
 #****************************************************************************************************#
-#                                             AUTOBOT.SH                                             #
+#                                             AUTOBOT1.SH                                            #
 #****************************************************************************************************#
 
 #-----------------------------------------------------------------------------------------------------
@@ -22,19 +22,19 @@ fi
 # CREATE AUTOBOT DIRECTORY  
 #-----------------------------------------------------------------------------------------------------
 
-create_dir="/root/remblock/autobot"
+create_dir="/root/remblock/autobot1"
 
 #-----------------------------------------------------------------------------------------------------
 # CREATE AUTOBOT CONFIG FILE
 #-----------------------------------------------------------------------------------------------------
 
-config_file="/root/remblock/autobot/config"
+config_file="/root/remblock/autobot1/config"
 
 #-----------------------------------------------------------------------------------------------------
 # BP MONITOR SCRIPT AND CONFIG PATHS
 #-----------------------------------------------------------------------------------------------------
 
-bp_monitor_script_path="/root/remblock/autobot/bpmonitor.sh"
+bp_monitor_script_path="/root/remblock/autobot1/bpmonitor.sh"
 bp_monitor_config_path="$config_file"
 
 #-----------------------------------------------------------------------------------------------------
@@ -47,14 +47,14 @@ minutes_to_wait=1442
 # CRON LINE WILL BE CREATED FOR THE BP MONITORING SCRIPT
 #-----------------------------------------------------------------------------------------------------
 
-bp_mon_cron_line="* * * * * /root/remblock/autobot/bpmonitor.sh"
+bp_mon_cron_line="* * * * * /root/remblock/autobot1/bpmonitor.sh"
 
 #-----------------------------------------------------------------------------------------------------
 # START AND STOP SERVER COMMANDS FILES PATH
 #-----------------------------------------------------------------------------------------------------
 
-start_server_commands_path="/root/remblock/autobot/start_server_commands.sh"
-stop_server_commands_path="/root/remblock/autobot/stop_server_commands.sh"
+start_server_commands_path="/root/remblock/autobot1/start_server_commands.sh"
+stop_server_commands_path="/root/remblock/autobot1/stop_server_commands.sh"
 service_definition_path="/etc/systemd/system/autobot.service"
 
 #-----------------------------------------------------------------------------------------------------
@@ -231,7 +231,7 @@ cat << 'DOC' > $bp_monitor_script_path
 PATH="/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/snap/bin"
 
 #Load configuration variables and values
-source "/root/remblock/autobot/config" &>/dev/null
+source "/root/remblock/autobot1/config" &>/dev/null
 now_epoch="$(date +%s)"
 now_date="$(date +%d-%m-%Y)"
 owneraccountname="$owner"
@@ -484,8 +484,8 @@ chmod u+x $bp_monitor_script_path
 if ! grep 'bpm_temp_dir' "$bp_monitor_config_path" &>/dev/null
 then
 cat << 'DOC' >> "$bp_monitor_config_path"
-bpm_cron_cmd="/root/remblock/autobot/bpmonitor.sh"
-bpm_temp_dir="/root/remblock/autobot/bpmonitor_temp"
+bpm_cron_cmd="/root/remblock/autobot1/bpmonitor.sh"
+bpm_temp_dir="/root/remblock/autobot1/bpmonitor_temp"
 bpm_remnode_log="/root/remnode.log"
 bpm_warning_alert_threshold=3
 bpm_check_produce_minutes=3
@@ -1061,7 +1061,7 @@ Voted Block Producers: $bpaccountnames"
     then
       sleep 120
     else
-      printf  "\n\nWAITING 2 MINUTES FOR THE CONFIRMATION OF THE TRANSACTIONS\n\n"
+      printf  "\nWAITING 2 MINUTES FOR THE CONFIRMATION OF THE TRANSACTIONS\n\n"
       progress-bar 112
       printf "\n\n\n"
     fi
