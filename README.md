@@ -5,7 +5,7 @@ This bot is fully customisable, allowing the user to choose whether to have thei
 
 ***
 
-**Step 1: Create a bot using BotFather**
+**STEP 1: CREATE A BOT USING BOTFATHER**
 
 The following steps describe how to create a new bot:
 
@@ -39,7 +39,7 @@ There are some other useful methods in BotFather which we won't cover in this tu
 
 ***
 
-**Step 2: Obtain your Chat Identification Number**
+**STEP 2: OBTAIN YOUR CHAT IDENTIFICATION NUMBER**
 
 Theres two ways to retrieve your Chat ID, the first is by opening the following URL in your web-browser: 
 
@@ -49,7 +49,7 @@ Your Chat ID will be shown in this format **`"id":7041782343`**, based on this e
 
 ***
 
-**Step 3: Download and run the script in root**
+**STEP 3: DOWNLOAD THE SCRIPTS REQUIRED TO MONITOR AND MANAGE YOUR PRODUCER OR GUARDIAN**
 <br>
 
 **AUTOBOT 1: Monitoring and Managing Producer**
