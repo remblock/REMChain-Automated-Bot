@@ -485,31 +485,6 @@ then
     echo
   fi
 fi
-
-#-----------------------------------------------------------------------------------------------------
-# GET BP MONITORING ANSWER FROM THE USER OR TAKE IT FROM THE CONFIG FILE
-#-----------------------------------------------------------------------------------------------------
-
-if get_config_value bp_monitoring
-then
-  if [ "$global_value" = "true" ]
-  then
-    bp_monitoring=true
-  fi
-else
-  if $at
-  then
-    exit 2
-  fi
-  if get_user_answer_yn "DO YOU WANT AUTOBOT TO ACTIVATE BP MONITORING"
-  then
-    bp_monitoring=true
-    echo "bp_monitoring=true" >> "$config_file"
-  else
-    echo "bp_monitoring=false" >> "$config_file"
-  fi
-  echo 
-fi
     
 #-----------------------------------------------------------------------------------------------------
 # GET TELEGRAM TOKEN FROM THE USER OR TAKE IT FROM THE CONFIG FILE
