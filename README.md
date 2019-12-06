@@ -168,7 +168,9 @@ sudo ./autobot9
 **PLEASE NOTE: You will need to change the default key permissions in remblock/autobot9/config file.**
 
 ***
+
 <br>
+
 **Autobot 10: Managing Guardian 9**
 
 ```
@@ -181,7 +183,9 @@ sudo ./autobot10
 **PLEASE NOTE: You will need to change the default key permissions in remblock/autobot10/config file.**
 
 ***
+
 <br>
+
 **Autobot 11: Managing Guardian 10**
 
 ```
