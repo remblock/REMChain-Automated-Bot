@@ -9,7 +9,7 @@ This bot is fully customisable, allowing the user to choose whether to have thei
 # Step 1: Create Telegram Bot Using Botfather
 <br>
 
-The following steps describe how to create a new bot:
+**The following steps describe how to create a new bot:**
 
 * Contact [**@BotFather**](https://telegram.me/BotFather) in your Telegram messenger.
 * To get a token, send BotFather a message that says **`/newbot`**.
