@@ -49,9 +49,9 @@ Your Chat ID will be shown in this format **`"id":7041782343`**, based on this e
 
 ***
 
-**STEP 3: DOWNLOAD THE SCRIPTS REQUIRED TO MONITOR AND MANAGE YOUR PRODUCER OR GUARDIAN**
+**`STEP 3: DOWNLOAD THE SCRIPTS REQUIRED TO MONITOR AND MANAGE YOUR PRODUCER OR GUARDIAN`**
 <br>
-
+<br>
 **AUTOBOT 1: Monitoring and Managing Producer**
 
 ```
@@ -66,7 +66,7 @@ sudo ./autobot1
 ***
 
 <br>
-
+<br>
 **AUTOBOT 2: Managing Guardian 1**
 
 ```
