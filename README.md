@@ -5,7 +5,7 @@ This bot is fully customisable, allowing the user to choose whether to have thei
 
 ***
 
-**STEP 1: CREATE A BOT USING BOTFATHER**
+**`STEP 1: CREATE A BOT USING BOTFATHER`**
 
 The following steps describe how to create a new bot:
 
@@ -39,7 +39,7 @@ There are some other useful methods in BotFather which we won't cover in this tu
 
 ***
 
-**STEP 2: OBTAIN YOUR CHAT IDENTIFICATION NUMBER**
+**`STEP 2: OBTAIN YOUR CHAT IDENTIFICATION NUMBER`**
 
 Theres two ways to retrieve your Chat ID, the first is by opening the following URL in your web-browser: 
 
