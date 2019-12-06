@@ -175,7 +175,6 @@ sudo ./autobot7
 <br>
 
 **PLEASE NOTE: You will need to change the default key permissions in remblock/autobot7/config file.**
-
 <br>
 
 ***
