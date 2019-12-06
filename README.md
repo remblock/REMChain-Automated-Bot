@@ -4,9 +4,10 @@ This bot is fully customisable, allowing the user to choose whether to have thei
 <br>
 
 ***
-
+<br>
 
 # Step 1: Create Telegram Bot Using Botfather
+<br>
 
 The following steps describe how to create a new bot:
 
@@ -40,23 +41,21 @@ There are some other useful methods in BotFather which we won't cover in this tu
 <br>
 
 ***
-
+<br>
 
 # Step 2: Obtain Your Chat Idenification Number
-
+<br>
 Theres two ways to retrieve your Chat ID, the first is by opening the following URL in your web-browser: 
 
 [**https://api.telegram.org/botTOKEN/getUpdates**](https://api.telegram.org/botTOKEN/getUpdates) then replace the **`TOKEN`** with your actual bot token.
 
 Your Chat ID will be shown in this format **`"id":7041782343`**, based on this example your Chat ID would of been **`7041782343`**. The second way that this can be done is through a third party telegram bot called [**@get_id_bot**](https://telegram.me/get_id_bot).
-
 <br>
 
 ***
-
+<br>
 
 # Step 3: Download The Scripts Required For Monitoring and Managing Your Guardian Or Producer.
-
 <br>
 
 **`AUTOBOT 1: MONITORING AND MANAGING PRODUCER`**
