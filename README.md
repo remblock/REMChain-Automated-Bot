@@ -1,9 +1,10 @@
 # REMChain-Automated-Bot
 
 This bot is fully customisable, allowing the user to choose whether to have their votes, claims and even a percentage of their claimed rewards restaked or transfered automatically.<br>
-<br>
 
 ***
+
+<br>
 
 **`STEP 1: CREATE A BOT USING BOTFATHER`**
 
@@ -37,7 +38,11 @@ Once your bot is created, you can set a custom name, profile photo and descripti
 
 There are some other useful methods in BotFather which we won't cover in this tutorial like **`/setcommands`**.
 
+<br>
+
 ***
+
+<br>
 
 **`STEP 2: OBTAIN YOUR CHAT IDENTIFICATION NUMBER`**
 
@@ -47,11 +52,14 @@ Theres two ways to retrieve your Chat ID, the first is by opening the following 
 
 Your Chat ID will be shown in this format **`"id":7041782343`**, based on this example your Chat ID would of been **`7041782343`**. The second way that this can be done is through a third party telegram bot called [**@get_id_bot**](https://telegram.me/get_id_bot).
 
+<br>
+
 ***
 
 **`STEP 3: DOWNLOAD THE SCRIPTS REQUIRED TO MONITOR AND MANAGE YOUR PRODUCER OR GUARDIAN`**
+
 <br>
-<br>
+
 **`AUTOBOT 1: Monitoring and Managing Producer`**
 
 ```
