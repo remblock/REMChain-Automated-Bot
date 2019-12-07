@@ -78,7 +78,7 @@ if [[ "$1" == "--at" ]]
 then
   at=true
   at now + $minutes_to_wait minutes << DOC &>/dev/null
-  /root/autobot.sh --at
+  /root/autobot3 --at
 DOC
 fi
 
