@@ -593,9 +593,10 @@ fi
 if [ ! -z "$telegram_chatid" ]
 then
   telegram_message="
-"${owneraccountname^}" Daily Summary
+Guardian 5 Daily Summary
 --------------------------------------
-Date: $(date +"%d-%m-%Y")"
+Date: $(date +"%d-%m-%Y")
+Name: "${owneraccountname^}""
   if $auto_reward_alert
   then
     if $reward_failed
