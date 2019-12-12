@@ -326,7 +326,7 @@ function remnodelogtime_to_epoch(){
 
 #Function that checks if whether the node has actual produced a block within the past configured max minutes.
 function check_produce_minutes(){
-  last_block_date=$(grep -i "produce_block" $bpm_remnode_log | sed -n '$p' | awk '{print $2}')
+  last_block_date=$(grep -i "signed by $owneraccountname" $bpm_remnode_log | sed -n '$p' | awk '{print $2}')
   last_block_epoch=$(remnodelogtime_to_epoch "$last_block_date")
   config_minutes_in_seconds="$((bpm_check_produce_minutes * 60))"
   if (( (now_epoch - last_block_epoch) >= config_minutes_in_seconds ))
