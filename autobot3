@@ -391,7 +391,7 @@ then
       fi
       read -p "PLEASE SET YOUR RESTAKING PERCENTAGE: " -e restakingpercentage
       echo "restakingpercentage=$restakingpercentage" >> "$config_file"
-      echo 
+      echo
     fi
     restakingpercentage=$(echo $restakingpercentage | tr -d '%' )
 
@@ -475,10 +475,10 @@ then
         echo "auto_transfer_alert=true" >> "$config_file"
       else
         echo "auto_transfer_alert=false" >> "$config_file"
-      fi 
+      fi
     else
       echo "auto_transfer=false" >> "$config_file"
-    fi 
+    fi
     echo
   fi
 fi
@@ -539,7 +539,7 @@ then
   #if ! $at; then echo $output; fi
   if [[ ! "$voteoutput" =~ "executed transaction" ]]; then vote_failed=true; fi
 fi
-  
+
 #-----------------------------------------------------------------------------------------------------
 # REMCLI COMMAND FOR CLAIMING YOUR REWARDS
 #-----------------------------------------------------------------------------------------------------
