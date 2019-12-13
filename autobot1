@@ -5,7 +5,7 @@
 #****************************************************************************************************#
 
 #-----------------------------------------------------------------------------------------------------
-# IF THE USER HAS NO ROOT PERMISSIONS THE SCRIPT WILL EXIT  
+# IF THE USER HAS NO ROOT PERMISSIONS THE SCRIPT WILL EXIT
 #-----------------------------------------------------------------------------------------------------
 
 if (($EUID!=0))
@@ -19,7 +19,7 @@ fi
 #****************************************************************************************************#
 
 #-----------------------------------------------------------------------------------------------------
-# CREATE AUTOBOT DIRECTORY  
+# CREATE AUTOBOT DIRECTORY
 #-----------------------------------------------------------------------------------------------------
 
 create_dir="/root/remblock/autobot1"
@@ -150,7 +150,7 @@ function get_user_answer_yn(){
   while :
   do
     read -p "$1 [y/n]: " answer
-    answer="$(echo $answer | tr '[:upper:]' '[:lower:]')"  
+    answer="$(echo $answer | tr '[:upper:]' '[:lower:]')"
     case "$answer" in
       yes|y) return 0 ;;
       no|n) return 1 ;;
@@ -287,7 +287,7 @@ function remove_empty_lines(){
   #if the first line is empty, delete it
   if ! [[ "$(head -1 $bpm_temp_dir/msg_queue.txt)" =~ [a-zA-Z0-9] ]]
   then
-    sed -i '1d' "$bpm_temp_dir/msg_queue.txt" 
+    sed -i '1d' "$bpm_temp_dir/msg_queue.txt"
   fi
 }
 
@@ -305,7 +305,7 @@ function send_telegram_messages(){
 
 #Check warning threshold and send message
 function send_warnings(){
-  if [ ! -f "$bpm_temp_dir/last_send_message_epoch.txt" ] 
+  if [ ! -f "$bpm_temp_dir/last_send_message_epoch.txt" ]
   then
     echo $now_epoch > "$bpm_temp_dir/last_send_message_epoch.txt"
   else
@@ -438,37 +438,37 @@ function check_disk_and_ram(){
 #****************************************************************************************************#
 
 if [ "$(echo $bpm_check_producer | tr '[:upper:]' '[:lower:]' )" == "true" ]
-then 
+then
   check_produce_minutes
 fi
 
 if [ "$(echo $bpm_check_log | tr '[:upper:]' '[:lower:]' )" == "true" ]
-then 
+then
   check_log_minutes
 fi
 
 if [ "$(echo $bpm_check_info | tr '[:upper:]' '[:lower:]' )" == "true" ]
-then 
+then
   check_remnode_chain
 fi
 
 if [ "$(echo $bpm_check_blocks | tr '[:upper:]' '[:lower:]' )" == "true" ]
-then 
+then
   check_block_minutes
 fi
 
 if [ "$(echo $bpm_check_irr_blocks | tr '[:upper:]' '[:lower:]' )" == "true" ]
-then 
+then
   check_last_iblock
 fi
 
 if [ "$(echo $bpm_check_peers | tr '[:upper:]' '[:lower:]' )" == "true" ]
-then 
+then
   check_net_peers
 fi
 
 if [ "$(echo $bpm_check_server | tr '[:upper:]' '[:lower:]' )" == "true" ]
-then 
+then
   check_disk_and_ram
 fi
 
@@ -518,7 +518,7 @@ create_start_stop_service
 
 #Fill possible missing config variables
 
-if get_config_value vote_permission 
+if get_config_value vote_permission
 then
   vote_permission="$global_value"
 else
@@ -565,7 +565,7 @@ else
   echo
   read -p "YOUR ACCOUNT NAME: " -e owneraccountname
   echo "owner=$owneraccountname" >> "$config_file"
-  echo 
+  echo
 fi
 
 #-----------------------------------------------------------------------------------------------------
@@ -582,7 +582,7 @@ else
   fi
   read -p "YOUR WALLET PASSWORD: " -e walletpassword
   echo "walletpassword=$walletpassword" >> "$config_file"
-  echo 
+  echo
 fi
 
 #-----------------------------------------------------------------------------------------------------
@@ -607,7 +607,7 @@ else
   else
     echo "auto_vote=false" >> "$config_file"
   fi
-  echo 
+  echo
 fi
 
 #-----------------------------------------------------------------------------------------------------
@@ -630,13 +630,13 @@ else
      bpaccountnames="$owneraccountname"
    fi
    echo "bpaccountnames=$bpaccountnames" >> "$config_file"
-  echo 
+  echo
 fi
-    
+
 #-----------------------------------------------------------------------------------------------------
 # GET VOTING NOTIFCATION ANSWER FROM THE USER OR TAKE IT FROM THE CONFIG FILE
 #-----------------------------------------------------------------------------------------------------
-      
+
 if get_config_value auto_vote_alert
 then
   if [ "$global_value" = "true" ]
@@ -655,7 +655,7 @@ then
     else
       echo "auto_vote_alert=false" >> "$config_file"
     fi
-    echo 
+    echo
   fi
 fi
 
@@ -681,7 +681,7 @@ else
   else
     echo "auto_reward=false" >> "$config_file"
   fi
-  echo 
+  echo
 fi
 
 #-----------------------------------------------------------------------------------------------------
@@ -708,7 +708,7 @@ then
     else
       echo "auto_reward_alert=false" >> "$config_file"
     fi
-    echo 
+    echo
   fi
 
 #-----------------------------------------------------------------------------------------------------
@@ -752,10 +752,10 @@ then
       fi
       read -p "PLEASE SET YOUR RESTAKING PERCENTAGE: " -e restakingpercentage
       echo "restakingpercentage=$restakingpercentage" >> "$config_file"
-      echo 
+      echo
     fi
     restakingpercentage=$(echo $restakingpercentage | tr -d '%' )
-    
+
 #-----------------------------------------------------------------------------------------------------
 # GET RESTAKING NOTIFCATION ANSWER FROM THE USER OR TAKE IT FROM THE CONFIG FILE
 #-----------------------------------------------------------------------------------------------------
@@ -778,10 +778,10 @@ then
       else
         echo "auto_restaking_alert=false" >> "$config_file"
       fi
-      echo 
+      echo
     fi
   fi
-  
+
 #-----------------------------------------------------------------------------------------------------
 # ASK THE USER FOR THE TRANSFER ACCOUNT NAME, TRANSFER PERCENTAGE AND TRANSFER NOTIFICATIONS
 #-----------------------------------------------------------------------------------------------------
@@ -836,10 +836,10 @@ then
         echo "auto_transfer_alert=true" >> "$config_file"
       else
         echo "auto_transfer_alert=false" >> "$config_file"
-      fi 
+      fi
     else
       echo "auto_transfer=false" >> "$config_file"
-    fi 
+    fi
     echo
   fi
 fi
@@ -866,7 +866,7 @@ else
   else
     echo "bp_monitoring=false" >> "$config_file"
   fi
-  echo 
+  echo
 fi
 
 #-----------------------------------------------------------------------------------------------------
@@ -880,7 +880,7 @@ then
     create_bp_monitor_files
   fi
 fi
-    
+
 #-----------------------------------------------------------------------------------------------------
 # GET TELEGRAM TOKEN FROM THE USER OR TAKE IT FROM THE CONFIG FILE
 #-----------------------------------------------------------------------------------------------------
@@ -897,7 +897,7 @@ then
     fi
     read -p "COPY AND PASTE YOUR TELEGRAM TOKEN: " -e telegram_token
     echo "telegram_token=$telegram_token" >> "$config_file"
-    echo 
+    echo
   fi
 
 #-----------------------------------------------------------------------------------------------------
@@ -914,7 +914,7 @@ then
     fi
     read -p "COPY AND PASTE YOUR TELEGRAM CHAT ID: " -e telegram_chatid
     echo "telegram_chatid=$telegram_chatid" >> "$config_file"
-    echo 
+    echo
   fi
 fi
 
@@ -937,7 +937,7 @@ then
   #if ! $at; then echo $output; fi
   if [[ ! "$voteoutput" =~ "executed transaction" ]]; then vote_failed=true; fi
 fi
-  
+
 #-----------------------------------------------------------------------------------------------------
 # REMCLI COMMAND FOR CLAIMING YOUR REWARDS
 #-----------------------------------------------------------------------------------------------------
@@ -965,7 +965,7 @@ then
   #if ! $at; then echo $output; fi
   if [[ ! "$transferoutput" =~ "executed transaction" ]]; then transfer_failed=true; fi
 fi
-  
+
 #-----------------------------------------------------------------------------------------------------
 # REMCLI COMMAND FOR RESTAKING YOUR REWARDS
 #-----------------------------------------------------------------------------------------------------
@@ -1050,11 +1050,11 @@ Voted Block Producers: $bpaccountnames"
       send_message=true
     fi
   fi
-  
+
 #-----------------------------------------------------------------------------------------------------
 # SEND ALERT NOTIFICATIONS TO TELEGRAM BOT (IF THERE'S SOMETHING TO SEND)
 #-----------------------------------------------------------------------------------------------------
- 
+
   if $send_message
   then
     #If at option is active, wait without printing the progress bar
