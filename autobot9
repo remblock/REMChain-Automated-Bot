@@ -5,7 +5,7 @@
 #****************************************************************************************************#
 
 #-----------------------------------------------------------------------------------------------------
-# IF THE USER HAS NO ROOT PERMISSIONS THE SCRIPT WILL EXIT  
+# IF THE USER HAS NO ROOT PERMISSIONS THE SCRIPT WILL EXIT
 #-----------------------------------------------------------------------------------------------------
 
 if (($EUID!=0))
@@ -19,7 +19,7 @@ fi
 #****************************************************************************************************#
 
 #-----------------------------------------------------------------------------------------------------
-# CREATE AUTOBOT DIRECTORY  
+# CREATE AUTOBOT DIRECTORY
 #-----------------------------------------------------------------------------------------------------
 
 create_dir="/root/remblock/autobot9"
@@ -128,7 +128,7 @@ function get_user_answer_yn(){
   while :
   do
     read -p "$1 [y/n]: " answer
-    answer="$(echo $answer | tr '[:upper:]' '[:lower:]')"  
+    answer="$(echo $answer | tr '[:upper:]' '[:lower:]')"
     case "$answer" in
       yes|y) return 0 ;;
       no|n) return 1 ;;
@@ -157,7 +157,7 @@ function get_config_value(){
 
 #Fill possible missing config variables
 
-if get_config_value vote_permission 
+if get_config_value vote_permission
 then
   vote_permission="$global_value"
 else
@@ -204,7 +204,7 @@ else
   echo
   read -p "YOUR ACCOUNT NAME: " -e owneraccountname
   echo "owner=$owneraccountname" >> "$config_file"
-  echo 
+  echo
 fi
 
 #-----------------------------------------------------------------------------------------------------
@@ -221,7 +221,7 @@ else
   fi
   read -p "YOUR WALLET PASSWORD: " -e walletpassword
   echo "walletpassword=$walletpassword" >> "$config_file"
-  echo 
+  echo
 fi
 
 #-----------------------------------------------------------------------------------------------------
@@ -246,7 +246,7 @@ else
   else
     echo "auto_vote=false" >> "$config_file"
   fi
-  echo 
+  echo
 fi
 
 #-----------------------------------------------------------------------------------------------------
@@ -269,13 +269,13 @@ else
      bpaccountnames="$owneraccountname"
    fi
    echo "bpaccountnames=$bpaccountnames" >> "$config_file"
-  echo 
+  echo
 fi
-    
+
 #-----------------------------------------------------------------------------------------------------
 # GET VOTING NOTIFCATION ANSWER FROM THE USER OR TAKE IT FROM THE CONFIG FILE
 #-----------------------------------------------------------------------------------------------------
-      
+
 if get_config_value auto_vote_alert
 then
   if [ "$global_value" = "true" ]
@@ -294,7 +294,7 @@ then
     else
       echo "auto_vote_alert=false" >> "$config_file"
     fi
-    echo 
+    echo
   fi
 fi
 
@@ -320,7 +320,7 @@ else
   else
     echo "auto_reward=false" >> "$config_file"
   fi
-  echo 
+  echo
 fi
 
 #-----------------------------------------------------------------------------------------------------
@@ -347,7 +347,7 @@ then
     else
       echo "auto_reward_alert=false" >> "$config_file"
     fi
-    echo 
+    echo
   fi
 
 #-----------------------------------------------------------------------------------------------------
@@ -372,7 +372,7 @@ then
     else
       echo "auto_restaking=false" >> "$config_file"
     fi
-    echo 
+    echo
   fi
 
 #-----------------------------------------------------------------------------------------------------
@@ -391,10 +391,10 @@ then
       fi
       read -p "PLEASE SET YOUR RESTAKING PERCENTAGE: " -e restakingpercentage
       echo "restakingpercentage=$restakingpercentage" >> "$config_file"
-      echo 
+      echo
     fi
     restakingpercentage=$(echo $restakingpercentage | tr -d '%' )
-    
+
 #-----------------------------------------------------------------------------------------------------
 # GET RESTAKING NOTIFCATION ANSWER FROM THE USER OR TAKE IT FROM THE CONFIG FILE
 #-----------------------------------------------------------------------------------------------------
@@ -417,10 +417,10 @@ then
       else
         echo "auto_restaking_alert=false" >> "$config_file"
       fi
-      echo 
+      echo
     fi
   fi
-  
+
 #-----------------------------------------------------------------------------------------------------
 # ASK THE USER FOR THE TRANSFER ACCOUNT NAME, TRANSFER PERCENTAGE AND TRANSFER NOTIFICATIONS
 #-----------------------------------------------------------------------------------------------------
@@ -482,7 +482,7 @@ then
     echo
   fi
 fi
-    
+
 #-----------------------------------------------------------------------------------------------------
 # GET TELEGRAM TOKEN FROM THE USER OR TAKE IT FROM THE CONFIG FILE
 #-----------------------------------------------------------------------------------------------------
@@ -499,7 +499,7 @@ then
     fi
     read -p "COPY AND PASTE YOUR TELEGRAM TOKEN: " -e telegram_token
     echo "telegram_token=$telegram_token" >> "$config_file"
-    echo 
+    echo
   fi
 
 #-----------------------------------------------------------------------------------------------------
@@ -516,7 +516,7 @@ then
     fi
     read -p "COPY AND PASTE YOUR TELEGRAM CHAT ID: " -e telegram_chatid
     echo "telegram_chatid=$telegram_chatid" >> "$config_file"
-    echo 
+    echo
   fi
 fi
 
@@ -539,7 +539,7 @@ then
   #if ! $at; then echo $output; fi
   if [[ ! "$voteoutput" =~ "executed transaction" ]]; then vote_failed=true; fi
 fi
-  
+
 #-----------------------------------------------------------------------------------------------------
 # REMCLI COMMAND FOR CLAIMING YOUR REWARDS
 #-----------------------------------------------------------------------------------------------------
@@ -567,7 +567,7 @@ then
   #if ! $at; then echo $output; fi
   if [[ ! "$transferoutput" =~ "executed transaction" ]]; then transfer_failed=true; fi
 fi
-  
+
 #-----------------------------------------------------------------------------------------------------
 # REMCLI COMMAND FOR RESTAKING YOUR REWARDS
 #-----------------------------------------------------------------------------------------------------
@@ -652,11 +652,11 @@ Voted Block Producers: $bpaccountnames"
       send_message=true
     fi
   fi
-  
+
 #-----------------------------------------------------------------------------------------------------
 # SEND ALERT NOTIFICATIONS TO TELEGRAM BOT (IF THERE'S SOMETHING TO SEND)
 #-----------------------------------------------------------------------------------------------------
- 
+
   if $send_message
   then
     #If at option is active, wait without printing the progress bar
