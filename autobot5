@@ -204,7 +204,7 @@ else
   echo
   read -p "YOUR ACCOUNT NAME: " -e owneraccountname
   echo "owner=$owneraccountname" >> "$config_file"
-  echo 
+  echo
 fi
 
 #-----------------------------------------------------------------------------------------------------
@@ -475,10 +475,10 @@ then
         echo "auto_transfer_alert=true" >> "$config_file"
       else
         echo "auto_transfer_alert=false" >> "$config_file"
-      fi 
+      fi
     else
       echo "auto_transfer=false" >> "$config_file"
-    fi 
+    fi
     echo
   fi
 fi
