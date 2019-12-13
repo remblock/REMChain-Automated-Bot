@@ -475,10 +475,10 @@ then
         echo "auto_transfer_alert=true" >> "$config_file"
       else
         echo "auto_transfer_alert=false" >> "$config_file"
-      fi 
+      fi
     else
       echo "auto_transfer=false" >> "$config_file"
-    fi 
+    fi
     echo
   fi
 fi
@@ -499,7 +499,7 @@ then
     fi
     read -p "COPY AND PASTE YOUR TELEGRAM TOKEN: " -e telegram_token
     echo "telegram_token=$telegram_token" >> "$config_file"
-    echo 
+    echo
   fi
 
 #-----------------------------------------------------------------------------------------------------
