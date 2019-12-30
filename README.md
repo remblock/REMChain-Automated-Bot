@@ -86,8 +86,6 @@ sudo wget https://github.com/SooSDExZ/REMChain-Automated-Bot/raw/master/Guardian
 
 **Please Note: You will need to change the default key permissions in remblock/autobot/config file.**
 
-<br>
-
 ***
 
 <br>
