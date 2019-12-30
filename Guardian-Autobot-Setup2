@@ -22,13 +22,13 @@ fi
 # CREATE AUTOBOT DIRECTORY
 #-----------------------------------------------------------------------------------------------------
 
-create_dir="/root/remblock/autobot2"
+create_dir="/root/remblock/autobot"
 
 #-----------------------------------------------------------------------------------------------------
 # CREATE AUTOBOT CONFIG FILE
 #-----------------------------------------------------------------------------------------------------
 
-config_file="/root/remblock/autobot2/config"
+config_file="/root/remblock/autobot/config"
 
 #-----------------------------------------------------------------------------------------------------
 # MINUTES TO WAIT BETWEEN EACH EXECUTIONS OF THE SCRIPT
@@ -161,7 +161,7 @@ if get_config_value vote_permission
 then
   vote_permission="$global_value"
 else
-  vote_permission="producer"
+  vote_permission="guardian"
   echo "vote_permission=$vote_permission" >> "$config_file"
 fi
 
@@ -169,7 +169,7 @@ if get_config_value claim_permission
 then
   claim_permission="$global_value"
 else
-  claim_permission="producer"
+  claim_permission="guardian"
   echo "claim_permission=$claim_permission" >> "$config_file"
 fi
 
@@ -177,7 +177,7 @@ if get_config_value stake_permission
 then
   stake_permission="$global_value"
 else
-  stake_permission="producer"
+  stake_permission="guardian"
   echo "stake_permission=$stake_permission" >> "$config_file"
 fi
 
@@ -185,7 +185,7 @@ if get_config_value transfer_permission
 then
   transfer_permission="$global_value"
 else
-  transfer_permission="transfer"
+  transfer_permission="active"
   echo "transfer_permission=$transfer_permission" >> "$config_file"
 fi
 
@@ -610,7 +610,6 @@ Claimed Rewards: $total_reward REM"
       send_message=true
     fi
   fi
-
   if $auto_transfer_alert
   then
     if $transfer_failed
@@ -624,7 +623,6 @@ Transfer Rewards: $transfer_amount REM"
       send_message=true
     fi
   fi
-
   if $auto_restaking_alert
   then
     if $restaking_failed
@@ -638,7 +636,6 @@ Restaked Rewards: $restake_reward REM"
       send_message=true
     fi
   fi
-
   if $auto_vote_alert
   then
     if $vote_failed
