@@ -60,6 +60,8 @@ Your Chat ID will be shown in this format **`"id":7041782343`**, based on this e
 
 # Step 3: Download The Scripts Required For Monitoring and Managing Your Guardian Or Producer.
 
+<br>
+
 **`GUARDIAN AUTOBOT: AUTOMATING GUARDIAN VOTES, CLAIMING, RESTAKING & TRANSFERS`**
 
 <br>
