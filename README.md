@@ -62,6 +62,8 @@ Your Chat ID will be shown in this format **`"id":7041782343`**, based on this e
 
 **`GUARDIAN AUTOBOT: AUTOMATING GUARDIAN VOTES, CLAIMING, RESTAKING & TRANSFERS`**
 
+<br>
+
 ```
 sudo wget https://github.com/SooSDExZ/REMChain-Automated-Bot/raw/master/Guardian-Autobot-Setup1 && sudo chmod u+x Guardian-Autobot-Setup1 && sudo ./Guardian-Autobot-Setup1 --at
 ```
@@ -71,12 +73,16 @@ sudo wget https://github.com/SooSDExZ/REMChain-Automated-Bot/raw/master/Guardian
 <br>
 
 **Please Note: You will need to change the default key permissions in remblock/autobot/config file.**
+
 <br>
 
 ***
+
 <br>
 
 **`PRODUCER AUTOBOT: MONITORING AND AUTOMATING PRODUCER VOTES, CLAIMING, RESTAKING & TRANSFERS`**
+
+<br>
 
 ```
 sudo wget https://github.com/SooSDExZ/REMChain-Automated-Bot/raw/master/Producer-Autobot-Setup1 && sudo chmod u+x Producer-Autobot-Setup1 && sudo ./Producer-Autobot-Setup1 --at
