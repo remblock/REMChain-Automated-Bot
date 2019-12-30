@@ -106,7 +106,7 @@ while [ : ]
 do
           read -p "PLEASE ENTER YOUR GUARDIAN PRIVATE KEY: " guardianprivatekey
 
-	  if [[ ! "$guardianprivatekey" = "${producerprivatekey%[[:space:]]*}" ]]; then
+	  if [[ ! "$guardianprivatekey" = "${guardianprivatekey%[[:space:]]*}" ]]; then
 	        printf "\nERROR: PRIVATE KEY SHOULDN'T CONTAIN ANY SPACES.\n\n"
                 continue
 
