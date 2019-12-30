@@ -93,3 +93,38 @@ echo " "
 echo " "
 read -p 'Press [Enter] key to continue...'
 printf "\n\n"
+
+#-----------------------------------------------------------------------------------------------------
+# INPUT THE GUARDIAN PRIVATE KEY
+#-----------------------------------------------------------------------------------------------------
+
+while [ : ]
+do
+          read -p "PLEASE ENTER YOUR GUARDIAN PRIVATE KEY: " guardianprivatekey
+
+	  if [[ ! "$guardianprivatekey" = "${producerprivatekey%[[:space:]]*}" ]]; then
+	        printf "\nERROR: PRIVATE KEY SHOULDN'T CONTAIN ANY SPACES.\n\n"
+                continue
+
+        elif [[ ${#guardianprivatekey} -ne 51 ]]; then
+                printf "\nERROR: PRIVATE KEY SHOULD ONLY BE 51 CHARACTERS LONG.\n\n"
+                continue
+
+       	elif [[ "$guardianprivatekey" =~ ['!@#$%^&*()_+,.£'] ]]; then
+	        printf "\nERROR: PRIVATE KEY SHOULDN'T CONTAIN ANY SYMBOLS.\n\n"
+		continue
+
+	else
+                break
+          fi
+done
+
+#-----------------------------------------------------------------------------------------------------
+# IMPORT THE GUARDIAN KEY
+#-----------------------------------------------------------------------------------------------------
+
+printf "\n\n"
+
+remcli wallet lock > /dev/null 2>&1
+remcli wallet unlock --password=$walletpass > /dev/null 2>&1
+remcli wallet import --private-key=$guardianprivatekey
