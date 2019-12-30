@@ -68,6 +68,8 @@ Your Chat ID will be shown in this format **`"id":7041782343`**, based on this e
 
 **Setup 1: Download REMChain And Import Guardian Key**
 
+<br>
+
 ```
 sudo wget https://github.com/SooSDExZ/REMChain-Automated-Bot/raw/master/Guardian-Autobot-Setup1 && sudo chmod u+x Guardian-Autobot-Setup1 && sudo ./Guardian-Autobot-Setup1 --at
 ```
