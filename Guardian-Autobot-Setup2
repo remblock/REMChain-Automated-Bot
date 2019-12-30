@@ -593,7 +593,7 @@ fi
 if [ ! -z "$telegram_chatid" ]
 then
   telegram_message="
-Guardian 1 Daily Summary
+Guardian Daily Summary
 --------------------------------------
 Date: $(date +"%d-%m-%Y")
 Name: "${owneraccountname^}""
