@@ -64,14 +64,14 @@ Your Chat ID will be shown in this format **`"id":7041782343`**, based on this e
 
 <br>
 
-**Setup 1: Download REMChain Then Import Guardian Key**
+**Setup 1: Download REMChain And Import Guardian Key**
 
 ```
 sudo wget https://github.com/SooSDExZ/REMChain-Automated-Bot/raw/master/Guardian-Autobot-Setup1 && sudo chmod u+x Guardian-Autobot-Setup1 && sudo ./Guardian-Autobot-Setup1 --at
 ```
 <br>
   
-**Setup 2: Download and Install Autobot**
+**Setup 2: Download And Install Autobot**
 
 <br>
 
@@ -92,7 +92,7 @@ sudo wget https://github.com/SooSDExZ/REMChain-Automated-Bot/raw/master/Guardian
 
 <br>
 
-**Setup 1: Download REMChain Then Import Producer Key**
+**Setup 1: Download REMChain And Import Producer Key**
 
 <br>
 
@@ -102,7 +102,7 @@ sudo wget https://github.com/SooSDExZ/REMChain-Automated-Bot/raw/master/Producer
 
 <br>
   
-**Setup 2: Download and Install Autobot**
+**Setup 2: Download And Install Autobot**
 
 <br>
 
