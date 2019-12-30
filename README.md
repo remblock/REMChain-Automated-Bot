@@ -64,9 +64,17 @@ Your Chat ID will be shown in this format **`"id":7041782343`**, based on this e
 
 <br>
 
+**Setup 1:**
+
 ```
 sudo wget https://github.com/SooSDExZ/REMChain-Automated-Bot/raw/master/Guardian-Autobot-Setup1 && sudo chmod u+x Guardian-Autobot-Setup1 && sudo ./Guardian-Autobot-Setup1 --at
 ```
+<br>
+  
+**Setup 2:**
+
+<br>
+
 ```
 sudo wget https://github.com/SooSDExZ/REMChain-Automated-Bot/raw/master/Guardian-Autobot-Setup2 && sudo chmod u+x Guardian-Autobot-Setup2 && sudo ./Guardian-Autobot-Setup2 --at
 ```
@@ -84,9 +92,20 @@ sudo wget https://github.com/SooSDExZ/REMChain-Automated-Bot/raw/master/Guardian
 
 <br>
 
+**Setup 1:**
+
+<br>
+
 ```
 sudo wget https://github.com/SooSDExZ/REMChain-Automated-Bot/raw/master/Producer-Autobot-Setup1 && sudo chmod u+x Producer-Autobot-Setup1 && sudo ./Producer-Autobot-Setup1 --at
 ```
+
+<br>
+  
+**Setup 2:**
+
+<br>
+
 ```
 sudo wget https://github.com/SooSDExZ/REMChain-Automated-Bot/raw/master/Producer-Autobot-Setup2 && sudo chmod u+x Producer-Autobot-Setup2 && sudo ./Producer-Autobot-Setup2 --at
 ```
