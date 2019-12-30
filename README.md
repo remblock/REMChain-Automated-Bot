@@ -55,156 +55,36 @@ Your Chat ID will be shown in this format **`"id":7041782343`**, based on this e
 <br>
 
 ***
+
 <br>
 
 # Step 3: Download The Scripts Required For Monitoring and Managing Your Guardian Or Producer.
-<br>
 
-**`AUTOBOT 1: MONITORING AND MANAGING PRODUCER`**
+**`GUARDIAN AUTOBOT: AUTOMATING GUARDIAN VOTES, CLAIMING, RESTAKING & TRANSFERS`**
 
 ```
-sudo wget https://github.com/SooSDExZ/REMChain-Automated-Bot/raw/master/autobot1 && sudo chmod u+x autobot1 && sudo ./autobot1 --at
+sudo wget https://github.com/SooSDExZ/REMChain-Automated-Bot/raw/master/Guardian-Autobot-Setup1 && sudo chmod u+x Guardian-Autobot-Setup1 && sudo ./Guardian-Autobot-Setup1 --at
+```
+```
+sudo wget https://github.com/SooSDExZ/REMChain-Automated-Bot/raw/master/Guardian-Autobot-Setup2 && sudo chmod u+x Guardian-Autobot-Setup2 && sudo ./Guardian-Autobot-Setup2 --at
 ```
 <br>
 
-**Please Note: You will need to change the default key permissions in remblock/autobot1/config file.**
+**Please Note: You will need to change the default key permissions in remblock/autobot/config file.**
 <br>
 
 ***
-
 <br>
 
-**`AUTOBOT 2: MANAGING GUARDIAN 1`**
+**`PRODUCER AUTOBOT: MONITORING AND AUTOMATING PRODUCER VOTES, CLAIMING, RESTAKING & TRANSFERS`**
 
 ```
-sudo wget https://github.com/SooSDExZ/REMChain-Automated-Bot/raw/master/autobot2 && sudo chmod u+x autobot2 && sudo ./autobot2 --at
+sudo wget https://github.com/SooSDExZ/REMChain-Automated-Bot/raw/master/Producer-Autobot-Setup1 && sudo chmod u+x Producer-Autobot-Setup1 && sudo ./Producer-Autobot-Setup1 --at
 ```
-<br>
-
-**Please Note: You will need to change the default key permissions in remblock/autobot2/config file.**
-<br>
-
-***
-
-<br>
-
-**`AUTOBOT 3: MANAGING GUARDIAN 2`**
-
 ```
-sudo wget https://github.com/SooSDExZ/REMChain-Automated-Bot/raw/master/autobot3 && sudo chmod u+x autobot3 && sudo ./autobot3 --at
+sudo wget https://github.com/SooSDExZ/REMChain-Automated-Bot/raw/master/Producer-Autobot-Setup2 && sudo chmod u+x Producer-Autobot-Setup2 && sudo ./Producer-Autobot-Setup2 --at
 ```
 <br>
 
-**Please Note: You will need to change the default key permissions in remblock/autobot3/config file.**
+**Please Note: You will need to change the default key permissions in remblock/autobot/config file.**
 <br>
-
-***
-
-<br>
-
-**`AUTOBOT 4: MANAGING GUARDIAN 3`**
-
-```
-sudo wget https://github.com/SooSDExZ/REMChain-Automated-Bot/raw/master/autobot4 && sudo chmod u+x autobot4 && sudo ./autobot4 --at
-```
-<br>
-
-**Please Note: You will need to change the default key permissions in remblock/autobot4/config file.**
-<br>
-
-***
-
-<br>
-
-**`AUTOBOT 5: MANAGING GUARDIAN 4`**
-
-```
-sudo wget https://github.com/SooSDExZ/REMChain-Automated-Bot/raw/master/autobot5 && sudo chmod u+x autobot5 && sudo ./autobot5 --at
-```
-<br>
-
-**Please Note: You will need to change the default key permissions in remblock/autobot5/config file.**
-<br>
-
-***
-
-<br>
-
-**`AUTOBOT 6: MANAGING GUARDIAN 5`**
-
-```
-sudo wget https://github.com/SooSDExZ/REMChain-Automated-Bot/raw/master/autobot6 && sudo chmod u+x autobot6 && sudo ./autobot6 --at
-```
-<br>
-
-**Please Note: You will need to change the default key permissions in remblock/autobot6/config file.**
-<br>
-
-***
-
-<br>
-
-**`AUTOBOT 7: MANAGING GUARDIAN 6`**
-
-```
-sudo wget https://github.com/SooSDExZ/REMChain-Automated-Bot/raw/master/autobot7 && sudo chmod u+x autobot7 && sudo ./autobot7 --at
-```
-<br>
-
-**Please Note: You will need to change the default key permissions in remblock/autobot7/config file.**
-<br>
-
-***
-
-<br>
-
-**`AUTOBOT 8: MANAGING GUARDIAN 7`**
-
-```
-sudo wget https://github.com/SooSDExZ/REMChain-Automated-Bot/raw/master/autobot8 && sudo chmod u+x autobot8 && sudo ./autobot8 --at
-```
-<br>
-
-**Please Note: You will need to change the default key permissions in remblock/autobot8/config file.**
-<br>
-
-***
-
-<br>
-
-**`AUTOBOT 9: MANAGING GUARDIAN 8`**
-
-```
-sudo wget https://github.com/SooSDExZ/REMChain-Automated-Bot/raw/master/autobot9 && sudo chmod u+x autobot9 && sudo ./autobot9 --at
-```
-<br>
-
-**Please Note: You will need to change the default key permissions in remblock/autobot9/config file.**
-<br>
-
-***
-
-<br>
-
-**`AUTOBOT 10: MANAGING GUARDIAN 9`**
-
-```
-sudo wget https://github.com/SooSDExZ/REMChain-Automated-Bot/raw/master/autobot10 && sudo chmod u+x autobot10 && sudo ./autobot10 --at
-```
-<br>
-
-**Please Note: You will need to change the default key permissions in remblock/autobot10/config file.**
-<br>
-
-***
-
-<br>
-
-**`AUTOBOT 11: MANAGING GUARDIAN 10`**
-
-```
-sudo wget https://github.com/SooSDExZ/REMChain-Automated-Bot/raw/master/autobot8 && sudo chmod u+x autobot11 && sudo ./autobot11 --at
-```
-<br>
-
-**Please Note: You will need to change the default key permissions in remblock/autobot11/config file.**
