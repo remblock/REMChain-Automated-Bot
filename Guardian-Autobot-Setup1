@@ -8,7 +8,8 @@
 # INSTALLING REM PROTOCOL BINARIES                                                                   #
 #----------------------------------------------------------------------------------------------------#
 
-wget https://github.com/Remmeauth/remprotocol/releases/download/0.3.0/remprotocol_0.3.0_amd64.deb && sudo apt install ./remprotocol_0.3.0_amd64.deb
+wget https://github.com/Remmeauth/remprotocol/releases/download/0.3.0/remprotocol_0.3.0_amd64.deb
+sudo apt install ./remprotocol_0.3.0_amd64.deb
 
 #----------------------------------------------------------------------------------------------------#
 # BOOTING REMNODE AND WALLET                                                                         #
