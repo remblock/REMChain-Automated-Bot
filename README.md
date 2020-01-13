@@ -75,7 +75,7 @@ Your Chat ID will be shown in this format **`"id":7041782343`**, based on this e
 <br>
 
 ```
-sudo wget https://github.com/remblock/REMChain-Automated-Bot/raw/master/autobot-setup1 && sudo chmod u+x autobot-setup1 && sudo ./autobot-setup1 --at
+sudo wget https://github.com/remblock/REMChain-Automated-Bot/raw/master/autobot-setup1 && sudo chmod u+x autobot-setup1 && sudo ./autobot-setup1
 ```
 <br>
   
@@ -84,7 +84,7 @@ sudo wget https://github.com/remblock/REMChain-Automated-Bot/raw/master/autobot-
 <br>
 
 ```
-sudo wget https://github.com/remblock/REMChain-Automated-Bot/raw/master/Guardian-Autobot-Setup2 && sudo chmod u+x Guardian-Autobot-Setup2 && sudo ./Guardian-Autobot-Setup2 --at
+sudo wget https://github.com/remblock/REMChain-Automated-Bot/raw/master/autobot-setup2 && sudo chmod u+x autobot-setup2 && sudo ./autobot-setup2
 ```
 
 <br>
@@ -92,5 +92,5 @@ sudo wget https://github.com/remblock/REMChain-Automated-Bot/raw/master/Guardian
 #### Please Note: You will need to change the default key permissions:
 
 ```
-nano remblock/autobot/config file
+nano remblock/autobot/config
 ```
