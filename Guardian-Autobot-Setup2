@@ -97,7 +97,7 @@ fi
 
 if [ ! -f "$config_file" ]
 then
-  echo "#Configuration file for the autobot.sh script" > "$config_file"
+  echo "#Configuration file for the autobot script" > "$config_file"
   echo "#Make the entries as variable=value" >> "$config_file"
   echo  >> "$config_file"
 fi
@@ -105,24 +105,6 @@ fi
 #****************************************************************************************************#
 #                                        FUNCTION DEFINITIONS                                        #
 #****************************************************************************************************#
-
-progress-bar() {
-
-  local duration=${1}
-  already_done() { for ((done=0; done<$elapsed; done++)); do printf "▇"; done }
-  remaining() { for ((remain=$elapsed; remain<$duration; remain++)); do printf " "; done }
-  percentage() { printf "| %s%%" $(( (($elapsed)*100)/($duration)*100/100 )); }
-  clean_line() { printf "\r"; }
-
-  for (( elapsed=1; elapsed<=$duration; elapsed++ )); do
-      already_done; remaining; percentage
-      sleep 1
-      clean_line
-
-  done
-  clean_line
-
-}
 
 function get_user_answer_yn(){
   while :
@@ -193,17 +175,17 @@ fi
 # ASK USER FOR THEIR OWNER ACCOUNT NAME OR TAKE IT FROM THE CONFIG FILE                              #
 #----------------------------------------------------------------------------------------------------#
 
-if get_config_value owner
+if get_config_value accountname
 then
-  owneraccountname="$global_value"
+  accountname="$global_value"
 else
   if $at
   then
     exit 2
   fi
   echo
-  read -p "YOUR ACCOUNT NAME: " -e owneraccountname
-  echo "owner=$owneraccountname" >> "$config_file"
+  read -p "YOUR ACCOUNT NAME: " -e accountname
+  echo "accountname=$accountname" >> "$config_file"
   echo
 fi
 
@@ -266,7 +248,7 @@ else
    read -p "THE BLOCK PRODUCERS THAT YOU WANT TO VOTE FOR: " -e bpaccountnames
    if [ -z "$bpaccountnames" ]
    then
-     bpaccountnames="$owneraccountname"
+     bpaccountnames="$accountname"
    fi
    echo "bpaccountnames=$bpaccountnames" >> "$config_file"
   echo
@@ -487,7 +469,7 @@ fi
 # GET TELEGRAM TOKEN FROM THE USER OR TAKE IT FROM THE CONFIG FILE                                   #
 #----------------------------------------------------------------------------------------------------#
 
-if $auto_vote_alert || $auto_reward_alert || $auto_transfer_alert || $auto_restaking_alert || $bp_monitoring
+if $auto_vote_alert || $auto_reward_alert || $auto_transfer_alert || $auto_restaking_alert
 then
   if get_config_value telegram_token
   then
@@ -534,7 +516,7 @@ output=$(remcli wallet unlock --password $walletpassword /dev/null 2>&1)
 
 if $auto_vote
 then
-  voteoutput=$(remcli system voteproducer prods $owneraccountname $bpaccountnames -p $owneraccountname@$vote_permission -f 2>&1)
+  voteoutput=$(remcli system voteproducer prods $accountname $bpaccountnames -p $accountname@$vote_permission -f 2>&1)
   #Uncomment if you want the output of the command printed
   #if ! $at; then echo $output; fi
   if [[ ! "$voteoutput" =~ "executed transaction" ]]; then vote_failed=true; fi
@@ -546,12 +528,12 @@ fi
 
 if $auto_reward
 then
-  previous=$(remcli get currency balance rem.token $owneraccountname | awk '{print $1}')
-  rewardoutput=$(remcli system claimrewards $owneraccountname -x 120 -p $owneraccountname@$claim_permission -f 2>&1)
+  previous=$(remcli get currency balance rem.token $accountname | awk '{print $1}')
+  rewardoutput=$(remcli system claimrewards $accountname -x 120 -p $accountname@$claim_permission -f 2>&1)
   #Uncomment if you want the output of the command printed
   #if ! $at; then echo $output; fi
   if [[ ! "$rewardoutput" =~ "executed transaction" ]]; then reward_failed=true; fi
-  after=$(remcli get currency balance rem.token $owneraccountname  | awk '{print $1}')
+  after=$(remcli get currency balance rem.token $accountname  | awk '{print $1}')
   total_reward=$(echo "$after - $previous"|bc)
 fi
 
@@ -562,7 +544,7 @@ fi
 if $auto_transfer
 then
   transfer_amount="$(echo "scale=4; ( $total_reward / 100 ) * $auto_transfer_perc" | bc )"
-  transferoutput=$(remcli transfer $owneraccountname $auto_transfer_acct "$transfer_amount REM" -x 120 -p $owneraccountname@$transfer_permission -f 2>&1)
+  transferoutput=$(remcli transfer $accountname $auto_transfer_acct "$transfer_amount REM" -x 120 -p $accountname@$transfer_permission -f 2>&1)
   #Uncomment if you want the output of the command printed
   #if ! $at; then echo $output; fi
   if [[ ! "$transferoutput" =~ "executed transaction" ]]; then transfer_failed=true; fi
@@ -580,7 +562,7 @@ then
   else
     restake_reward=$(echo "scale=4; ( $total_reward / 100 ) * $restakingpercentage" | bc )
   fi
-  restakingoutput=$(remcli system delegatebw $owneraccountname $owneraccountname "$restake_reward REM" -x 120 -p $owneraccountname@$stake_permission -f 2>&1)
+  restakingoutput=$(remcli system delegatebw $accountname $accountname "$restake_reward REM" -x 120 -p $accountname@$stake_permission -f 2>&1)
   #Uncomment if you want the output of the command printed
   #if ! $at; then echo $output; fi
   if [[ ! "$restakingoutput" =~ "executed transaction" ]]; then restaking_failed=true; fi
@@ -593,10 +575,10 @@ fi
 if [ ! -z "$telegram_chatid" ]
 then
   telegram_message="
-Guardian Daily Summary
+Daily Summary
 --------------------------------------
 Date: $(date +"%d-%m-%Y")
-Name: "${owneraccountname^}""
+Name: "${accountname^}""
   if $auto_reward_alert
   then
     if $reward_failed
@@ -660,10 +642,6 @@ Voted Block Producers: $bpaccountnames"
     if $at
     then
       sleep 120
-    else
-      printf  "\nWAITING 2 MINUTES FOR THE CONFIRMATION OF THE TRANSACTIONS\n\n"
-      progress-bar 112
-      printf "\n\n\n"
     fi
     curl -s -X POST https://api.telegram.org/bot$telegram_token/sendMessage -d chat_id=$telegram_chatid -d text="$telegram_message" &>/dev/null
   fi
