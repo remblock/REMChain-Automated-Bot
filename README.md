@@ -1,6 +1,6 @@
 # REMChain-Automated-Bot
 
-REMChain-Automated-Bot is a fully customisable script which monitors and manages your Guardians and Producer node. It also allows Guardians and Producers the flexibility to choose whether to have their votes, claims and even a percentage of their claimed rewards restaked or transfered out automatically every 24 hours. Furthermore it also has a built in monitor which monitors and alerts you whenever your node faces issues within the set intervals.
+REMChain-Automated-Bot is a fully customisable script which can automatically manage your Guardian or Producer node. It also allows Guardians and Producers the flexibility to choose whether to have their votes, claims and even a percentage of their claimed rewards restaked or transfered out automatically every 24 hours.
 
 <br>
 
@@ -70,7 +70,7 @@ Your Chat ID will be shown in this format **`"id":7041782343`**, based on this e
 
 <br>
 
-#### Setup 1: Download REMChain And Import Guardian Key
+#### Setup 1: Download REMChain & Import Guardian Key
 
 <br>
 
@@ -79,7 +79,7 @@ sudo wget https://github.com/remblock/REMChain-Automated-Bot/raw/master/autobot-
 ```
 <br>
   
-#### Setup 2: Download And Install Autobot
+#### Setup 2: Download & Install Autobot
 
 <br>
 
