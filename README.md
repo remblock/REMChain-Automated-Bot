@@ -6,8 +6,6 @@ REMChain-Automated-Bot is a fully customisable script which monitors and manages
 
 ***
 
-<br>
-
 ## Step 1: Create Telegram Bot Using Botfather
 
 #### The following steps describe how to create a new bot:
@@ -58,6 +56,8 @@ Your Chat ID will be shown in this format **`"id":7041782343`**, based on this e
 <br>
 
 ***
+
+<br>
 
 ## Step 3: Download The Scripts Required For Monitoring and Managing Your Guardian Or Producer.
 
