@@ -1,10 +1,8 @@
 # REMChain-Automated-Bot
 
 REMChain-Automated-Bot is a fully customisable script which monitors and manages your Guardians and Producer node. It also allows Guardians and Producers the flexibility to choose whether to have their votes, claims and even a percentage of their claimed rewards restaked or transfered out automatically every 24 hours. Furthermore it also has a built in monitor which monitors and alerts you whenever your node faces issues within the set intervals.<br>
-<br>
 
 ***
-<br>
 
 # Step 1: Create Telegram Bot Using Botfather
 <br>
@@ -39,10 +37,8 @@ Once your bot is created, you can set a custom name, profile photo and descripti
 
 There are some other useful methods in BotFather which we won't cover in this tutorial like **`/setcommands`**.
 <br>
-<br>
 
 ***
-<br>
 
 # Step 2: Obtain Your Chat Idenification Number
 <br>
@@ -52,11 +48,8 @@ Theres two ways to retrieve your Chat ID, the first is by opening the following 
 
 Your Chat ID will be shown in this format **`"id":7041782343`**, based on this example your Chat ID would of been **`7041782343`**. The second way that this can be done is through a third party telegram bot called [**@get_id_bot**](https://telegram.me/get_id_bot).
 <br>
-<br>
 
 ***
-
-<br>
 
 # Step 3: Download The Scripts Required For Monitoring and Managing Your Guardian Or Producer.
 
@@ -82,9 +75,10 @@ sudo wget https://github.com/remblock/REMChain-Automated-Bot/raw/master/autobot-
 ```
 sudo wget https://github.com/remblock/REMChain-Automated-Bot/raw/master/Guardian-Autobot-Setup2 && sudo chmod u+x Guardian-Autobot-Setup2 && sudo ./Guardian-Autobot-Setup2 --at
 ```
+
 <br>
 
-**Please Note: You will need to change the default key permissions in remblock/autobot/config file.**
+**Please Note: You will need to change the default key permissions:**
 
 ```
 nano remblock/autobot/config file
