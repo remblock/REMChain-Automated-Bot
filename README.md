@@ -6,7 +6,10 @@ REMChain-Automated-Bot is a fully customisable script which monitors and manages
 
 ***
 
+<br>
+
 ## Step 1: Create Telegram Bot Using Botfather
+
 <br>
 
 #### The following steps describe how to create a new bot:
