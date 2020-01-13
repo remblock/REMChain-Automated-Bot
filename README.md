@@ -62,16 +62,16 @@ Your Chat ID will be shown in this format **`"id":7041782343`**, based on this e
 
 <br>
 
-**`GUARDIAN AUTOBOT: AUTOMATING GUARDIAN VOTES, CLAIMING, RESTAKING & TRANSFERS`**
+**`AUTOBOT: AUTOMATING VOTES, CLAIMING, RESTAKING & TRANSFERS`**
 
 <br>
 
-**Setup 1: Download REMChain And Import Guardian Key**
+**Setup 1: Download REMChain And Import Reward Key**
 
 <br>
 
 ```
-sudo wget https://github.com/SooSDExZ/REMChain-Automated-Bot/raw/master/Guardian-Autobot-Setup1 && sudo chmod u+x Guardian-Autobot-Setup1 && sudo ./Guardian-Autobot-Setup1 --at
+sudo wget https://github.com/remblock/REMChain-Automated-Bot/raw/master/autobot-setup1 && sudo chmod u+x autobot-setup1 && sudo ./autobot-setup1 --at
 ```
 <br>
   
@@ -80,40 +80,8 @@ sudo wget https://github.com/SooSDExZ/REMChain-Automated-Bot/raw/master/Guardian
 <br>
 
 ```
-sudo wget https://github.com/SooSDExZ/REMChain-Automated-Bot/raw/master/Guardian-Autobot-Setup2 && sudo chmod u+x Guardian-Autobot-Setup2 && sudo ./Guardian-Autobot-Setup2 --at
+sudo wget https://github.com/remblock/REMChain-Automated-Bot/raw/master/Guardian-Autobot-Setup2 && sudo chmod u+x Guardian-Autobot-Setup2 && sudo ./Guardian-Autobot-Setup2 --at
 ```
 <br>
 
 **Please Note: You will need to change the default key permissions in remblock/autobot/config file.**
-
-<br>
-
-***
-
-<br>
-
-**`PRODUCER AUTOBOT: MONITORING AND AUTOMATING PRODUCER VOTES, CLAIMING, RESTAKING & TRANSFERS`**
-
-<br>
-
-**Setup 1: Download REMChain And Import Producer Key**
-
-<br>
-
-```
-sudo wget https://github.com/SooSDExZ/REMChain-Automated-Bot/raw/master/Producer-Autobot-Setup1 && sudo chmod u+x Producer-Autobot-Setup1 && sudo ./Producer-Autobot-Setup1 --at
-```
-
-<br>
-  
-**Setup 2: Download And Install Autobot**
-
-<br>
-
-```
-sudo wget https://github.com/SooSDExZ/REMChain-Automated-Bot/raw/master/Producer-Autobot-Setup2 && sudo chmod u+x Producer-Autobot-Setup2 && sudo ./Producer-Autobot-Setup2 --at
-```
-<br>
-
-**Please Note: You will need to change the default key permissions in remblock/autobot/config file.**
-<br>
