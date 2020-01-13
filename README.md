@@ -55,7 +55,7 @@ Your Chat ID will be shown in this format **`"id":7041782343`**, based on this e
 
 <br>
 
-**`AUTOBOT: AUTOMATING VOTES, CLAIMING, RESTAKING & TRANSFERS`**
+## `AUTOBOT: AUTOMATING VOTES, CLAIMING, RESTAKING & TRANSFERS`
 
 <br>
 
