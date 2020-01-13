@@ -2,6 +2,8 @@
 
 REMChain-Automated-Bot is a fully customisable script which monitors and manages your Guardians and Producer node. It also allows Guardians and Producers the flexibility to choose whether to have their votes, claims and even a percentage of their claimed rewards restaked or transfered out automatically every 24 hours. Furthermore it also has a built in monitor which monitors and alerts you whenever your node faces issues within the set intervals.
 
+## AUTOBOT: AUTOMATING VOTES, CLAIMING, RESTAKING & TRANSFERS
+
 <br>
 
 ***
@@ -63,10 +65,6 @@ Your Chat ID will be shown in this format **`"id":7041782343`**, based on this e
 <br>
 
 ## Step 3: Download The Scripts Required For Monitoring and Managing Your Guardian Or Producer.
-
-<br>
-
-## AUTOBOT: AUTOMATING VOTES, CLAIMING, RESTAKING & TRANSFERS
 
 <br>
 
