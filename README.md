@@ -4,10 +4,10 @@ REMChain-Automated-Bot is a fully customisable script which monitors and manages
 
 ***
 
-# Step 1: Create Telegram Bot Using Botfather
+## Step 1: Create Telegram Bot Using Botfather
 <br>
 
-**The following steps describe how to create a new bot:**
+#### The following steps describe how to create a new bot:
 
 * Contact [**@BotFather**](https://telegram.me/BotFather) in your Telegram messenger.
 * To get a token, send BotFather a message that says **`/newbot`**.
@@ -17,19 +17,19 @@ REMChain-Automated-Bot is a fully customisable script which monitors and manages
 
 Once your bot is created, you can set a custom name, profile photo and description for it. The description is basically a message that explains what the bot can do.
 
-**To set the Bot name in BotFather do the following:**
+#### To set the Bot name in BotFather do the following:
 
 * Send **`/setname`** to BotFather.
 * Select the bot which you want to change.
 * Send the new name to BotFather.
 
-**To set a Profile photo for your bot in BotFather do the following:**
+#### To set a Profile photo for your bot in BotFather do the following:
 
 * Send **`/setuserpic`** to BotFather.
 * Select the bot that you want the profile photo changed on.
 * Send the photo to BotFather.
 
-**To set Description for your bot in BotFather do the following:**
+#### To set Description for your bot in BotFather do the following:
 
 * Send **`/setdescription`** to BotFather.
 * Select the bot for which you are writing a description.
@@ -40,7 +40,7 @@ There are some other useful methods in BotFather which we won't cover in this tu
 
 ***
 
-# Step 2: Obtain Your Chat Idenification Number
+## Step 2: Obtain Your Chat Idenification Number
 <br>
 Theres two ways to retrieve your Chat ID, the first is by opening the following URL in your web-browser: 
 
@@ -51,7 +51,7 @@ Your Chat ID will be shown in this format **`"id":7041782343`**, based on this e
 
 ***
 
-# Step 3: Download The Scripts Required For Monitoring and Managing Your Guardian Or Producer.
+## Step 3: Download The Scripts Required For Monitoring and Managing Your Guardian Or Producer.
 
 <br>
 
@@ -59,7 +59,7 @@ Your Chat ID will be shown in this format **`"id":7041782343`**, based on this e
 
 <br>
 
-**Setup 1: Download REMChain And Import Guardian Key**
+#### Setup 1: Download REMChain And Import Guardian Key
 
 <br>
 
@@ -68,7 +68,7 @@ sudo wget https://github.com/remblock/REMChain-Automated-Bot/raw/master/autobot-
 ```
 <br>
   
-**Setup 2: Download And Install Autobot**
+#### Setup 2: Download And Install Autobot
 
 <br>
 
@@ -78,7 +78,7 @@ sudo wget https://github.com/remblock/REMChain-Automated-Bot/raw/master/Guardian
 
 <br>
 
-**Please Note: You will need to change the default key permissions:**
+#### Please Note: You will need to change the default key permissions:
 
 ```
 nano remblock/autobot/config file
