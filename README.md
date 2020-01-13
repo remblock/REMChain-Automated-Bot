@@ -66,7 +66,7 @@ Your Chat ID will be shown in this format **`"id":7041782343`**, based on this e
 
 <br>
 
-**Setup 1: Download REMChain And Import Reward Key**
+**Setup 1: Download REMChain And Import Guardian Key**
 
 <br>
 
@@ -85,3 +85,7 @@ sudo wget https://github.com/remblock/REMChain-Automated-Bot/raw/master/Guardian
 <br>
 
 **Please Note: You will need to change the default key permissions in remblock/autobot/config file.**
+
+```
+nano remblock/autobot/config file
+```
