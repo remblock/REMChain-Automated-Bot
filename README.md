@@ -1,6 +1,6 @@
 # REMChain-Automated-Bot
 
-REMChain-Automated-Bot is a fully customisable script which can automatically manage your Guardian or Producer node. It also allows Guardians and Producers the flexibility to choose whether to have their votes, claims and even a percentage of their claimed rewards restaked or transfered out automatically every 24 hours.
+REMChain-Automated-Bot is a fully customisable script which can help manage your Guardian or Producer node. It will help automate your voting, claiming, and even allowing you to choose whether to have a percentage of your claimed rewards restaked or transfered out every 24 hours automatically.
 
 <br>
 
