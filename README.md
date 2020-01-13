@@ -10,8 +10,6 @@ REMChain-Automated-Bot is a fully customisable script which monitors and manages
 
 ## Step 1: Create Telegram Bot Using Botfather
 
-<br>
-
 #### The following steps describe how to create a new bot:
 
 * Contact [**@BotFather**](https://telegram.me/BotFather) in your Telegram messenger.
@@ -41,12 +39,17 @@ Once your bot is created, you can set a custom name, profile photo and descripti
 * Change the description and send it to BotFather.
 
 There are some other useful methods in BotFather which we won't cover in this tutorial like **`/setcommands`**.
+
 <br>
 
 ***
 
-## Step 2: Obtain Your Chat Idenification Number
 <br>
+
+## Step 2: Obtain Your Chat Idenification Number
+
+<br>
+
 Theres two ways to retrieve your Chat ID, the first is by opening the following URL in your web-browser: 
 
 [**https://api.telegram.org/botTOKEN/getUpdates**](https://api.telegram.org/botTOKEN/getUpdates) then replace the **`TOKEN`** with your actual bot token.
