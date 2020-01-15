@@ -66,7 +66,7 @@ Your Chat ID will be shown in this format **`"id":7041782343`**, based on this e
 
 <br>
 
-## Step 3: Download & Setup The Scripts Required For REMChain-Automated-Bot.
+## Step 3: Download & Setup The Scripts Required For REMChain-Automated-Bot
 
 <br>
 
