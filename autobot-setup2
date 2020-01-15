@@ -78,7 +78,7 @@ if [[ "$1" == "--at" ]]
 then
   at=true
   at now + $minutes_to_wait minutes << DOC &>/dev/null
-  /root/autobot2 --at
+  /root/autobot --at
 DOC
 fi
 
@@ -638,7 +638,6 @@ Voted Block Producers: $bpaccountnames"
 
   if $send_message
   then
-    #If at option is active, wait without printing the progress bar
     if $at
     then
       sleep 120
