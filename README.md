@@ -70,7 +70,7 @@ Your Chat ID will be shown in this format **`"id":7041782343`**, based on this e
 
 <br>
 
-#### Setup 1: Download REMChain & Import Guardian Key
+#### Setup 1: Download REMChain & Import Authorising Key
 
 <br>
 
