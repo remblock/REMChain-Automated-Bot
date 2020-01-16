@@ -2,7 +2,6 @@
 
 REMChain-Automated-Bot is a fully customisable script which has been constructed to help manage your Guardian or Producer node. The script is capable of automating your day-to-days tasks of voting and claiming. Additionally, the script enables you to have the flexibility of choosing whether to have a percentage of your claimed rewards automatically restaked or have them transfered out automatically every 24 hours.
 
-<br>
 
 ##
 
