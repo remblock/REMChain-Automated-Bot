@@ -1,7 +1,7 @@
 #!/bin/bash
 
 #****************************************************************************************************#
-#                                   REMCHAIN-AUTOMATED-BOT (SETUP 2)                                 #
+#                                   REMCHAIN-AUTOMATED-BOT (SETUP)                                   #
 #****************************************************************************************************#
 
 #----------------------------------------------------------------------------------------------------#
@@ -516,7 +516,7 @@ output=$(remcli wallet unlock --password $walletpassword /dev/null 2>&1)
 
 if $auto_vote
 then
-  voteoutput=$(remcli system voteproducer prods $accountname $bpaccountnames -p $accountname@$vote_permission -f 2>&1)
+  voteoutput=$(remcli -u https://remchain.remme.io system voteproducer prods $accountname $bpaccountnames -p $accountname@$vote_permission -f 2>&1)
   #Uncomment if you want the output of the command printed
   #if ! $at; then echo $output; fi
   if [[ ! "$voteoutput" =~ "executed transaction" ]]; then vote_failed=true; fi
@@ -529,7 +529,7 @@ fi
 if $auto_reward
 then
   previous=$(remcli get currency balance rem.token $accountname | awk '{print $1}')
-  rewardoutput=$(remcli system claimrewards $accountname -x 120 -p $accountname@$claim_permission -f 2>&1)
+  rewardoutput=$(remcli -u https://remchain.remme.io system claimrewards $accountname -x 120 -p $accountname@$claim_permission -f 2>&1)
   #Uncomment if you want the output of the command printed
   #if ! $at; then echo $output; fi
   if [[ ! "$rewardoutput" =~ "executed transaction" ]]; then reward_failed=true; fi
@@ -544,7 +544,7 @@ fi
 if $auto_transfer
 then
   transfer_amount="$(echo "scale=4; ( $total_reward / 100 ) * $auto_transfer_perc" | bc )"
-  transferoutput=$(remcli transfer $accountname $auto_transfer_acct "$transfer_amount REM" -x 120 -p $accountname@$transfer_permission -f 2>&1)
+  transferoutput=$(remcli -u https://remchain.remme.io transfer $accountname $auto_transfer_acct "$transfer_amount REM" -x 120 -p $accountname@$transfer_permission -f 2>&1)
   #Uncomment if you want the output of the command printed
   #if ! $at; then echo $output; fi
   if [[ ! "$transferoutput" =~ "executed transaction" ]]; then transfer_failed=true; fi
@@ -562,7 +562,7 @@ then
   else
     restake_reward=$(echo "scale=4; ( $total_reward / 100 ) * $restakingpercentage" | bc )
   fi
-  restakingoutput=$(remcli system delegatebw $accountname $accountname "$restake_reward REM" -x 120 -p $accountname@$stake_permission -f 2>&1)
+  restakingoutput=$(remcli -u https://remchain.remme.io system delegatebw $accountname $accountname "$restake_reward REM" -x 120 -p $accountname@$stake_permission -f 2>&1)
   #Uncomment if you want the output of the command printed
   #if ! $at; then echo $output; fi
   if [[ ! "$restakingoutput" =~ "executed transaction" ]]; then restaking_failed=true; fi
