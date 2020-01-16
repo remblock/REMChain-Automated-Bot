@@ -528,12 +528,12 @@ fi
 
 if $auto_reward
 then
-  previous=$(remcli get currency balance rem.token $accountname | awk '{print $1}')
+  previous=$(remcli -u https://remchain.remme.io get currency balance rem.token $accountname | awk '{print $1}')
   rewardoutput=$(remcli -u https://remchain.remme.io system claimrewards $accountname -x 120 -p $accountname@$claim_permission -f 2>&1)
   #Uncomment if you want the output of the command printed
   #if ! $at; then echo $output; fi
   if [[ ! "$rewardoutput" =~ "executed transaction" ]]; then reward_failed=true; fi
-  after=$(remcli get currency balance rem.token $accountname  | awk '{print $1}')
+  after=$(remcli -u https://remchain.remme.io get currency balance rem.token $accountname  | awk '{print $1}')
   total_reward=$(echo "$after - $previous"|bc)
 fi
 
