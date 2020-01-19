@@ -85,7 +85,7 @@ sudo wget https://github.com/remblock/REMChain-Automated-Bot/raw/master/remchain
 <br>
 
 ```
-sudo wget https://github.com/remblock/REMChain-Automated-Bot/raw/master/autobot && sudo chmod u+x autobot && sudo ./autobot
+sudo wget https://github.com/remblock/REMChain-Automated-Bot/raw/master/remchain-autobot && sudo chmod u+x remchain-autobot && sudo ./remchain-autobot
 ```
 
 <br>
