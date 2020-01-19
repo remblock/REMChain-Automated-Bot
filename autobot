@@ -506,7 +506,7 @@ fi
 # REMCLI COMMANDS FOR UNLOCKING YOUR WALLET                                                          #
 #----------------------------------------------------------------------------------------------------#
 
-output=$(remcli wallet unlock --password $walletpassword 2>&1)
+output=$(remcli wallet unlock --password $walletpassword > /dev/null 2>&1)
 #Uncomment if you want the output of the command printed
 #if ! $at; then echo $output; fi
 
