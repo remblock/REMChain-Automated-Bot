@@ -90,6 +90,33 @@ sudo wget https://github.com/remblock/REMChain-Automated-Bot/raw/master/remchain
 
 <br>
 
+#### Setup 3: Check if Autobot has At scheduled
+
+<br>
+
+```
+atq
+```
+
+#### Setup 4: How to setup the at schedule if theres no upcoming schedule
+
+<br>
+
+```
+sudo ./remchain-autobot --at
+```
+
+#### Setup 5: How to remove an upcoming at schedule
+
+<br>
+
+```
+atrm <at schedule number>
+
+```
+
+<br>
+
 #### Please Note: You will need to change the default key permissions:
 
 ```
