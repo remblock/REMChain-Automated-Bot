@@ -67,7 +67,7 @@ Your Chat ID will be shown in this format **`"id":7041782343`**, based on this e
 
 <br>
 
-## Step 3: Download & Setup The Scripts Required For REMChain-Automated-Bot
+## Step 3: Download & Setup The Scripts Required For REMChain-Autobot
 
 <br>
 
@@ -80,7 +80,7 @@ sudo wget https://github.com/remblock/REMChain-Automated-Bot/raw/master/remchain
 ```
 <br>
   
-#### Setup 2: Download & Install Autobot
+#### Setup 2: Download & Install REMChain-Autobot
 
 <br>
 
@@ -90,7 +90,7 @@ sudo wget https://github.com/remblock/REMChain-Automated-Bot/raw/master/remchain
 
 <br>
 
-#### Setup 3: Check if Autobot has At scheduled
+#### Setup 3: Check if REMChain-Autobot has an upcoming "at" scheduled
 
 <br>
 
@@ -98,7 +98,7 @@ sudo wget https://github.com/remblock/REMChain-Automated-Bot/raw/master/remchain
 atq
 ```
 
-#### Setup 4: How to setup the at schedule if theres no upcoming schedule
+#### Setup 4: How to setup the "at" schedule if theres no upcoming schedule
 
 <br>
 
@@ -106,7 +106,7 @@ atq
 sudo ./remchain-autobot --at
 ```
 
-#### Setup 5: How to remove an upcoming at schedule
+#### Setup 5: How to remove an upcoming "at" schedule
 
 <br>
 
