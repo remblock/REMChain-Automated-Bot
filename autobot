@@ -412,18 +412,18 @@ then
     if [ "$global_value" = "true" ]
     then
       auto_transfer=true
-      if get_config_value auto_transfer_acct
+      if get_config_value auto_transfer_account
       then
-        auto_transfer_acct="$global_value"
+        auto_transfer_account="$global_value"
       else
-        echo "ERROR: auto_transfer_acct must be set when using auto_transfer"
+        echo "ERROR: auto_transfer_account must be set when using auto_transfer"
 	exit 1
       fi
-      if get_config_value auto_transfer_perc
+      if get_config_value auto_transfer_percent
       then
-        auto_transfer_perc="$global_value"
+        auto_transfer_percent="$global_value"
       else
-        echo "ERROR: auto_transfer_perc must be set when using auto_transfer"
+        echo "ERROR: auto_transfer_percent must be set when using auto_transfer"
 	exit 1
       fi
       if get_config_value auto_transfer_alert
@@ -444,12 +444,12 @@ then
       auto_transfer=true
       echo "auto_transfer=true" >> "$config_file"
       echo
-      read -p "PLEASE SET YOUR TRANSFER ACCOUNT NAME: " -e auto_transfer_acct
-      echo "auto_transfer_acct=$auto_transfer_acct" >> "$config_file"
+      read -p "PLEASE SET YOUR TRANSFER ACCOUNT NAME: " -e auto_transfer_account
+      echo "auto_transfer_account=$auto_transfer_account" >> "$config_file"
       echo
-      read -p "PLEASE SET YOUR TRANSFER PERCENTAGE: " -e auto_transfer_perc
-      auto_transfer_perc=$(echo $auto_transfer_perc | tr -d '%' )
-      echo "auto_transfer_perc=$auto_transfer_perc" >> "$config_file"
+      read -p "PLEASE SET YOUR TRANSFER PERCENTAGE: " -e auto_transfer_percent
+      auto_transfer_percent=$(echo $auto_transfer_percent | tr -d '%' )
+      echo "auto_transfer_percent=$auto_transfer_percent" >> "$config_file"
       echo
       if get_user_answer_yn "DO YOU WANT TO RECEIVE TRANSFER NOTIFICATIONS"
       then
@@ -543,8 +543,8 @@ fi
 
 if $auto_transfer
 then
-  transfer_amount="$(echo "scale=4; ( $total_reward / 100 ) * $auto_transfer_perc" | bc )"
-  transferoutput=$(remcli -u https://remchain.remme.io transfer $accountname $auto_transfer_acct "$transfer_amount REM" -x 120 -p $accountname@$transfer_permission -f 2>&1)
+  transfer_amount=$(echo "scale=4; ( $total_reward / 100 ) * $auto_transfer_percent" | bc )
+  transferoutput=$(remcli -u https://remchain.remme.io transfer $accountname $auto_transfer_account "$transfer_amount REM" -x 120 -p $accountname@$transfer_permission -f 2>&1)
   #Uncomment if you want the output of the command printed
   #if ! $at; then echo $output; fi
   if [[ ! "$transferoutput" =~ "executed transaction" ]]; then transfer_failed=true; fi
