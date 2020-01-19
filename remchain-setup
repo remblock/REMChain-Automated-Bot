@@ -85,6 +85,6 @@ printf "\n\n"
 remcli wallet lock > /dev/null 2>&1
 remcli wallet unlock --password=$walletpass > /dev/null 2>&1
 remcli wallet import --private-key=$guardianprivatekey
-rm autobot-setup1
+rm remchain-setup
 
 printf "\n\n"
