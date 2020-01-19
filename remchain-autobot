@@ -78,7 +78,7 @@ if [[ "$1" == "--at" ]]
 then
   at=true
   at now + $minutes_to_wait minutes << DOC &>/dev/null
-  /root/autobot --at
+  /root/remchain-autobot --at
 DOC
 fi
 
@@ -640,7 +640,7 @@ Voted Block Producers: $bpaccountnames"
   then
     if $at
     then
-      sleep 120
+      sleep 2
     fi
     curl -s -X POST https://api.telegram.org/bot$telegram_token/sendMessage -d chat_id=$telegram_chatid -d text="$telegram_message" &>/dev/null
   fi
