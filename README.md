@@ -76,7 +76,7 @@ Your Chat ID will be shown in this format **`"id":7041782343`**, based on this e
 <br>
 
 ```
-sudo wget https://github.com/remblock/REMChain-Automated-Bot/raw/master/autobot-setup1 && sudo chmod u+x autobot-setup1 && sudo ./autobot-setup1
+sudo wget https://github.com/remblock/REMChain-Automated-Bot/raw/master/remchain-setup && sudo chmod u+x remchain-setup && sudo ./remchain-setup
 ```
 <br>
   
@@ -85,7 +85,7 @@ sudo wget https://github.com/remblock/REMChain-Automated-Bot/raw/master/autobot-
 <br>
 
 ```
-sudo wget https://github.com/remblock/REMChain-Automated-Bot/raw/master/autobot-setup2 && sudo chmod u+x autobot-setup2 && sudo ./autobot-setup2
+sudo wget https://github.com/remblock/REMChain-Automated-Bot/raw/master/autobot && sudo chmod u+x autobot && sudo ./autobot
 ```
 
 <br>
