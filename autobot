@@ -143,7 +143,7 @@ if get_config_value vote_permission
 then
   vote_permission="$global_value"
 else
-  vote_permission="guardian"
+  vote_permission="owner"
   echo "vote_permission=$vote_permission" >> "$config_file"
 fi
 
@@ -151,7 +151,7 @@ if get_config_value claim_permission
 then
   claim_permission="$global_value"
 else
-  claim_permission="guardian"
+  claim_permission="owner"
   echo "claim_permission=$claim_permission" >> "$config_file"
 fi
 
@@ -159,7 +159,7 @@ if get_config_value stake_permission
 then
   stake_permission="$global_value"
 else
-  stake_permission="guardian"
+  stake_permission="owner"
   echo "stake_permission=$stake_permission" >> "$config_file"
 fi
 
@@ -167,7 +167,7 @@ if get_config_value transfer_permission
 then
   transfer_permission="$global_value"
 else
-  transfer_permission="active"
+  transfer_permission="owner"
   echo "transfer_permission=$transfer_permission" >> "$config_file"
 fi
 
@@ -506,7 +506,7 @@ fi
 # REMCLI COMMANDS FOR UNLOCKING YOUR WALLET                                                          #
 #----------------------------------------------------------------------------------------------------#
 
-output=$(remcli wallet unlock --password $walletpassword /dev/null 2>&1)
+output=$(remcli wallet unlock --password $walletpassword 2>&1)
 #Uncomment if you want the output of the command printed
 #if ! $at; then echo $output; fi
 
@@ -533,7 +533,7 @@ then
   #Uncomment if you want the output of the command printed
   #if ! $at; then echo $output; fi
   if [[ ! "$rewardoutput" =~ "executed transaction" ]]; then reward_failed=true; fi
-  after=$(remcli -u https://remchain.remme.io get currency balance rem.token $accountname  | awk '{print $1}')
+  after=$(remcli -u https://remchain.remme.io get currency balance rem.token $accountname | awk '{print $1}')
   total_reward=$(echo "$after - $previous"|bc)
 fi
 
