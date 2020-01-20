@@ -1,7 +1,7 @@
 #!/bin/bash
 
 #****************************************************************************************************#
-#                                     REMCHAIN-AUTOMATED-BOT                                         #
+#                                        REMCHAIN-AUTOMATED-BOT                                      #
 #****************************************************************************************************#
 
 #----------------------------------------------------------------------------------------------------#
@@ -137,40 +137,6 @@ function get_config_value(){
 #                                       MAIN PROGRAM FUNCTIONS                                       #
 #****************************************************************************************************#
 
-#Fill possible missing config variables
-
-if get_config_value vote_permission
-then
-  vote_permission="$global_value"
-else
-  vote_permission="owner"
-  echo "vote_permission=$vote_permission" >> "$config_file"
-fi
-
-if get_config_value claim_permission
-then
-  claim_permission="$global_value"
-else
-  claim_permission="owner"
-  echo "claim_permission=$claim_permission" >> "$config_file"
-fi
-
-if get_config_value stake_permission
-then
-  stake_permission="$global_value"
-else
-  stake_permission="owner"
-  echo "stake_permission=$stake_permission" >> "$config_file"
-fi
-
-if get_config_value transfer_permission
-then
-  transfer_permission="$global_value"
-else
-  transfer_permission="owner"
-  echo "transfer_permission=$transfer_permission" >> "$config_file"
-fi
-
 #----------------------------------------------------------------------------------------------------#
 # ASK USER FOR THEIR OWNER ACCOUNT NAME OR TAKE IT FROM THE CONFIG FILE                              #
 #----------------------------------------------------------------------------------------------------#
@@ -231,16 +197,33 @@ else
   echo
 fi
 
+if $auto_vote
+then
+  if get_config_value vote_permission
+  then
+    vote_permission="$global_value"
+else
+  if $at
+   then
+     exit 2
+   fi
+   read -p "ENTER YOUR VOTING KEY PERMISSION: " -e vote_permission
+   if [ -z "$vote_permission" ]
+   then
+     vote_permission="owner"
+   fi
+   echo "vote_permission=$vote_permission" >> "$config_file"
+   echo
+ fi
+
 #----------------------------------------------------------------------------------------------------#
 # IF AUTOMATED VOTING IS ENABLED, ASK THE USER FOR ACCOUNT NAMES OR TAKE IT FROM THE CONFIG FILE     #
 #----------------------------------------------------------------------------------------------------#
 
-if $auto_vote
-then
  if get_config_value bpaccountnames
  then
    bpaccountnames="$global_value"
-else
+ else
    if $at
    then
      exit 2
@@ -251,33 +234,33 @@ else
      bpaccountnames="$accountname"
    fi
    echo "bpaccountnames=$bpaccountnames" >> "$config_file"
-  echo
-fi
+   echo
+ fi
 
 #----------------------------------------------------------------------------------------------------#
 # GET VOTING NOTIFCATION ANSWER FROM THE USER OR TAKE IT FROM THE CONFIG FILE                        #
 #----------------------------------------------------------------------------------------------------#
 
-if get_config_value auto_vote_alert
-then
-  if [ "$global_value" = "true" ]
-  then
-    auto_vote_alert=true
-  fi
-  else
-    if $at
-    then
-      exit 2
-    fi
-    if get_user_answer_yn "DO YOU WANT TO RECEIVE VOTING NOTIFICATIONS"
-    then
-      auto_vote_alert=true
-      echo "auto_vote_alert=true" >> "$config_file"
-    else
-      echo "auto_vote_alert=false" >> "$config_file"
-    fi
-    echo
-  fi
+ if get_config_value auto_vote_alert
+ then
+   if [ "$global_value" = "true" ]
+   then
+     auto_vote_alert=true
+   fi
+ else
+   if $at
+   then
+     exit 2
+   fi
+   if get_user_answer_yn "DO YOU WANT TO RECEIVE VOTING NOTIFICATIONS"
+   then
+     auto_vote_alert=true
+     echo "auto_vote_alert=true" >> "$config_file"
+   else
+     echo "auto_vote_alert=false" >> "$config_file"
+   fi
+     echo
+ fi
 fi
 
 #----------------------------------------------------------------------------------------------------#
@@ -311,26 +294,38 @@ fi
 
 if $auto_reward
 then
-  if get_config_value auto_reward_alert
+  if get_config_value claim_permission
   then
-    if [ "$global_value" = "true" ]
-    then
-      auto_reward_alert=true
-    fi
-  else
-    if $at
-    then
-      exit 2
-    fi
-    if get_user_answer_yn "DO YOU WANT TO RECEIVE REWARD NOTIFICATIONS"
-    then
-      auto_reward_alert=true
-      echo "auto_reward_alert=true" >> "$config_file"
-    else
-      echo "auto_reward_alert=false" >> "$config_file"
-    fi
+    claim_permission="$global_value"
+else
+  if $at
+   then
+     exit 2
+   fi
+   read -p "ENTER YOUR CLAIM KEY PERMISSION: " -e claim_permission
+   if [ -z "$claim_permission" ]
+   then
+     claim_permission="owner"
+   fi
+   echo "claim_permission=$claim_permission" >> "$config_file"
+   echo
+ fi
+ if get_config_value auto_reward_alert
+ then
+   if [ "$global_value" = "true" ]
+   then
+     auto_reward_alert=true
+   fi
+ else
+   if get_user_answer_yn "DO YOU WANT TO RECEIVE REWARD NOTIFICATIONS"
+   then
+     auto_reward_alert=true
+     echo "auto_reward_alert=true" >> "$config_file"
+   else
+     echo "auto_reward_alert=false" >> "$config_file"
+   fi
     echo
-  fi
+ fi
 
 #----------------------------------------------------------------------------------------------------#
 # GET AUTOMATED RESTAKING ANSWER FROM THE USER OR TAKE IT FROM THE CONFIG FILE                       #
@@ -361,45 +356,57 @@ then
 # GET THE RESTAKING PERCENTAGE FROM THE USER OR TAKE IT FROM THE CONFIG FILE                         #
 #----------------------------------------------------------------------------------------------------#
 
-  if $auto_restaking
+if $auto_restaking
+then
+  if get_config_value stake_permission
   then
-    if get_config_value restakingpercentage
-    then
-      restakingpercentage="$global_value"
-    else
-      if $at
-      then
-        exit 2
-      fi
-      read -p "PLEASE SET YOUR RESTAKING PERCENTAGE: " -e restakingpercentage
-      echo "restakingpercentage=$restakingpercentage" >> "$config_file"
-      echo
-    fi
-    restakingpercentage=$(echo $restakingpercentage | tr -d '%' )
+    stake_permission="$global_value"
+else
+  if $at
+   then
+     exit 2
+   fi
+   read -p "ENTER YOUR CLAIM KEY PERMISSION: " -e stake_permission
+   if [ -z "$stake_permission" ]
+   then
+     stake_permission="owner"
+   fi
+   echo "claim_permission=$stake_permission" >> "$config_file"
+   echo
+ fi
+ if get_config_value restakingpercentage
+ then
+   restakingpercentage="$global_value"
+  else
+    read -p "PLEASE SET YOUR RESTAKING PERCENTAGE: " -e restakingpercentage
+    echo "restakingpercentage=$restakingpercentage" >> "$config_file"
+    echo
+  fi
+  restakingpercentage=$(echo $restakingpercentage | tr -d '%' )
 
 #----------------------------------------------------------------------------------------------------#
 # GET RESTAKING NOTIFCATION ANSWER FROM THE USER OR TAKE IT FROM THE CONFIG FILE                     #
 #----------------------------------------------------------------------------------------------------#
 
-    if get_config_value auto_restaking_alert
-    then
-      if [ "$global_value" = "true" ]
-      then
-        auto_restaking_alert=true
+   if get_config_value auto_restaking_alert
+   then
+     if [ "$global_value" = "true" ]
+     then
+       auto_restaking_alert=true
+     fi
+   else
+     if $at
+     then
+       exit 2
+     fi
+     if get_user_answer_yn "DO YOU WANT TO RECEIVE RESTAKING NOTIFICATIONS"
+     then
+       auto_restaking_alert=true
+       echo "auto_restaking_alert=true" >> "$config_file"
+     else
+       echo "auto_restaking_alert=false" >> "$config_file"
       fi
-    else
-      if $at
-      then
-        exit 2
-      fi
-      if get_user_answer_yn "DO YOU WANT TO RECEIVE RESTAKING NOTIFICATIONS"
-      then
-        auto_restaking_alert=true
-        echo "auto_restaking_alert=true" >> "$config_file"
-      else
-        echo "auto_restaking_alert=false" >> "$config_file"
-      fi
-      echo
+     echo
     fi
   fi
 
@@ -451,6 +458,13 @@ then
       auto_transfer_percent=$(echo $auto_transfer_percent | tr -d '%' )
       echo "auto_transfer_percent=$auto_transfer_percent" >> "$config_file"
       echo
+      read -p "ENTER YOUR TRANSFER KEY PERMISSION: " -e transfer_permission
+      if [ -z "$transfer_permission" ]
+      then
+        transfer_permission="owner"
+      fi
+        echo "transfer_permission=$transfer_permission" >> "$config_file"
+        echo
       if get_user_answer_yn "DO YOU WANT TO RECEIVE TRANSFER NOTIFICATIONS"
       then
         auto_transfer_alert=true
@@ -507,8 +521,6 @@ fi
 #----------------------------------------------------------------------------------------------------#
 
 output=$(remcli wallet unlock --password $walletpassword > /dev/null 2>&1)
-#Uncomment if you want the output of the command printed
-#if ! $at; then echo $output; fi
 
 #----------------------------------------------------------------------------------------------------#
 # REMCLI COMMAND FOR CASTING YOUR VOTES                                                              #
@@ -517,8 +529,6 @@ output=$(remcli wallet unlock --password $walletpassword > /dev/null 2>&1)
 if $auto_vote
 then
   voteoutput=$(remcli -u https://remchain.remme.io system voteproducer prods $accountname $bpaccountnames -p $accountname@$vote_permission -f 2>&1)
-  #Uncomment if you want the output of the command printed
-  #if ! $at; then echo $output; fi
   if [[ ! "$voteoutput" =~ "executed transaction" ]]; then vote_failed=true; fi
 fi
 
@@ -530,8 +540,6 @@ if $auto_reward
 then
   previous=$(remcli -u https://remchain.remme.io get currency balance rem.token $accountname | awk '{print $1}')
   rewardoutput=$(remcli -u https://remchain.remme.io system claimrewards $accountname -x 120 -p $accountname@$claim_permission -f 2>&1)
-  #Uncomment if you want the output of the command printed
-  #if ! $at; then echo $output; fi
   if [[ ! "$rewardoutput" =~ "executed transaction" ]]; then reward_failed=true; fi
   after=$(remcli -u https://remchain.remme.io get currency balance rem.token $accountname | awk '{print $1}')
   total_reward=$(echo "$after - $previous"|bc)
@@ -545,8 +553,6 @@ if $auto_transfer
 then
   transfer_amount=$(echo "scale=4; ( $total_reward / 100 ) * $auto_transfer_percent" | bc )
   transferoutput=$(remcli -u https://remchain.remme.io transfer $accountname $auto_transfer_account "$transfer_amount REM" -x 120 -p $accountname@$transfer_permission -f 2>&1)
-  #Uncomment if you want the output of the command printed
-  #if ! $at; then echo $output; fi
   if [[ ! "$transferoutput" =~ "executed transaction" ]]; then transfer_failed=true; fi
 fi
 
@@ -563,8 +569,6 @@ then
     restake_reward=$(echo "scale=4; ( $total_reward / 100 ) * $restakingpercentage" | bc )
   fi
   restakingoutput=$(remcli -u https://remchain.remme.io system delegatebw $accountname $accountname "$restake_reward REM" -x 120 -p $accountname@$stake_permission -f 2>&1)
-  #Uncomment if you want the output of the command printed
-  #if ! $at; then echo $output; fi
   if [[ ! "$restakingoutput" =~ "executed transaction" ]]; then restaking_failed=true; fi
 fi
 
