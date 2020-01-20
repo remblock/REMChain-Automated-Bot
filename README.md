@@ -98,6 +98,8 @@ sudo wget https://github.com/remblock/REMChain-Automated-Bot/raw/master/remchain
 atq
 ```
 
+<br>
+
 #### Setup 4: How to setup the "at" schedule if theres no upcoming schedule
 
 <br>
@@ -105,6 +107,8 @@ atq
 ```
 sudo ./remchain-autobot --at
 ```
+
+<br>
 
 #### Setup 5: How to remove an upcoming "at" schedule
 
