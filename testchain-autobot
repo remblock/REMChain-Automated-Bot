@@ -302,7 +302,7 @@ else
    then
      exit 2
    fi
-   read -p "ENTER YOUR CLAIM KEY PERMISSION: " -e claim_permission
+   read -p "ENTER YOUR CLAIM REWARD KEY PERMISSION: " -e claim_permission
    if [ -z "$claim_permission" ]
    then
      claim_permission="owner"
@@ -366,19 +366,19 @@ else
    then
      exit 2
    fi
-   read -p "ENTER YOUR CLAIM KEY PERMISSION: " -e stake_permission
+   read -p "ENTER YOUR RESTAKING KEY PERMISSION: " -e stake_permission
    if [ -z "$stake_permission" ]
    then
      stake_permission="owner"
    fi
-   echo "claim_permission=$stake_permission" >> "$config_file"
+   echo "stake_permission=$stake_permission" >> "$config_file"
    echo
  fi
  if get_config_value restakingpercentage
  then
    restakingpercentage="$global_value"
   else
-    read -p "PLEASE SET YOUR RESTAKING PERCENTAGE: " -e restakingpercentage
+    read -p "PLEASE SET YOUR RESTAKING REWARD PERCENTAGE: " -e restakingpercentage
     echo "restakingpercentage=$restakingpercentage" >> "$config_file"
     echo
   fi
