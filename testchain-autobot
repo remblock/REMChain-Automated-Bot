@@ -527,7 +527,7 @@ output=$(remcli wallet unlock --password $walletpassword > /dev/null 2>&1)
 #----------------------------------------------------------------------------------------------------#
 
 remcli -u https://testchain.remme.io get table rem.oracle rem.oracle remprice -L rem.usd -U rem.usd > remprice
-getremprice=$(grep '"price"' remprice | awk -F'"' '{print $4}')
+getremprice=$(grep '"price"' remprice | awk -F'"' '{print $4}' | awk '{printf "%.4f",$1}')
 
 #----------------------------------------------------------------------------------------------------#
 # REMCLI COMMAND FOR CASTING YOUR VOTES                                                              #
