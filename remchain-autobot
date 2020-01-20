@@ -523,6 +523,13 @@ fi
 output=$(remcli wallet unlock --password $walletpassword > /dev/null 2>&1)
 
 #----------------------------------------------------------------------------------------------------#
+# REMCLI COMMAND FOR OBTAINING TOKEN PRICE                                                           #
+#----------------------------------------------------------------------------------------------------#
+
+remcli -u https://remchain.remme.io get table rem.oracle rem.oracle remprice -L rem.usd -U rem.usd > remprice
+getremprice=$(grep '"price"' remprice | awk -F'"' '{print $4}')
+
+#----------------------------------------------------------------------------------------------------#
 # REMCLI COMMAND FOR CASTING YOUR VOTES                                                              #
 #----------------------------------------------------------------------------------------------------#
 
@@ -543,6 +550,7 @@ then
   if [[ ! "$rewardoutput" =~ "executed transaction" ]]; then reward_failed=true; fi
   after=$(remcli -u https://remchain.remme.io get currency balance rem.token $accountname | awk '{print $1}')
   total_reward=$(echo "$after - $previous"|bc)
+  total_rewardusd=$(echo "$total_reward * $getremprice" | bc | awk '{printf "%.2f",$1}')
 fi
 
 #----------------------------------------------------------------------------------------------------#
@@ -554,6 +562,7 @@ then
   transfer_amount=$(echo "scale=4; ( $total_reward / 100 ) * $auto_transfer_percent" | bc )
   transferoutput=$(remcli -u https://remchain.remme.io transfer $accountname $auto_transfer_account "$transfer_amount REM" -x 120 -p $accountname@$transfer_permission -f 2>&1)
   if [[ ! "$transferoutput" =~ "executed transaction" ]]; then transfer_failed=true; fi
+  transfer_amountusd=$(echo "$transfer_amount * $getremprice" | bc | awk '{printf "%.2f",$1}')
 fi
 
 #----------------------------------------------------------------------------------------------------#
@@ -570,6 +579,7 @@ then
   fi
   restakingoutput=$(remcli -u https://remchain.remme.io system delegatebw $accountname $accountname "$restake_reward REM" -x 120 -p $accountname@$stake_permission -f 2>&1)
   if [[ ! "$restakingoutput" =~ "executed transaction" ]]; then restaking_failed=true; fi
+  restake_rewardusd=$(echo "$restake_reward * $getremprice" | bc | awk '{printf "%.2f",$1}')
 fi
 
 #----------------------------------------------------------------------------------------------------#
@@ -582,7 +592,8 @@ then
 Daily Summary
 --------------------------------------
 Date: $(date +"%d-%m-%Y")
-Name: "${accountname^}""
+Name: "${accountname^}"
+REM Price: $getremprice USD"
   if $auto_reward_alert
   then
     if $reward_failed
@@ -592,7 +603,7 @@ Claimed Rewards: Failed"
       send_message=true
     else
       telegram_message="$telegram_message
-Claimed Rewards: $total_reward REM"
+Claimed Rewards: $total_reward REM | $"$total_rewardusd" USD"
       send_message=true
     fi
   fi
@@ -605,7 +616,7 @@ Transfer Rewards: Failed"
       send_message=true
     else
       telegram_message="$telegram_message
-Transfer Rewards: $transfer_amount REM"
+Transfer Rewards: $transfer_amount REM | $"$transfer_amountusd" USD"
       send_message=true
     fi
   fi
@@ -618,7 +629,7 @@ Restaked Rewards: Failed"
       send_message=true
     else
       telegram_message="$telegram_message
-Restaked Rewards: $restake_reward REM"
+Restaked Rewards: $restake_reward REM | $"$restake_rewardusd" USD"
       send_message=true
     fi
   fi
