@@ -556,7 +556,7 @@ then
   rewardoutput=$(remcli -u https://remchain.remme.io system claimrewards $accountname -x 120 -p $accountname@$claim_permission -f 2>&1)
   if [[ ! "$rewardoutput" =~ "executed transaction" ]]; then reward_failed=true; fi
   after=$(remcli -u https://remchain.remme.io get currency balance rem.token $accountname | awk '{print $1}')
-  total_reward=$(echo "$after - $previous"|bc)
+  total_reward=$(echo "$after - $previous" |bc)
   total_rewardusd=$(echo "$total_reward * $getremprice" | bc | awk '{printf "%.2f",$1}')
 fi
 
