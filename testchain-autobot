@@ -419,6 +419,13 @@ else
     if [ "$global_value" = "true" ]
     then
       auto_transfer=true
+      if get_config_value transfer_permission
+      then
+        transfer_permission="$global_value"
+      else
+        echo "ERROR: transfer_permission must be set when using auto_transfer"
+	exit 1
+      fi
       if get_config_value auto_transfer_account
       then
         auto_transfer_account="$global_value"
