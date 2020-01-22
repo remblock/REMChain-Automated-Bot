@@ -566,7 +566,7 @@ fi
 
 if $auto_transfer
 then
-  transfer_amount=$(echo "scale=4; ( $total_reward / 100 ) * $auto_transfer_percent" | bc )
+  transfer_amount=$(echo "scale=4; $total_reward * $auto_transfer_percent / 100" | bc )
   transferoutput=$(remcli -u https://testchain.remme.io transfer $accountname $auto_transfer_account "$transfer_amount REM" -x 120 -p $accountname@$transfer_permission -f 2>&1)
   if [[ ! "$transferoutput" =~ "executed transaction" ]]; then transfer_failed=true; fi
   transfer_amountusd=$(echo "$transfer_amount * $getremprice" | bc | awk '{printf "%.2f",$1}')
@@ -582,7 +582,7 @@ then
   then
     restake_reward="$total_reward"
   else
-    restake_reward=$(echo "scale=4; ( $total_reward / 100 ) * $restakingpercentage" | bc )
+    restake_reward=$(echo "scale=4; $total_reward * $restakingpercentage / 100" | bc )
   fi
   restakingoutput=$(remcli -u https://testchain.remme.io system delegatebw $accountname $accountname "$restake_reward REM" -x 120 -p $accountname@$stake_permission -f 2>&1)
   if [[ ! "$restakingoutput" =~ "executed transaction" ]]; then restaking_failed=true; fi
