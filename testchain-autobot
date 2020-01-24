@@ -556,7 +556,9 @@ then
   rewardoutput=$(remcli -u https://testchain.remme.io system claimrewards $accountname -x 120 -p $accountname@$claim_permission -f 2>&1)
   if [[ ! "$rewardoutput" =~ "executed transaction" ]]; then reward_failed=true; fi
   after=$(remcli -u https://testchain.remme.io get currency balance rem.token $accountname | awk '{print $1}')
-  total_reward=$(echo "$after - $previous" | bc)
+  sleep 120
+  total_reward=$(echo "scale=4; $after - $previous" | bc)
+  claimamount=$(echo "$total_reward" | awk '{print ($0-int($0)<0.499)?int($0):int($0)+1}')
   total_rewardusd=$(echo "$total_reward * $getremprice" | bc | awk '{printf "%.2f",$1}')
 fi
 
@@ -569,6 +571,7 @@ then
   transfer_amount=$(echo "scale=4; $total_reward * $auto_transfer_percent / 100" | bc )
   transferoutput=$(remcli -u https://testchain.remme.io transfer $accountname $auto_transfer_account "$transfer_amount REM" -x 120 -p $accountname@$transfer_permission -f 2>&1)
   if [[ ! "$transferoutput" =~ "executed transaction" ]]; then transfer_failed=true; fi
+  transferamount=$(echo "$transfer_amount" | awk '{print ($0-int($0)<0.499)?int($0):int($0)+1}')
   transfer_amountusd=$(echo "$transfer_amount * $getremprice" | bc | awk '{printf "%.2f",$1}')
 fi
 
@@ -586,6 +589,7 @@ then
   fi
   restakingoutput=$(remcli -u https://testchain.remme.io system delegatebw $accountname $accountname "$restake_reward REM" -x 120 -p $accountname@$stake_permission -f 2>&1)
   if [[ ! "$restakingoutput" =~ "executed transaction" ]]; then restaking_failed=true; fi
+  restakeamount=$(echo "$restake_reward" | awk '{print ($0-int($0)<0.499)?int($0):int($0)+1}')
   restake_rewardusd=$(echo "$restake_reward * $getremprice" | bc | awk '{printf "%.2f",$1}')
 fi
 
@@ -610,7 +614,7 @@ Claimed Rewards: Failed"
       send_message=true
     else
       telegram_message="$telegram_message
-Claimed Rewards: $total_reward REM | $"$total_rewardusd" USD"
+Claimed Rewards: $claimamount REM | $"$total_rewardusd" USD"
       send_message=true
     fi
   fi
@@ -623,7 +627,7 @@ Transfer Rewards: Failed"
       send_message=true
     else
       telegram_message="$telegram_message
-Transfer Rewards: $transfer_amount REM | $"$transfer_amountusd" USD"
+Transfer Rewards: $transferamount REM | $"$transfer_amountusd" USD"
       send_message=true
     fi
   fi
@@ -636,7 +640,7 @@ Restaked Rewards: Failed"
       send_message=true
     else
       telegram_message="$telegram_message
-Restaked Rewards: $restake_reward REM | $"$restake_rewardusd" USD"
+Restaked Rewards: $restakeamount REM | $"$restake_rewardusd" USD"
       send_message=true
     fi
   fi
@@ -660,10 +664,6 @@ Voted Block Producers: $bpaccountnames"
 
   if $send_message
   then
-    if $at
-    then
-      sleep 2
-    fi
     curl -s -X POST https://api.telegram.org/bot$telegram_token/sendMessage -d chat_id=$telegram_chatid -d text="$telegram_message" &>/dev/null
   fi
 fi
