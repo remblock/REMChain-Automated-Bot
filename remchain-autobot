@@ -604,8 +604,8 @@ then
 Daily Summary
 --------------------------------------
 Date: $(date +"%d-%m-%Y")
-Name: "${accountname^}"
-REM Price: $getremprice USD"
+REM Price: $getremprice USD
+Producer Name: "${accountname^}""
   if $auto_reward_alert
   then
     if $reward_failed
