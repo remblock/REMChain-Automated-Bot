@@ -600,6 +600,7 @@ fi
 if [ ! -z "$telegram_chatid" ]
 then
   telegram_message="
+--------------------------------------
 Daily Summary
 --------------------------------------
 Date: $(date +"%d-%m-%Y")
@@ -610,24 +611,17 @@ REM Price: $getremprice USD"
     if $reward_failed
     then
       telegram_message="$telegram_message
-Claimed Rewards: Failed"
+--------------------------------------
+Claimed Rewards
+--------------------------------------
+Failed"
       send_message=true
     else
       telegram_message="$telegram_message
-Claimed Rewards: $claimamount REM | $"$total_rewardusd" USD"
-      send_message=true
-    fi
-  fi
-  if $auto_transfer_alert
-  then
-    if $transfer_failed
-    then
-      telegram_message="$telegram_message
-Transfer Rewards: Failed"
-      send_message=true
-    else
-      telegram_message="$telegram_message
-Transfer Rewards: $transferamount REM | $"$transfer_amountusd" USD"
+--------------------------------------
+Claimed Rewards
+--------------------------------------
+$claimamount REM | $"$total_rewardusd" USD"
       send_message=true
     fi
   fi
@@ -636,11 +630,36 @@ Transfer Rewards: $transferamount REM | $"$transfer_amountusd" USD"
     if $restaking_failed
     then
       telegram_message="$telegram_message
-Restaked Rewards: Failed"
+--------------------------------------
+Restaked Rewards
+--------------------------------------
+Failed"
       send_message=true
     else
       telegram_message="$telegram_message
-Restaked Rewards: $restakeamount REM | $"$restake_rewardusd" USD"
+--------------------------------------
+Restaked Rewards
+--------------------------------------
+$restakeamount REM | $"$restake_rewardusd" USD"
+      send_message=true
+    fi
+  fi
+  if $auto_transfer_alert
+  then
+    if $transfer_failed
+    then
+      telegram_message="$telegram_message
+--------------------------------------
+Transferred Rewards
+--------------------------------------
+Failed"
+      send_message=true
+    else
+      telegram_message="$telegram_message
+--------------------------------------
+Transferred Rewards
+--------------------------------------
+$transferamount REM | $"$transfer_amountusd" USD"
       send_message=true
     fi
   fi
@@ -649,11 +668,17 @@ Restaked Rewards: $restakeamount REM | $"$restake_rewardusd" USD"
     if $vote_failed
     then
       telegram_message="$telegram_message
-Voted Block Producers: Failed"
+--------------------------------------
+Voted Block Producers
+--------------------------------------
+Failed"
       send_message=true
     else
       telegram_message="$telegram_message
-Voted Block Producers: $bpaccountnames"
+--------------------------------------
+Voted Block Producers
+--------------------------------------
+$bpaccountnames"
       send_message=true
     fi
   fi
