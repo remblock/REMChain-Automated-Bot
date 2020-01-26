@@ -149,27 +149,42 @@ else
   then
     exit 2
   fi
-  echo
-  read -p "YOUR ACCOUNT NAME: " -e accountname
+  accountname=$(cat config/config.ini | grep 'producer-name' | awk '{print $3}')
+  if [ ! -z "$accountname" ]
+  then
+    echo "accountname=$accountname" >> "$config_file"
+  fi
+fi
+if [ -z "$accountname" ]
+then
+  echo ""
+  read -p "ENTER YOUR ACCOUNT NAME: " -e accountname
   echo "accountname=$accountname" >> "$config_file"
-  echo
 fi
 
 #----------------------------------------------------------------------------------------------------#
 # ASK USER FOR THEIR WALLET PASSWORD OR TAKE IT FROM THE CONFIG FILE                                 #
 #----------------------------------------------------------------------------------------------------#
 
-if get_config_value walletpassword
+if get_config_value walletpass
 then
-  walletpassword="$global_value"
+  walletpass="$global_value"
 else
   if $at
   then
     exit 2
   fi
-  read -p "YOUR WALLET PASSWORD: " -e walletpassword
-  echo "walletpassword=$walletpassword" >> "$config_file"
-  echo
+  walletpass=$(cat walletpass)
+  if [ ! -z "$walletpass" ]
+  then
+    echo "walletpass=$walletpass" >> "$config_file"
+  fi
+fi
+if [ -z "$walletpass" ]
+then
+  echo ""
+  read -p "ENTER YOUR WALLET PASSWORD: " -e walletpass
+  echo "walletpass=$walletpass" >> "$config_file"
 fi
 
 #----------------------------------------------------------------------------------------------------#
@@ -527,7 +542,7 @@ fi
 # REMCLI COMMANDS FOR UNLOCKING YOUR WALLET                                                          #
 #----------------------------------------------------------------------------------------------------#
 
-output=$(remcli wallet unlock --password $walletpassword > /dev/null 2>&1)
+output=$(remcli wallet unlock --password $walletpass > /dev/null 2>&1)
 
 #----------------------------------------------------------------------------------------------------#
 # REMCLI COMMAND FOR OBTAINING TOKEN PRICE                                                           #
