@@ -626,7 +626,6 @@ Account Name: "${accountname^}""
     if $reward_failed
     then
       telegram_message="$telegram_message
-
 --------------------------------------
 Claimed Rewards
 --------------------------------------
@@ -634,7 +633,6 @@ Failed"
       send_message=true
     else
       telegram_message="$telegram_message
-
 --------------------------------------
 Claimed Rewards
 --------------------------------------
@@ -647,7 +645,6 @@ $claimamount REM | $"$total_rewardusd" USD"
     if $restaking_failed
     then
       telegram_message="$telegram_message
-
 --------------------------------------
 Restaked Rewards
 --------------------------------------
@@ -655,7 +652,6 @@ Failed"
       send_message=true
     else
       telegram_message="$telegram_message
-
 --------------------------------------
 Restaked Rewards
 --------------------------------------
@@ -668,7 +664,6 @@ $restakeamount REM | $"$restake_rewardusd" USD"
     if $transfer_failed
     then
       telegram_message="$telegram_message
-
 --------------------------------------
 Transferred Rewards
 --------------------------------------
@@ -676,7 +671,6 @@ Failed"
       send_message=true
     else
       telegram_message="$telegram_message
-
 --------------------------------------
 Transferred Rewards
 --------------------------------------
@@ -689,7 +683,6 @@ $transferamount REM | $"$transfer_amountusd" USD"
     if $vote_failed
     then
       telegram_message="$telegram_message
-
 --------------------------------------
 Voted Block Producers
 --------------------------------------
@@ -697,7 +690,6 @@ Failed"
       send_message=true
     else
       telegram_message="$telegram_message
-
 --------------------------------------
 Voted Block Producers
 --------------------------------------
