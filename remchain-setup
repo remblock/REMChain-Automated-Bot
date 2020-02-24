@@ -17,6 +17,41 @@ sudo apt install ./remprotocol_0.4.0_amd64.deb
 
 wget https://remchain.remme.io/genesis.json
 
+#----------------------------------------------------------------------------------------------------
+# RESTORE FROM SNAPSHOT                                                                              
+#----------------------------------------------------------------------------------------------------
+
+sudo wget https://github.com/remblock/REMChain-Remote-Snapshots/raw/master/setup-remote-snapshot 
+sudo chmod u+x setup-remote-snapshot 
+sudo ./setup-remote-snapshot
+cd data
+cd snapshots
+sudo ./restore-remote-snapshot
+
+#----------------------------------------------------------------------------------------------------
+# GRACEFULLY STOP REMNODE                                                                            
+#----------------------------------------------------------------------------------------------------
+
+remnode_pid=$(pgrep remnode)
+
+if [ ! -z "$remnode_pid" ]; 
+then
+  if ps -p $remnode_pid > /dev/null; 
+  then
+    kill -SIGINT $remnode_pid
+  fi
+  while ps -p $remnode_pid > /dev/null; do
+    sleep 1
+  done
+fi
+
+#-----------------------------------------------------------------------------------------------------
+# RUN REMNODE IN THE BACKGROUND
+#-----------------------------------------------------------------------------------------------------
+
+remnode --config-dir ./config/ --data-dir ./data/ >> remnode.log 2>&1 &
+sleep 4
+
 #----------------------------------------------------------------------------------------------------#
 # RUNNING THE WALLET DAEMON                                                                          #
 #----------------------------------------------------------------------------------------------------#
@@ -85,6 +120,37 @@ printf "\n\n"
 remcli wallet lock > /dev/null 2>&1
 remcli wallet unlock --password=$walletpass > /dev/null 2>&1
 remcli wallet import --private-key=$guardianprivatekey
-rm remchain-setup
 
 printf "\n\n"
+
+#----------------------------------------------------------------------------------------------------#
+# SETUP GRACEFUL SHUTDOWN                                                                            #
+#----------------------------------------------------------------------------------------------------#
+
+echo '#!/bin/sh
+remnode_pid=$(pgrep remnode)
+if [ ! -z "$remnode_pid" ]; then
+if ps -p $remnode_pid > /dev/null; then
+kill -SIGINT $remnode_pid
+fi
+while ps -p $remnode_pid > /dev/null; do
+sleep 1
+done
+fi
+' > /root/node_shutdown.sh
+echo '[Unit]
+Description=Gracefully shut down remnode to avoid database dirty flag
+DefaultDependencies=no
+After=poweroff.target shutdown.target reboot.target halt.target kexec.target
+Requires=network-online.target network.target
+[Service]
+Type=oneshot
+ExecStop=/root/node_shutdown.sh
+RemainAfterExit=yes
+KillMode=none
+[Install]
+WantedBy=multi-user.target' > /etc/systemd/system/node_shutdown.service
+sudo chmod +x /root/node_shutdown.sh
+systemctl daemon-reload
+systemctl enable node_shutdown
+systemctl restart node_shutdown
