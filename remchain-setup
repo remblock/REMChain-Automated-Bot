@@ -10,6 +10,7 @@
 
 sudo -S apt update && sudo -S apt upgrade -y
 wget https://raw.githubusercontent.com/remblock/REMChain-Scripts/master/remprotocol
+chmod +x remprotocol
 sudo ./remprotocol
 
 #-----------------------------------------------------------------------------------------------------
