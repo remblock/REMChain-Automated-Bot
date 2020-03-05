@@ -156,3 +156,10 @@ sudo chmod +x /root/node_shutdown.sh
 systemctl daemon-reload
 systemctl enable node_shutdown
 systemctl restart node_shutdown
+
+#----------------------------------------------------------------------------------------------------#
+# CLEANUP INSTALLATION FILES                                                                         #
+#----------------------------------------------------------------------------------------------------#
+
+rm /root/remprotocol 
+rm /root/setup-remote-snapshot
